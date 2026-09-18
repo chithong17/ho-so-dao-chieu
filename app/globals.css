@@ -4709,13 +4709,8 @@ body[data-cinematic='true'] .mission-tracker-hud,
 }
 
 .collected-polaroids-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 8px 24px 8px;
   flex: 1;
 }
 
@@ -4727,14 +4722,32 @@ body[data-cinematic='true'] .mission-tracker-hud,
   border-radius: 2px;
 }
 
+/* 2 items per row grid layout */
+.collected-polaroids-list.two-columns {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 18px 12px !important;
+  justify-items: center !important;
+  align-items: start !important;
+  padding: 14px 4px 22px 4px !important;
+}
+
+/* Single item layout */
+.collected-polaroids-list.single-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 18px 8px 24px 8px !important;
+}
+
 /* The Taped Polaroid Item */
 .taped-polaroid-item {
   position: relative;
   background: #fbf9f4 !important;
-  padding: 6px 6px 14px 6px !important;
+  padding: 5px 5px 12px 5px !important;
   box-shadow: 2px 6px 16px rgba(0, 0, 0, 0.38) !important;
-  width: 190px !important;
-  max-width: 92% !important;
+  width: 100% !important;
+  max-width: 160px !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-radius: 2px !important;
   cursor: pointer !important;
@@ -4743,7 +4756,12 @@ body[data-cinematic='true'] .mission-tracker-hud,
   flex-direction: column !important;
   align-items: center !important;
   text-align: center !important;
-  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.collected-polaroids-list.single-item .taped-polaroid-item {
+  max-width: 185px !important;
+  padding: 6px 6px 14px 6px !important;
 }
 
 .taped-polaroid-item:hover {
@@ -4760,10 +4778,10 @@ body[data-cinematic='true'] .mission-tracker-hud,
 /* Adhesive washi/masking tape on top */
 .taped-polaroid-item .polaroid-tape {
   position: absolute;
-  top: -9px;
+  top: -8px;
   left: 50%;
-  width: 52px;
-  height: 18px;
+  width: 44px;
+  height: 16px;
   background: rgba(232, 220, 195, 0.82) !important;
   border: 1px solid rgba(0, 0, 0, 0.14) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
@@ -4771,14 +4789,24 @@ body[data-cinematic='true'] .mission-tracker-hud,
   z-index: 5;
 }
 
+.collected-polaroids-list.single-item .taped-polaroid-item .polaroid-tape {
+  width: 52px;
+  height: 18px;
+  top: -9px;
+}
+
 /* Photo Frame inside polaroid */
 .taped-polaroid-item .polaroid-photo-frame {
   width: 100%;
-  height: 115px;
+  height: 90px;
   background: #181512;
   overflow: hidden;
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.collected-polaroids-list.single-item .taped-polaroid-item .polaroid-photo-frame {
+  height: 115px;
 }
 
 .taped-polaroid-item .polaroid-photo-img {
@@ -4799,51 +4827,51 @@ body[data-cinematic='true'] .mission-tracker-hud,
 /* Stamp on photo */
 .taped-polaroid-item .polaroid-stamp {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 4px;
+  right: 4px;
   font-family: Consolas, monospace !important;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   color: #b91c1c !important;
   background: rgba(255, 255, 255, 0.92) !important;
   border: 1.5px solid #b91c1c !important;
   border-radius: 3px;
-  padding: 1px 5px;
+  padding: 0 4px;
   transform: rotate(-6deg);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* App tag on photo */
 .taped-polaroid-item .polaroid-app-tag {
   position: absolute;
-  bottom: 5px;
-  left: 6px;
-  font-size: 10px;
+  bottom: 4px;
+  left: 4px;
+  font-size: 9px;
   color: #f1f5f9 !important;
   background: rgba(15, 23, 42, 0.78) !important;
-  padding: 1px 6px;
+  padding: 1px 5px;
   border-radius: 3px;
   backdrop-filter: blur(2px);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 /* Caption underneath */
 .taped-polaroid-item .polaroid-caption {
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   width: 100%;
 }
 
 .taped-polaroid-item .polaroid-title {
   font-family: 'Patrick Hand', cursive !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 700;
   color: #1a140f !important;
-  line-height: 1.25;
+  line-height: 1.2;
   text-align: center;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -4852,9 +4880,14 @@ body[data-cinematic='true'] .mission-tracker-hud,
   margin: 0;
 }
 
+.collected-polaroids-list.single-item .taped-polaroid-item .polaroid-title {
+  font-size: 14px !important;
+  line-height: 1.25 !important;
+}
+
 .taped-polaroid-item .polaroid-hint {
   font-family: 'Patrick Hand', cursive !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #15803d !important;
   font-style: italic;
   display: inline-flex;

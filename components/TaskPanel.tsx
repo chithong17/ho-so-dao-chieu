@@ -66,7 +66,7 @@ export default function TaskPanel(){
         <FileText size={15}/>
         <span>CHỨNG CỨ ĐÃ THU THẬP ({collectedEvidence.length}/{task.evidence.length})</span>
       </div>
-      <div className="collected-polaroids-list custom-scroll">
+      <div className={`collected-polaroids-list ${collectedEvidence.length === 1 ? 'single-item' : 'two-columns'} custom-scroll`}>
         {collectedEvidence.map((ev, i) => {
           const rotationAngle = i % 2 === 0 ? -2.5 : 2;
           const tapeAngle = i % 2 === 0 ? 3 : -2.5;
