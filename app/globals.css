@@ -5361,7 +5361,7 @@ body[data-cinematic='true'] .mission-tracker-hud,
   content: "";
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: var(--arrow-left, 50%);
   margin-left: -5px;
   border-width: 6px 5px 0 5px;
   border-style: solid;
@@ -5373,8 +5373,8 @@ body[data-cinematic='true'] .mission-tracker-hud,
   transform: translateX(0) translateY(4px);
 }
 .info-tooltip-bubble.align-left::after {
-  left: 12px;
-  margin-left: 0;
+  left: var(--arrow-left, 12px);
+  margin-left: -5px;
 }
 
 .info-tooltip-bubble.align-right {
@@ -5383,9 +5383,9 @@ body[data-cinematic='true'] .mission-tracker-hud,
   transform: translateX(0) translateY(4px);
 }
 .info-tooltip-bubble.align-right::after {
-  left: auto;
-  right: 12px;
-  margin-left: 0;
+  left: var(--arrow-left, auto);
+  right: var(--arrow-right, 12px);
+  margin-left: -5px;
 }
 
 .info-tooltip-wrap:hover .info-tooltip-bubble,
