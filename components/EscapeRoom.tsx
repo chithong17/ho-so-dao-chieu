@@ -25,6 +25,19 @@ function CinematicIntro({ onComplete }: { onComplete: () => void }) {
   ];
 
   React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.dataset.cinematic = 'true';
+      window.dispatchEvent(new CustomEvent('hsdc-cinematic', { detail: true }));
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        delete document.body.dataset.cinematic;
+        window.dispatchEvent(new CustomEvent('hsdc-cinematic', { detail: false }));
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
     if (slide >= slides.length) {
       const t = setTimeout(onComplete, 1500);
       return () => clearTimeout(t);

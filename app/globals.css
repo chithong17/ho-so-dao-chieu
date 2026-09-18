@@ -3873,6 +3873,19 @@ dialog.ui-files .inner-content {
   opacity: 0;
   pointer-events: none;
 }
+
+/* Hide persistent notebook HUD and mission tracker during cinematic scenes */
+body:has(.cinematic-overlay) .case-notebook-hud,
+body:has(.cinematic-overlay) .mission-tracker-hud,
+body[data-cinematic='true'] .case-notebook-hud,
+body[data-cinematic='true'] .mission-tracker-hud,
+.game-root:has(.cinematic-overlay) .case-notebook-hud,
+.game-root:has(.cinematic-overlay) .mission-tracker-hud {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
 .cinematic-slide {
   box-shadow: inset 0 0 250px 100px rgba(0, 0, 0, 0.9);
   position: absolute;
@@ -4206,3 +4219,461 @@ dialog.ui-files .inner-content {
   text-shadow: 0 0 6px rgba(85, 255, 85, 0.6) !important;
   font-weight: 500 !important;
 }
+
+/* ===================================================
+   CASE NOTEBOOK HUD / IN-GAME COLLECTIBLE OVERLAY
+   =================================================== */
+.case-notebook-hud {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 130px;
+  height: auto;
+  z-index: 95;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: manipulation;
+  /* Default state: slightly subdued, blending into dark detective atmosphere with ambient depth */
+  transform: translateY(0) scale(1);
+  filter: brightness(0.92) contrast(1.04) drop-shadow(0 8px 18px rgba(0, 0, 0, 0.72));
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), filter 0.25s ease;
+}
+
+.case-notebook-hud:focus-visible {
+  outline: 2px solid var(--gold-light, #ffd580) !important;
+  outline-offset: 4px !important;
+  border-radius: 6px;
+}
+
+/* Hover: soft warm amber/golden glow, slight scale-up and upward lift */
+.case-notebook-hud:hover {
+  filter: brightness(1.18) drop-shadow(0 0 16px rgba(217, 164, 65, 0.46)) drop-shadow(0 10px 24px rgba(0, 0, 0, 0.8)) !important;
+  transform: translateY(-3px) scale(1.06) !important;
+}
+
+.case-notebook-hud:active {
+  transform: translateY(-1px) scale(1.02) !important;
+  filter: brightness(1.1) drop-shadow(0 0 10px rgba(217, 164, 65, 0.35)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.65)) !important;
+}
+
+.case-notebook-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1024 / 1536;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .case-notebook-hud {
+    bottom: 24px;
+    right: 24px;
+    width: 115px;
+  }
+}
+
+@media (max-width: 768px) {
+  .case-notebook-hud {
+    bottom: 74px; /* Sits comfortably above mobile navigation bar */
+    right: 18px;
+    width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .case-notebook-hud {
+    bottom: 70px;
+    right: 14px;
+    width: 78px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-notebook-hud {
+    transition: none !important;
+  }
+  .case-notebook-hud:hover {
+    transform: none !important;
+  }
+}
+
+[data-motion="reduce"] .case-notebook-hud {
+  transition: none !important;
+  transform: none !important;
+}
+
+/* ===================================================
+   COLLECT MISSION BUTTON IN NOTEBOOK
+   =================================================== */
+.modal-overlay.point-and-click dialog.ui-notebook .related-evidence .collect-mission-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-left: 10px !important;
+  padding: 6px 14px !important;
+  min-height: 34px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  background: rgba(184, 134, 45, 0.18) !important;
+  color: #433017 !important;
+  border: 1px solid rgba(138, 97, 43, 0.65) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-overlay.point-and-click dialog.ui-notebook .related-evidence .collect-mission-btn:hover {
+  background: rgba(184, 134, 45, 0.32) !important;
+  border-color: rgba(138, 97, 43, 0.95) !important;
+  box-shadow: 0 2px 8px rgba(180, 130, 40, 0.28) !important;
+  transform: translateY(-1px) !important;
+}
+
+.modal-overlay.point-and-click dialog.ui-notebook .related-evidence .collect-mission-btn.active {
+  background: rgba(46, 125, 78, 0.2) !important;
+  color: #123d21 !important;
+  border: 1px solid rgba(46, 125, 78, 0.75) !important;
+  box-shadow: 0 0 8px rgba(46, 125, 78, 0.22) !important;
+}
+
+.modal-overlay.point-and-click dialog.ui-notebook .related-evidence .collect-mission-btn.active:hover {
+  background: rgba(46, 125, 78, 0.32) !important;
+}
+
+/* ===================================================
+   MISSION TRACKER HUD (BOTTOM-LEFT CORNER)
+   =================================================== */
+@keyframes missionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mission-tracker-hud {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  width: 330px;
+  max-width: calc(100vw - 40px);
+  z-index: 95;
+  background: rgba(16, 23, 31, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(217, 164, 65, 0.4);
+  border-radius: 9px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.8), 0 0 18px rgba(217, 164, 65, 0.12);
+  color: #d1dbe2;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: hidden;
+  animation: missionSlideIn 0.28s cubic-bezier(0.2, 0, 0.2, 1);
+  user-select: none;
+}
+
+.mission-tracker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(10, 15, 21, 0.75);
+  border-bottom: 1px solid rgba(217, 164, 65, 0.22);
+}
+
+.mission-tracker-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  min-width: 0;
+  flex: 1;
+}
+
+.mission-tracker-title:hover strong {
+  color: #ffd88a;
+}
+
+.mission-icon {
+  color: var(--gold, #d9a441);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mission-title-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.mission-title-text strong {
+  font: 10px Consolas, monospace;
+  letter-spacing: 1.2px;
+  color: var(--gold-light, #eed08d);
+  display: block;
+  text-transform: uppercase;
+}
+
+.mission-title-text small {
+  font-size: 11px;
+  color: #9bb0c1;
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.mission-tracker-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.mission-btn-icon {
+  width: 26px;
+  height: 26px;
+  min-height: 26px;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #8da4b7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mission-btn-icon:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.mission-tracker-body {
+  padding: 10px 14px 14px;
+}
+
+.mission-progress-bar {
+  margin-bottom: 11px;
+}
+
+.mission-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: #8da3b5;
+  margin-bottom: 5px;
+}
+
+.mission-progress-label strong {
+  font-family: Consolas, monospace;
+  color: var(--gold, #d9a441);
+}
+
+.mission-progress-label strong.all-found {
+  color: #55ff55;
+}
+
+.mission-progress-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.mission-progress-fill {
+  height: 100%;
+  background: var(--gold, #d9a441);
+  border-radius: 99px;
+  transition: width 0.35s ease, background-color 0.35s ease;
+}
+
+.mission-progress-fill.complete {
+  background: #55ff55;
+  box-shadow: 0 0 8px rgba(85, 255, 85, 0.6);
+}
+
+.mission-evidence-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.mission-evidence-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.18s ease;
+  cursor: default;
+}
+
+.mission-evidence-item.locked {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.mission-evidence-item.found {
+  background: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.22);
+  cursor: pointer;
+}
+
+.mission-evidence-item.found:hover {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.4);
+  transform: translateX(2px);
+}
+
+.mission-item-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tick-icon.pending {
+  color: rgba(217, 164, 65, 0.4);
+}
+
+.tick-icon.found {
+  color: #22c55e;
+  filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.55));
+}
+
+.mission-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mission-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.mission-item-badge {
+  font: 10.5px Consolas, monospace;
+  font-weight: 700;
+  color: var(--gold, #d9a441);
+  background: rgba(217, 164, 65, 0.12);
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.mission-evidence-item.found .mission-item-badge {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.mission-item-name {
+  font-size: 12px;
+  color: #c9d5df;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.mission-evidence-item.found .mission-item-name {
+  color: #e2fbe8;
+}
+
+.badge-location {
+  margin-left: auto;
+  font-size: 9.5px;
+  color: #94a3b8;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  line-height: 1.2;
+}
+
+.mission-complete-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  margin-top: 10px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  border-radius: 5px;
+  color: #4ade80;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Minimized pill */
+.mission-tracker-hud.minimized {
+  width: auto;
+  padding: 0;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
+.mission-tracker-hud.minimized .mission-tracker-header {
+  border-bottom: none;
+  padding: 6px 12px;
+  gap: 8px;
+}
+
+.mission-tracker-hud.minimized .mission-title-text small {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mission-tracker-hud {
+    bottom: 74px;
+    left: 16px;
+    width: 255px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mission-tracker-hud {
+    bottom: 70px;
+    left: 12px;
+    width: 220px;
+  }
+}
+
+

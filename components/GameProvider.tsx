@@ -1,27 +1,99 @@
 'use client';
 import {createContext,useContext,useReducer,useEffect,useRef,useState,useCallback,type ReactNode,type Dispatch} from 'react';
-import {createState,reduceGame,validateSave} from '../game/engine';
-import type {Action,GameState,Mode} from '../game/types';
-const key=(m:Mode)=>`hsdc:save:${m}:v1`;
-type Context={state:GameState;dispatch:Dispatch<Action>;ready:boolean;saveStatus:string;conflict:boolean;resolveConflict:()=>void;enter:(m:Mode,fresh?:boolean)=>void;home:boolean;setHome:(v:boolean)=>void;paused:boolean;setPaused:(v:boolean)=>void;reduced:boolean;setReduced:(v:boolean)=>void};
+import {createState,reduceGame} from '../game/engine';
+import {getConfig} from '../game/config';
+import {initialSelection,readSave,saveKey} from '../game/storage';
+import type {Action,GameState,Mode,Difficulty} from '../game/types';
+export type TrackedMission = {
+  taskId: string;
+  taskTitle: string;
+  evidenceIds: string[];
+  foundEvidenceIds: string[];
+} | null;
+
+type Context={state:GameState;config:ReturnType<typeof getConfig>;dispatch:Dispatch<Action>;ready:boolean;saveStatus:string;conflict:boolean;resolveConflict:()=>void;enter:(m:Mode,fresh?:boolean,difficulty?:Difficulty)=>void;home:boolean;setHome:(v:boolean)=>void;paused:boolean;setPaused:(v:boolean)=>void;reduced:boolean;setReduced:(v:boolean)=>void;trackedMission:TrackedMission;setTrackedMission:React.Dispatch<React.SetStateAction<TrackedMission>>};
 const GameContext=createContext<Context|null>(null);
 export function GameProvider({children}:{children:ReactNode}){
  const [state,dispatch]=useReducer(reduceGame,undefined,()=>createState());
  const [ready,setReady]=useState(false),[saveStatus,setSaveStatus]=useState('Đang mở hồ sơ…'),[conflict,setConflict]=useState(false),[home,setHome]=useState(false),[paused,setPaused]=useState(false),[reduced,setReduced]=useState(false);
- const lastRaw=useRef<string|null>(null),lastRevision=useRef(-1),pending=useRef<GameState|null>(null);
- const read=useCallback((m:Mode)=>{try{const raw=localStorage.getItem(key(m));lastRaw.current=raw;if(!raw)return null;const v=validateSave(JSON.parse(raw));if(v.error){setSaveStatus(v.error);setConflict(true);return null;}if(v.state?.mode!==m){setSaveStatus('Chế độ trong bản lưu không khớp. Hãy bắt đầu lượt mới.');setConflict(true);return null;}return v.state;}catch{setSaveStatus('Không đọc được bản lưu. Lượt mới vẫn có thể chơi trên thiết bị này.');setConflict(true);return null;}},[]);
- // A hydration effect reads this device's storage only after server rendering.
- // eslint-disable-next-line react-hooks/set-state-in-effect
- useEffect(()=>{let m:Mode='individual';try{const settings=JSON.parse(localStorage.getItem('hsdc:settings:v1')??'{}');m=settings.mode==='presenter'?'presenter':'individual';setReduced(settings.reduced===true);}catch{/* preferences are optional */}const s=read(m);dispatch({type:'load',state:s??createState(m)});lastRevision.current=s?.revision??0;if(s)setSaveStatus('Đã khôi phục tiến trình');else if(!lastRaw.current)setSaveStatus('Tiến trình lưu trên thiết bị');setReady(true);},[read]);
- useEffect(()=>{if(!ready||conflict||state.revision===lastRevision.current)return;
- const flush=()=>{try{if(localStorage.getItem(key(state.mode))!==lastRaw.current){setConflict(true);setSaveStatus('Một tab khác vừa cập nhật tiến trình.');return;}const raw=JSON.stringify(state);localStorage.setItem(key(state.mode),raw);lastRaw.current=raw;lastRevision.current=state.revision;pending.current=null;setSaveStatus('Đã lưu trên thiết bị');}catch{setSaveStatus('Không lưu được; bạn vẫn có thể tiếp tục chơi trong tab này.');}};
- pending.current=state;const timer=setTimeout(flush,250);window.addEventListener('pagehide',flush);return()=>{clearTimeout(timer);window.removeEventListener('pagehide',flush);};
- },[state,ready,conflict]);
- useEffect(()=>{const onStorage=(e:StorageEvent)=>{if(e.key===key(state.mode)&&e.newValue!==lastRaw.current){setConflict(true);setSaveStatus('Tiến trình đã thay đổi trong tab khác.');}};window.addEventListener('storage',onStorage);return()=>window.removeEventListener('storage',onStorage);},[state.mode]);
+ const [trackedMission,setTrackedMission]=useState<TrackedMission>(null);
+
+ const customDispatch: Dispatch<Action> = useCallback((action: Action) => {
+  if (action.type === 'evidence') {
+   setTrackedMission(prev => {
+    if (!prev) return null;
+    if (prev.evidenceIds.includes(action.id) && !prev.foundEvidenceIds.includes(action.id)) {
+     return {
+      ...prev,
+      foundEvidenceIds: [...prev.foundEvidenceIds, action.id],
+     };
+    }
+    return prev;
+   });
+  }
+  dispatch(action);
+ }, []);
+ const lastRaw=useRef<string|null>(null),lastRevision=useRef(0),pending=useRef<GameState|null>(null);
+ const blocked=useRef(false);
+ const read=useCallback((m:Mode,d:Difficulty)=>{
+  try {
+   const result=readSave(localStorage,m,d);
+   lastRaw.current=result.raw;blocked.current=!!result.error;setConflict(!!result.error);
+   setSaveStatus(result.error??(result.state?'Đã khôi phục tiến trình':'Tiến trình lưu trên thiết bị'));
+   return result.state;
+  } catch {blocked.current=true;setConflict(true);setSaveStatus('Không đọc được bản lưu. Lưu đang tạm dừng.');return null;}
+ },[]);
+ const flush=useCallback(()=>{
+  const next=pending.current;
+  if(!next||blocked.current)return;
+  try {
+   const key=saveKey(next.mode,next.difficulty);
+   if(localStorage.getItem(key)!==lastRaw.current){blocked.current=true;setConflict(true);setSaveStatus('Một tab khác vừa cập nhật tiến trình.');return;}
+   const raw=JSON.stringify(next);localStorage.setItem(key,raw);lastRaw.current=raw;lastRevision.current=next.revision;pending.current=null;setSaveStatus('Đã lưu trên thiết bị');
+  }catch{setSaveStatus('Không lưu được; bạn vẫn có thể tiếp tục chơi trong tab này.');}
+ },[]);
+ useEffect(()=>{
+  let selection:{mode:Mode;difficulty:Difficulty;reduced:boolean}={mode:'individual',difficulty:'easy',reduced:false};
+  try{selection=initialSelection(localStorage);}catch{/* read below reports unavailable storage */}
+  setReduced(selection.reduced);
+  const saved=read(selection.mode,selection.difficulty);
+  if(saved&&Array.isArray(saved.opened)&&Object.keys(saved.answers??{}).length===0&&!saved.opened.includes('EZ02')&&!saved.opened.includes('E03')){
+   saved.opened=saved.opened.filter(id=>id!=='EZ01'&&id!=='E01'&&id!=='E02');
+  }
+  dispatch({type:'load',state:saved??createState(selection.mode,selection.difficulty)});
+  lastRevision.current=saved?.revision??0;setReady(true);
+ },[read]);
+ useEffect(()=>{
+  if(!ready||conflict||state.revision===lastRevision.current)return;
+  pending.current=state;
+  const timer=setTimeout(flush,250);window.addEventListener('pagehide',flush);
+  return()=>{clearTimeout(timer);window.removeEventListener('pagehide',flush);};
+ },[state,ready,conflict,flush]);
+ useEffect(()=>{
+  const onStorage=(e:StorageEvent)=>{
+   if((e.key===null||e.key===saveKey(state.mode,state.difficulty))&&e.newValue!==lastRaw.current){blocked.current=true;setConflict(true);setSaveStatus('Tiến trình đã thay đổi trong tab khác.');}
+  };
+  window.addEventListener('storage',onStorage);return()=>window.removeEventListener('storage',onStorage);
+ },[state.mode,state.difficulty]);
  useEffect(()=>{if(!ready||paused||home||conflict)return;const timer=setInterval(()=>{if(document.visibilityState==='visible')dispatch({type:'tick',seconds:5});},5000);return()=>clearInterval(timer);},[ready,paused,home,conflict]);
- useEffect(()=>{if(!ready)return;document.documentElement.dataset.motion=reduced?'reduce':'normal';try{localStorage.setItem('hsdc:settings:v1',JSON.stringify({mode:state.mode,reduced}));}catch{/* game remains usable */}},[ready,state.mode,reduced]);
- const enter=(m:Mode,fresh=false)=>{setConflict(false);pending.current=null;const s=fresh?null:read(m);const next=s??createState(m);if(fresh){try{const raw=JSON.stringify(next);localStorage.setItem(key(m),raw);lastRaw.current=raw;setSaveStatus('Đã bắt đầu lượt mới');}catch{setSaveStatus('Chơi trong bộ nhớ; chưa lưu được trên thiết bị.');lastRaw.current=null;}}lastRevision.current=next.revision;dispatch({type:'load',state:next});setHome(false);setPaused(false);};
- const resolveConflict=()=>{setConflict(false);const s=read(state.mode);if(s){dispatch({type:'load',state:s});lastRevision.current=s.revision;setSaveStatus('Đã tải tiến trình mới nhất');}};
- return <GameContext.Provider value={{state,dispatch,ready,saveStatus,conflict,resolveConflict,enter,home,setHome,paused,setPaused,reduced,setReduced}}>{children}</GameContext.Provider>;
+ useEffect(()=>{if(!ready)return;document.documentElement.dataset.motion=reduced?'reduce':'normal';try{localStorage.setItem('hsdc:settings:v1',JSON.stringify({mode:state.mode,difficulty:state.difficulty,reduced}));}catch{/* optional preferences */}},[ready,state.mode,state.difficulty,reduced]);
+ const enter=(m:Mode,fresh=false,difficulty:Difficulty=state.difficulty)=>{
+  // Flush outgoing changes before switching slots, including the debounce window.
+  if(!(fresh&&m===state.mode&&difficulty===state.difficulty)){
+   if(state.revision!==lastRevision.current)pending.current=state;
+   flush();
+  }
+  pending.current=null;
+  const saved=fresh?null:read(m,difficulty);
+  const next=saved??createState(m,difficulty);
+  if(fresh){
+   blocked.current=false;setConflict(false);
+   try{const raw=JSON.stringify(next);localStorage.setItem(saveKey(m,difficulty),raw);lastRaw.current=raw;setSaveStatus('Đã bắt đầu lượt mới');}
+   catch{lastRaw.current=null;setSaveStatus('Chơi trong bộ nhớ; chưa lưu được trên thiết bị.');}
+  }
+  lastRevision.current=next.revision;dispatch({type:'load',state:next});setHome(false);setPaused(false);setTrackedMission(null);
+ };
+ const resolveConflict=()=>{const saved=read(state.mode,state.difficulty);if(saved){pending.current=null;dispatch({type:'load',state:saved});lastRevision.current=saved.revision;setSaveStatus('Đã tải tiến trình mới nhất');}};
+ return <GameContext.Provider value={{state,config:getConfig(state.difficulty),dispatch:customDispatch,ready,saveStatus,conflict,resolveConflict,enter,home,setHome,paused,setPaused,reduced,setReduced,trackedMission,setTrackedMission}}>{children}</GameContext.Provider>;
 }
 export function useGame(){const c=useContext(GameContext);if(!c)throw new Error('GameProvider missing');return c;}

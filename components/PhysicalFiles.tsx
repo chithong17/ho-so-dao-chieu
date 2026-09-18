@@ -1,17 +1,13 @@
 import React from 'react';
 import { useGame } from './GameProvider';
-import { evidence } from '../game/evidence';
+
 import { Search, FileText } from 'lucide-react';
 
 export default function PhysicalFiles({ query, setQuery, choose }: { query: string, setQuery: (q:string)=>void, choose: (id:string)=>void }) {
-  const { state } = useGame();
+  const { state, config } = useGame();
+  const {evidence,sources:evidenceSources}=config;
   
   
-  const evidenceSources: Record<string, string> = {
-    E01:'phone',E02:'files',E03:'laptop',E04:'laptop',E05:'laptop',E06:'laptop',E07:'phone',E08:'files',E09:'files',E10:'files',
-    E11:'board',E12:'board',E13:'phone',E14:'board',E15:'board',E16:'board',E17:'phone'
-  };
-
   const fileEvidence = evidence.filter(e => evidenceSources[e.id] === 'files' && e.chapter <= state.unlocked);
   const found = fileEvidence.filter(e => (e.title+' '+e.id).toLowerCase().includes(query.toLowerCase()));
   const selected = evidence.find(e => e.id === state.selectedEvidence) || fileEvidence[0];
