@@ -1,11 +1,37 @@
 'use client';
-import {useEffect,useRef,type ReactNode} from 'react';
-import {X,ArrowUp,ArrowDown,Plus,Trash2,Check,Paperclip,Lock} from 'lucide-react';
+import {useEffect,useRef,useState,type ReactNode} from 'react';
+import {X,ArrowUp,ArrowDown,Plus,Trash2,Check,Paperclip,Lock,Info} from 'lucide-react';
 import type {Option} from '../game/types';
 import {useGame} from './GameProvider';
+
+export function InfoTooltip({ text, label, align = 'center' }: { text: string; label?: string; align?: 'left' | 'center' | 'right' }) {
+  const [active, setActive] = useState(false);
+  return (
+    <span
+      className={`info-tooltip-wrap align-${align} ${active ? 'active' : ''}`}
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setActive(v => !v);
+      }}
+      tabIndex={0}
+      aria-label={label || 'Xem giải thích'}
+      title={label || text}
+    >
+      <span className="info-tooltip-trigger" aria-hidden="true">
+        <Info size={11} strokeWidth={2.5} />
+      </span>
+      <span className="info-tooltip-bubble" role="tooltip">
+        {text}
+      </span>
+    </span>
+  );
+}
+
 export function Modal({title,children,onClose}:{title:string;children:ReactNode;onClose:()=>void}){const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{const old=document.activeElement as HTMLElement|null;ref.current?.showModal();return()=>old?.focus();},[]);return <dialog ref={ref} onCancel={onClose} aria-label={title}><div className="modal-head"><h2>{title}</h2><button className="icon-button" aria-label="Đóng" onClick={onClose}><X size={20}/></button></div>{children}</dialog>;}
-export function Choice({label,value,options,onChange}:{label:string;value:string;options:Option[];onChange:(v:string)=>void}){return <fieldset className="choice-field"><legend>{label}</legend><div className="choice-list">{options.map(o=><label className={`choice ${value===o.id?'selected':''}`} key={o.id}><input type="radio" name={label} checked={value===o.id} onChange={()=>onChange(o.id)}/><span>{o.label}</span>{value===o.id&&<Check size={15}/>}</label>)}</div></fieldset>;}
-export function Chips({label,options,value,max,onChange}:{label:string;options:Option[];value:string[];max:number;onChange:(v:string[])=>void}){return <fieldset className="choice-field"><legend>{label} <small>{value.length}/{max}</small></legend><div className="chip-list">{options.map(o=><button type="button" className={`chip ${value.includes(o.id)?'selected':''}`} aria-pressed={value.includes(o.id)} key={o.id} disabled={!value.includes(o.id)&&value.length>=max} onClick={()=>onChange(value.includes(o.id)?value.filter(x=>x!==o.id):[...value,o.id])}>{value.includes(o.id)?<Check size={14}/>:<Plus size={14}/>} {o.label}</button>)}</div></fieldset>;}
+export function Choice({label,value,options,onChange}:{label:ReactNode;value:string;options:Option[];onChange:(v:string)=>void}){return <fieldset className="choice-field"><legend>{label}</legend><div className="choice-list">{options.map(o=><label className={`choice ${value===o.id?'selected':''}`} key={o.id}><input type="radio" name={typeof label === 'string' ? label : 'choice'} checked={value===o.id} onChange={()=>onChange(o.id)}/><span>{o.label}</span>{value===o.id&&<Check size={15}/>}</label>)}</div></fieldset>;}
+export function Chips({label,options,value,max,onChange}:{label:ReactNode;options:Option[];value:string[];max:number;onChange:(v:string[])=>void}){return <fieldset className="choice-field"><legend>{label} <small>{value.length}/{max}</small></legend><div className="chip-list">{options.map(o=><button type="button" className={`chip ${value.includes(o.id)?'selected':''}`} aria-pressed={value.includes(o.id)} key={o.id} disabled={!value.includes(o.id)&&value.length>=max} onClick={()=>onChange(value.includes(o.id)?value.filter(x=>x!==o.id):[...value,o.id])}>{value.includes(o.id)?<Check size={14}/>:<Plus size={14}/>} {o.label}</button>)}</div></fieldset>;}
 export function EvidencePicker({value,max=2,ids,onChange}:{value:string[];max?:number;ids:string[];onChange:(v:string[])=>void}){
   const {state,config:{evidence},trackedMission}=useGame();
   const isCollected=(id:string)=>state.opened.includes(id)||(trackedMission?.foundEvidenceIds?.includes(id)??false);
@@ -23,7 +49,11 @@ export function EvidencePicker({value,max=2,ids,onChange}:{value:string[];max?:n
     }
   };
   return <fieldset className="choice-field evidence-picker-field">
-    <legend>Gắn chứng cứ <small>{value.length}/{max}</small></legend>
+    <legend style={{display:'inline-flex',alignItems:'center',gap:'4px'}}>
+      <span>Gắn chứng cứ</span>
+      <InfoTooltip text="Chọn 2 chứng cứ đã thu thập trong phòng để bảo vệ kết luận của bạn. Chứng cứ chưa tìm thấy sẽ bị khóa 🔒." />
+      <small style={{marginLeft:'6px'}}>{value.length}/{max}</small>
+    </legend>
     <div className="chip-list">
       {options.map(o=>{
         const isSelected=value.includes(o.id);
@@ -45,5 +75,6 @@ export function EvidencePicker({value,max=2,ids,onChange}:{value:string[];max?:n
     </div>
   </fieldset>;
 }
-export function Sorter({label,value,options,max,onChange}:{label:string;value:string[];options:Option[];max:number;onChange:(v:string[])=>void}){const move=(i:number,dir:number)=>{const n=[...value];[n[i],n[i+dir]]=[n[i+dir],n[i]];onChange(n);};return <fieldset className="choice-field sorter"><legend>{label} <small>{value.length}/{max}</small></legend><div className="sort-bank">{options.filter(o=>!value.includes(o.id)).map(o=><button disabled={value.length>=max} type="button" key={o.id} onClick={()=>onChange([...value,o.id])}><Plus size={15}/><span>{o.label}</span></button>)}</div><ol className="sort-stack">{value.map((v,i)=><li key={v}><b>{String(i+1).padStart(2,'0')}</b><span>{options.find(o=>o.id===v)?.label}</span><div className="sort-controls"><button type="button" title="Lên" aria-label={`Đưa ${v} lên`} disabled={i===0} onClick={()=>move(i,-1)}><ArrowUp size={14}/></button><button type="button" title="Xuống" aria-label={`Đưa ${v} xuống`} disabled={i===value.length-1} onClick={()=>move(i,1)}><ArrowDown size={14}/></button><button type="button" title="Bỏ" aria-label={`Bỏ ${v}`} onClick={()=>onChange(value.filter(x=>x!==v))}><Trash2 size={14}/></button></div></li>)}</ol>{!value.length&&<p className="empty-slot"><Paperclip size={16}/> Chọn thẻ ở trên để bắt đầu sắp xếp.</p>}</fieldset>;}
+export function Sorter({label,value,options,max,onChange}:{label:ReactNode;value:string[];options:Option[];max:number;onChange:(v:string[])=>void}){const move=(i:number,dir:number)=>{const n=[...value];[n[i],n[i+dir]]=[n[i+dir],n[i]];onChange(n);};return <fieldset className="choice-field sorter"><legend>{label} <small>{value.length}/{max}</small></legend><div className="sort-bank">{options.filter(o=>!value.includes(o.id)).map(o=><button disabled={value.length>=max} type="button" key={o.id} onClick={()=>onChange([...value,o.id])}><Plus size={15}/><span>{o.label}</span></button>)}</div><ol className="sort-stack">{value.map((v,i)=><li key={v}><b>{String(i+1).padStart(2,'0')}</b><span>{options.find(o=>o.id===v)?.label}</span><div className="sort-controls"><button type="button" title="Lên" aria-label={`Đưa ${v} lên`} disabled={i===0} onClick={()=>move(i,-1)}><ArrowUp size={14}/></button><button type="button" title="Xuống" aria-label={`Đưa ${v} xuống`} disabled={i===value.length-1} onClick={()=>move(i,1)}><ArrowDown size={14}/></button><button type="button" title="Bỏ" aria-label={`Bỏ ${v}`} onClick={()=>onChange(value.filter(x=>x!==v))}><Trash2 size={14}/></button></div></li>)}</ol>{!value.length&&<p className="empty-slot"><Paperclip size={16}/> Chọn thẻ ở trên để bắt đầu sắp xếp.</p>}</fieldset>;}
 export function Avatar({name,size=''}:{name:string;size?:string}){return <span className={`avatar avatar-${name==='Nam'?'blue':name==='Mai'?'purple':name==='Linh'?'rose':'green'} ${size}`}>{name.slice(0,1)}</span>;}
+

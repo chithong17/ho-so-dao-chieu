@@ -1,7 +1,7 @@
 import {afterEach,describe,it,expect} from 'vitest';
 import {cleanup,render,screen,fireEvent} from '@testing-library/react';
 import {useState} from 'react';
-import {Choice,Sorter,EvidencePicker} from '../../components/ui';
+import {Choice,Sorter,EvidencePicker,InfoTooltip} from '../../components/ui';
 import {GameProvider,useGame} from '../../components/GameProvider';
 import {EvidenceCaption} from '../../components/EvidenceReader';
 import {evidence} from '../../game/evidence';
@@ -102,6 +102,34 @@ describe('EvidencePicker - Không cho phép gắn chứng cứ chưa thu thập'
     // Click to select
     fireEvent.click(evidenceChip);
     expect(evidenceChip.classList.contains('selected')).toBe(true);
+  });
+});
+
+describe('InfoTooltip - Hiển thị icon (i) và tooltip giải thích', () => {
+  it('hiển thị icon và giải thích khi hover hoặc tương tác', () => {
+    render(
+      <InfoTooltip text="Giải thích khái niệm khó hiểu" />
+    );
+
+    const tooltipBubble = screen.getByRole('tooltip');
+    expect(tooltipBubble.textContent).toContain('Giải thích khái niệm khó hiểu');
+
+    const wrapper = tooltipBubble.parentElement!;
+    expect(wrapper.classList.contains('info-tooltip-wrap')).toBe(true);
+
+    // Mouse enter kích hoạt class active
+    fireEvent.mouseEnter(wrapper);
+    expect(wrapper.classList.contains('active')).toBe(true);
+
+    // Mouse leave tắt class active
+    fireEvent.mouseLeave(wrapper);
+    expect(wrapper.classList.contains('active')).toBe(false);
+
+    // Click toggle active
+    fireEvent.click(wrapper);
+    expect(wrapper.classList.contains('active')).toBe(true);
+    fireEvent.click(wrapper);
+    expect(wrapper.classList.contains('active')).toBe(false);
   });
 });
 
