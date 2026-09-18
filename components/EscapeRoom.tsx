@@ -83,7 +83,7 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro }: EscapeRoo
         
         {scene === 'intro' && <CinematicIntro onComplete={() => { 
           if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('hs01_intro_seen', '1'); setScene('desk'); 
-          setTimeout(() => setShowTutorial(true), 1000); 
+          if(document.documentElement.dataset.competition!=='true')setTimeout(() => setShowTutorial(true), 1000); 
         }} />}
 
         {showTutorial && (

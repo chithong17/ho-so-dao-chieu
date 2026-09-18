@@ -11,13 +11,15 @@ export type TrackedMission = {
   foundEvidenceIds: string[];
 } | null;
 
-type Context={state:GameState;config:ReturnType<typeof getConfig>;dispatch:Dispatch<Action>;ready:boolean;saveStatus:string;conflict:boolean;resolveConflict:()=>void;enter:(m:Mode,fresh?:boolean,difficulty?:Difficulty)=>void;home:boolean;setHome:(v:boolean)=>void;paused:boolean;setPaused:(v:boolean)=>void;reduced:boolean;setReduced:(v:boolean)=>void;trackedMission:TrackedMission;setTrackedMission:React.Dispatch<React.SetStateAction<TrackedMission>>};
+export type CompetitionBridge={state:GameState;version:number;showIntro:boolean;send:(action:Action,version:number)=>Promise<{state:GameState;version:number}>;exit:()=>void};
+type Context={state:GameState;config:ReturnType<typeof getConfig>;dispatch:Dispatch<Action>;ready:boolean;saveStatus:string;conflict:boolean;resolveConflict:()=>void;enter:(m:Mode,fresh?:boolean,difficulty?:Difficulty)=>void;home:boolean;setHome:(v:boolean)=>void;paused:boolean;setPaused:(v:boolean)=>void;reduced:boolean;setReduced:(v:boolean)=>void;trackedMission:TrackedMission;setTrackedMission:React.Dispatch<React.SetStateAction<TrackedMission>>;competitive:boolean;competitionIntro:boolean};
 const GameContext=createContext<Context|null>(null);
-export function GameProvider({children}:{children:ReactNode}){
- const [state,dispatch]=useReducer(reduceGame,undefined,()=>createState());
- const [ready,setReady]=useState(false),[saveStatus,setSaveStatus]=useState('Đang mở hồ sơ…'),[conflict,setConflict]=useState(false),[home,setHome]=useState(false),[paused,setPaused]=useState(false),[reduced,setReduced]=useState(false);
+export function GameProvider({children,competition}:{children:ReactNode;competition?:CompetitionBridge}){
+ const [state,dispatch]=useReducer(reduceGame,undefined,()=>competition?.state??createState());
+ const [ready,setReady]=useState(!!competition),[saveStatus,setSaveStatus]=useState(competition?'Đã kết nối phòng thi đấu':'Đang mở hồ sơ…'),[conflict,setConflict]=useState(false),[home,setHome]=useState(false),[paused,setPaused]=useState(false),[reduced,setReduced]=useState(false);
  const [trackedMission,setTrackedMission]=useState<TrackedMission>(null);
 
+ const competitionVersion=useRef(competition?.version??0),competitionQueue=useRef(Promise.resolve());
  const customDispatch: Dispatch<Action> = useCallback((action: Action) => {
   if (action.type === 'evidence') {
    setTrackedMission(prev => {
@@ -32,7 +34,8 @@ export function GameProvider({children}:{children:ReactNode}){
    });
   }
   dispatch(action);
- }, []);
+  if(competition&&!['load','begin','tick','reopen'].includes(action.type))competitionQueue.current=competitionQueue.current.then(async()=>{try{const result=await competition.send(action,competitionVersion.current);competitionVersion.current=result.version;setSaveStatus('Đã đồng bộ với phòng');}catch{setSaveStatus('Mất đồng bộ với phòng; đang khôi phục trạng thái…');window.location.reload();}});
+ }, [competition]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -65,6 +68,7 @@ export function GameProvider({children}:{children:ReactNode}){
   }catch{setSaveStatus('Không lưu được; bạn vẫn có thể tiếp tục chơi trong tab này.');}
  },[]);
  useEffect(()=>{
+  if(competition){competitionVersion.current=competition.version;return;}
   let selection:{mode:Mode;difficulty:Difficulty;reduced:boolean}={mode:'individual',difficulty:'easy',reduced:false};
   try{selection=initialSelection(localStorage);}catch{/* read below reports unavailable storage */}
   setReduced(selection.reduced);
@@ -74,21 +78,22 @@ export function GameProvider({children}:{children:ReactNode}){
   }
   dispatch({type:'load',state:saved??createState(selection.mode,selection.difficulty)});
   lastRevision.current=saved?.revision??0;setReady(true);
- },[read]);
+ },[read,competition]);
  useEffect(()=>{
-  if(!ready||conflict||state.revision===lastRevision.current)return;
+  if(competition||!ready||conflict||state.revision===lastRevision.current)return;
   pending.current=state;
   const timer=setTimeout(flush,250);window.addEventListener('pagehide',flush);
   return()=>{clearTimeout(timer);window.removeEventListener('pagehide',flush);};
- },[state,ready,conflict,flush]);
+ },[state,ready,conflict,flush,competition]);
  useEffect(()=>{
-  const onStorage=(e:StorageEvent)=>{
+  if(competition)return;const onStorage=(e:StorageEvent)=>{
    if((e.key===null||e.key===saveKey(state.mode,state.difficulty))&&e.newValue!==lastRaw.current){blocked.current=true;setConflict(true);setSaveStatus('Tiến trình đã thay đổi trong tab khác.');}
   };
   window.addEventListener('storage',onStorage);return()=>window.removeEventListener('storage',onStorage);
- },[state.mode,state.difficulty]);
+ },[state.mode,state.difficulty,competition]);
  useEffect(()=>{if(!ready||paused||home||conflict)return;const timer=setInterval(()=>{if(document.visibilityState==='visible')dispatch({type:'tick',seconds:5});},5000);return()=>clearInterval(timer);},[ready,paused,home,conflict]);
- useEffect(()=>{if(!ready)return;document.documentElement.dataset.motion=reduced?'reduce':'normal';try{localStorage.setItem('hsdc:settings:v1',JSON.stringify({mode:state.mode,difficulty:state.difficulty,reduced}));}catch{/* optional preferences */}},[ready,state.mode,state.difficulty,reduced]);
+ useEffect(()=>{if(!ready)return;document.documentElement.dataset.motion=reduced?'reduce':'normal';if(!competition)try{localStorage.setItem('hsdc:settings:v1',JSON.stringify({mode:state.mode,difficulty:state.difficulty,reduced}));}catch{/* optional preferences */}},[ready,state.mode,state.difficulty,reduced,competition]);
+ const setHomeSafe=(value:boolean)=>{if(competition&&value){competition.exit();return;}setHome(value);};
  const enter=(m:Mode,fresh=false,difficulty:Difficulty=state.difficulty)=>{
   // Flush outgoing changes before switching slots, including the debounce window.
   if(!(fresh&&m===state.mode&&difficulty===state.difficulty)){
@@ -106,6 +111,6 @@ export function GameProvider({children}:{children:ReactNode}){
   lastRevision.current=next.revision;dispatch({type:'load',state:next});setHome(false);setPaused(false);setTrackedMission(null);
  };
  const resolveConflict=()=>{const saved=read(state.mode,state.difficulty);if(saved){pending.current=null;dispatch({type:'load',state:saved});lastRevision.current=saved.revision;setSaveStatus('Đã tải tiến trình mới nhất');}};
- return <GameContext.Provider value={{state,config:getConfig(state.difficulty),dispatch:customDispatch,ready,saveStatus,conflict,resolveConflict,enter,home,setHome,paused,setPaused,reduced,setReduced,trackedMission,setTrackedMission}}>{children}</GameContext.Provider>;
+ return <GameContext.Provider value={{state,config:getConfig(state.difficulty),dispatch:customDispatch,ready,saveStatus,conflict,resolveConflict,enter,home,setHome:setHomeSafe,paused,setPaused,reduced,setReduced,trackedMission,setTrackedMission,competitive:!!competition,competitionIntro:competition?.showIntro??false}}>{children}</GameContext.Provider>;
 }
 export function useGame(){const c=useContext(GameContext);if(!c)throw new Error('GameProvider missing');return c;}
