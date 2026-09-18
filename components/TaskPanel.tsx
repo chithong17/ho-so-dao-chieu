@@ -66,35 +66,61 @@ export default function TaskPanel(){
         <FileText size={15}/>
         <span>CHỨNG CỨ ĐÃ THU THẬP ({collectedEvidence.length}/{task.evidence.length})</span>
       </div>
-      <div className="collected-evidence-cards custom-scroll">
-        {collectedEvidence.map(ev => (
-          <div
-            key={ev.id}
-            className="collected-evidence-card"
-            onClick={() => {
-              setViewingEvidence(ev);
-              dispatch({ type: 'evidence', id: ev.id });
-            }}
-            role="button"
-            tabIndex={0}
-            title={`Bấm để xem chi tiết: ${ev.id} · ${ev.title}`}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
+      <div className="collected-polaroids-list custom-scroll">
+        {collectedEvidence.map((ev, i) => {
+          const rotationAngle = i % 2 === 0 ? -2.5 : 2;
+          const tapeAngle = i % 2 === 0 ? 3 : -2.5;
+          const bgImg = ev.app === 'chat' || ev.app === 'files' ? '/scene_desk.jpg' : ev.app === 'terminal' ? '/scene_wall.jpg' : '/bg_room.jpg';
+          return (
+            <div
+              key={ev.id}
+              className="collected-evidence-card taped-polaroid-item"
+              style={{ transform: `rotate(${rotationAngle}deg)` }}
+              onClick={() => {
                 setViewingEvidence(ev);
                 dispatch({ type: 'evidence', id: ev.id });
-              }
-            }}
-          >
-            <div className="card-top">
-              <span className="card-badge">{ev.id}</span>
-              <span className="card-status"><CheckCircle2 size={13}/> Đã thu thập</span>
+              }}
+              role="button"
+              tabIndex={0}
+              title={`Bấm để xem chi tiết: ${ev.id} · ${ev.title}`}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setViewingEvidence(ev);
+                  dispatch({ type: 'evidence', id: ev.id });
+                }
+              }}
+            >
+              {/* Adhesive masking tape */}
+              <div
+                className="polaroid-tape"
+                style={{ transform: `translateX(-50%) rotate(${tapeAngle}deg)` }}
+              />
+
+              {/* Photo Frame */}
+              <div className="polaroid-photo-frame">
+                <div
+                  className="polaroid-photo-img"
+                  style={{ backgroundImage: `url(${bgImg})` }}
+                >
+                  <span className="card-badge polaroid-stamp">{ev.id}</span>
+                  <span className="polaroid-app-tag">
+                    {ev.app === 'chat' ? 'Tin nhắn' : ev.app === 'terminal' ? 'Nhật ký' : ev.app === 'mail' ? 'Hộp thư' : 'Tài liệu'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Polaroid Bottom Caption with handwritten ink */}
+              <div className="polaroid-caption">
+                <strong className="card-title polaroid-title">{ev.title}</strong>
+                <span className="card-action polaroid-hint">
+                  <CheckCircle2 size={13} style={{ stroke: '#15803d', display: 'inline', verticalAlign: '-2px', marginRight: '4px' }}/>
+                  Bấm để xem chi tiết
+                </span>
+              </div>
             </div>
-            <strong className="card-title">{ev.title}</strong>
-            <p className="card-summary">{ev.summary}</p>
-            <span className="card-action">Bấm để xem chi tiết ➔</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   ) : (
