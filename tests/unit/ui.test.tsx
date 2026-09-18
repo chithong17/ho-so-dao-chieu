@@ -1,8 +1,8 @@
 import {afterEach,describe,it,expect} from 'vitest';
 import {cleanup,render,screen,fireEvent} from '@testing-library/react';
 import {useState} from 'react';
-import {Choice,Sorter} from '../../components/ui';
-import {GameProvider} from '../../components/GameProvider';
+import {Choice,Sorter,EvidencePicker} from '../../components/ui';
+import {GameProvider,useGame} from '../../components/GameProvider';
 import {EvidenceCaption} from '../../components/EvidenceReader';
 import {evidence} from '../../game/evidence';
 
@@ -47,4 +47,62 @@ describe('Red Stamp ĐÃ HOÀN THÀNH khi nộp lập luận đúng', () => {
     expect(screen.queryByText('ĐÃ HOÀN THÀNH')).toBeNull();
   });
 });
+
+describe('EvidencePicker - Không cho phép gắn chứng cứ chưa thu thập', () => {
+  it('khóa và không thể chọn chứng cứ chưa được thu thập', () => {
+    function PickerDemo() {
+      const [val, setVal] = useState<string[]>([]);
+      return <EvidencePicker ids={['EZ01', 'EZ02', 'E01', 'E02']} value={val} onChange={setVal} max={2} />;
+    }
+    render(
+      <GameProvider>
+        <PickerDemo />
+      </GameProvider>
+    );
+
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
+    const firstBtn = buttons[0];
+    expect(firstBtn.getAttribute('disabled')).not.toBeNull();
+    expect(firstBtn.classList.contains('locked')).toBe(true);
+    expect(firstBtn.textContent).toContain('(Chưa thu thập)');
+
+    // Clicking uncollected button does not change value
+    fireEvent.click(firstBtn);
+    expect(firstBtn.classList.contains('selected')).toBe(false);
+  });
+
+  it('cho phép chọn chứng cứ khi đã được thu thập', () => {
+    let targetId = '';
+    function PickerWithCollect() {
+      const [val, setVal] = useState<string[]>([]);
+      const { dispatch, config: { evidence } } = useGame();
+      targetId = evidence[0].id;
+      return (
+        <div>
+          <button onClick={() => dispatch({ type: 'evidence', id: targetId })}>Collect Evidence</button>
+          <EvidencePicker ids={[targetId]} value={val} onChange={setVal} max={2} />
+        </div>
+      );
+    }
+    render(
+      <GameProvider>
+        <PickerWithCollect />
+      </GameProvider>
+    );
+
+    const collectBtn = screen.getByRole('button', { name: 'Collect Evidence' });
+    fireEvent.click(collectBtn);
+
+    // After collection, button should be unlocked and selectable
+    const evidenceChip = screen.getByRole('button', { name: new RegExp(targetId, 'i') });
+    expect(evidenceChip.getAttribute('disabled')).toBeNull();
+    expect(evidenceChip.classList.contains('locked')).toBe(false);
+
+    // Click to select
+    fireEvent.click(evidenceChip);
+    expect(evidenceChip.classList.contains('selected')).toBe(true);
+  });
+});
+
 

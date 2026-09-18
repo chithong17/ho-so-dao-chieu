@@ -5279,4 +5279,18 @@ body[data-cinematic='true'] .mission-tracker-hud,
   color: #16a34a !important;
 }
 
+/* Locked evidence chip styling */
+.chip.locked,
+.modal-overlay.point-and-click dialog.ui-notebook .chip.locked {
+  opacity: 0.42 !important;
+  cursor: not-allowed !important;
+  border-style: dotted !important;
+  border-color: rgba(60, 40, 20, 0.28) !important;
+  background: rgba(0, 0, 0, 0.03) !important;
+}
 
+.chip.locked *,
+.modal-overlay.point-and-click dialog.ui-notebook .chip.locked * {
+  color: rgba(26, 20, 15, 0.45) !important;
+  cursor: not-allowed !important;
+}
