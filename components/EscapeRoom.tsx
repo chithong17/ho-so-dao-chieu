@@ -93,27 +93,33 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro }: EscapeRoo
           </div>
         )}
 
-        {scene === 'desk' && (
+                        {scene === 'desk' && (
           <>
-            <img src="/scene_desk.jpg" alt="Desk View" className="room-bg" draggable="false" />
+            <img 
+              src="/scene_desk.jpg" 
+              alt="Desk View" 
+              className="room-bg" 
+              draggable="false" 
+              style={{ filter: 'sepia(0.3) saturate(1.2) brightness(1.1) hue-rotate(-5deg)' }}
+            />
             
             <Interactable
-              x="44%" y="46%" width="15%" height="15%"
-              label="Máy tính · nhật ký kỹ thuật"
+              x="39%" y="34%" width="16%" height="23%"
+              label="Máy tính - nhật ký kỹ thuật"
               icon={<Laptop size={24} />}
               onClick={() => onInteract('laptop')} sfx="laptop"
             />
             
             <Interactable
-              x="30%" y="56%" width="14%" height="12%"
+              x="28%" y="54%" width="14%" height="12%"
               label="Hồ sơ vụ án (Sổ điều tra)"
               icon={<Book size={24} />}
               onClick={() => onInteract('notebook')} sfx="page_turn"
             />
             
-            <Interactable
-              x="46%" y="62%" width="10%" height="8%"
-              label="Điện thoại · liên lạc nhóm"
+                                    <Interactable
+              x="46%" y="61%" width="9%" height="8%"
+              label="Điện thoại - liên lạc nhóm"
               icon={<Smartphone size={24} />}
               onClick={() => onInteract('phone')} sfx="phone"
             />
