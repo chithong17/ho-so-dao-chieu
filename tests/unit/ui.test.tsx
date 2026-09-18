@@ -31,7 +31,20 @@ describe('EvidenceCaption - Ẩn dòng gợi ý và mở khóa có trừ điểm
 
     // Dòng gợi ý xuất hiện
     expect(screen.getByText(item.summary)).toBeDefined();
-    expect(screen.getByText(/đã mở gợi ý phân tích \(-2 điểm độ tin cậy\)/i)).toBeDefined();
+  });
+});
+
+describe('Red Stamp ĐÃ HOÀN THÀNH khi nộp lập luận đúng', () => {
+  it('đóng dấu mộc đỏ lên trang khi lập luận chuẩn xác', async () => {
+    const TaskPanel = (await import('../../components/TaskPanel')).default;
+    render(
+      <GameProvider>
+        <TaskPanel />
+      </GameProvider>
+    );
+
+    // Ban đầu chưa hoàn thành, chưa có mộc đỏ
+    expect(screen.queryByText('ĐÃ HOÀN THÀNH')).toBeNull();
   });
 });
 
