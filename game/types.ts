@@ -26,6 +26,7 @@ export type GameState = {
  selectedEvidence: string; activeTask: string; opened: string[]; pinned: string[];
  answers: Record<string,Answer>; drafts: Record<string,Answer>; attempts: Record<string,Attempt[]>;
  hints: Record<string,number>; experiments: Record<string,string[]>; notes: Record<string,string>;
+ unlockedEvidenceHints?: string[];
  debriefs: Chapter[]; verdict: Verdict | null; result: Result | null;
  elapsed: number; revision: number; updatedAt: string;
 };
@@ -36,6 +37,7 @@ export type Action =
  | { type: 'task'; id: string } | { type: 'draft'; id: string; answer: Answer }
  | { type: 'submit'; id: string; answer: Answer; at: string }
  | { type: 'hint'; id: string } | { type: 'experiment'; id: string; run: string }
+ | { type: 'unlockEvidenceHint'; id: string }
  | { type: 'note'; id: string; note: string }
  | { type: 'debrief' } | { type: 'next' } | { type: 'chapter'; chapter: Chapter }
  | { type: 'verdictDraft'; verdict: Verdict } | { type: 'finish'; verdict: Verdict }

@@ -98,11 +98,18 @@ export function caseCredibility(s:GameState){
  const achieved=tasks.reduce((total,t)=>total+(s.answers[t.id]?evaluateChallenge(t.id,s.answers[t.id]).score:0),0);
  const opened=s.difficulty==='easy'?Math.min(10,s.opened.length/evidence.length*10):Math.min(10,s.opened.length);
  const core=chapters.map(c=>c.id).reduce((total,c)=>total+(chapterRequirements[c].every(r=>(evaluateChallenge(r.taskId,s.answers[r.taskId]??emptyAnswer(r.taskId)).score)>=r.minimum)?15/chapters.length:0),0);
- const score=Math.min(100,Math.round(15+achieved/maxScore*60+opened+core));
+
+ // Penalties:
+ const resubmissions=Object.values(s.attempts).reduce((count,arr)=>count+Math.max(0,arr.length-1),0);
+ const resubmissionPenalty=resubmissions*2;
+ const unlockedHints=(s.unlockedEvidenceHints??[]).length;
+ const evidenceHintPenalty=unlockedHints*2;
+
+ const score=Math.max(0,Math.min(100,Math.round(15+achieved/maxScore*60+opened+core-resubmissionPenalty-evidenceHintPenalty)));
  const label=score<35?'Vội kết luận':score<60?'Đang kiểm chứng':score<80?'Lập luận có cơ sở':'Hồ sơ vững';
- return {score,label};
+ return {score,label,resubmissions,resubmissionPenalty,unlockedHints,evidenceHintPenalty};
 }
-export function createState(mode:Mode='individual',difficulty:Difficulty='standard'):GameState {const config=getConfig(difficulty);return {schemaVersion:2,caseVersion:'1.1.0',caseId:'HS-01',mode,difficulty,screen:'intro',chapter:1,unlocked:1,initial:null,selectedEvidence:config.evidence[0].id,activeTask:config.tasks[0].id,opened:[],pinned:[],answers:{},drafts:{},attempts:{},hints:{},experiments:{},notes:{},debriefs:[],verdict:null,result:null,elapsed:0,revision:0,updatedAt:''};}
+export function createState(mode:Mode='individual',difficulty:Difficulty='standard'):GameState {const config=getConfig(difficulty);return {schemaVersion:2,caseVersion:'1.1.0',caseId:'HS-01',mode,difficulty,screen:'intro',chapter:1,unlocked:1,initial:null,selectedEvidence:config.evidence[0].id,activeTask:config.tasks[0].id,opened:[],pinned:[],answers:{},drafts:{},attempts:{},hints:{},experiments:{},notes:{},unlockedEvidenceHints:[],debriefs:[],verdict:null,result:null,elapsed:0,revision:0,updatedAt:''};}
 export const chapterComplete=(s:GameState,c:Chapter)=>chapterReadiness(s,c).ready;
 export function reduceGame(s:GameState,a:Action):GameState {
  if(a.type==='load')return validateSave(a.state).state??s;
@@ -122,6 +129,11 @@ export function reduceGame(s:GameState,a:Action):GameState {
    next={...s,answers:{...s.answers,[a.id]:a.answer},drafts:{...s.drafts,[a.id]:a.answer},attempts:{...s.attempts,[a.id]:[...prev,{answer:a.answer,evaluation:evaluateChallenge(a.id,a.answer),at:a.at}]},updatedAt:a.at};break;
   }
   case 'hint':next={...s,hints:{...s.hints,[a.id]:Math.min(2,(s.hints[a.id]??0)+1)}};break;
+  case 'unlockEvidenceHint':{
+   const unlocked=s.unlockedEvidenceHints??[];
+   if(!unlocked.includes(a.id))next={...s,unlockedEvidenceHints:[...unlocked,a.id]};
+   break;
+  }
   case 'experiment':next={...s,experiments:{...s.experiments,[a.id]:[...new Set([...(s.experiments[a.id]??[]),a.run])]}};break;
   case 'note':next={...s,notes:{...s.notes,[a.id]:a.note.slice(0,500)}};break;
   case 'debrief':if(chapterReadiness(s,s.chapter).ready)next={...s,screen:'debrief'};break;
@@ -169,6 +181,7 @@ export function validateSave(input:unknown):{state:GameState|null;error:string|n
  if(!record(input.answers)||!record(input.drafts)||!record(input.attempts)||!record(input.hints)||!record(input.experiments)||!record(input.notes))return fail();
  if(!Object.entries(input.answers).every(([id,a])=>knownTask(id)&&isAnswer(id,a)&&answerComplete(id,a))||!Object.entries(input.drafts).every(([id,a])=>knownTask(id)&&isAnswer(id,a)))return fail();
  if(!strings(input.opened,evidenceIds)||!strings(input.pinned,evidenceIds)||!Array.isArray(input.debriefs)||!input.debriefs.every(c=>chapterIds.includes(c))||new Set(input.debriefs).size!==input.debriefs.length)return fail();
+ if(input.unlockedEvidenceHints!==undefined&&!strings(input.unlockedEvidenceHints,evidenceIds))return fail();
  if(!inList(input.selectedEvidence,evidenceIds)||!inList(input.activeTask,tasks.map(t=>t.id)))return fail();
  if(!['elapsed','revision'].every(k=>typeof input[k]==='number'&&Number.isFinite(input[k])&&Number(input[k])>=0)||typeof input.updatedAt!=='string')return fail();
  if(input.initial!==null&&(!record(input.initial)||!inList(input.initial.conclusion,initialOptions.map(o=>o.id))||!inList(input.initial.confidence,['Thấp','Vừa','Cao'])))return fail();
@@ -177,10 +190,11 @@ export function validateSave(input:unknown):{state:GameState|null;error:string|n
  if(!Object.entries(input.hints).every(([id,v])=>knownTask(id)&&typeof v==='number'&&[0,1,2].includes(v))||!Object.entries(input.notes).every(([id,v])=>knownTask(id)&&typeof v==='string'&&v.length<=500)||!Object.entries(input.experiments).every(([id,v])=>knownTask(id)&&strings(v)&&v.every(s=>s.length<=100)))return fail();
  for(const [id,arr]of Object.entries(input.attempts)){if(!knownTask(id)||!Array.isArray(arr)||!arr.every(a=>record(a)&&isAnswer(id,a.answer)&&answerComplete(id,a.answer)&&typeof a.at==='string'))return fail();}
  const s=structuredClone(input) as unknown as GameState;
+ if(!Array.isArray(s.unlockedEvidenceHints))s.unlockedEvidenceHints=[];
  for(const [id,a]of Object.entries(s.attempts))s.attempts[id]=a.map(x=>({...x,evaluation:evaluateChallenge(id,x.answer)}));
  if(tasks.find(t=>t.id===s.activeTask)!.chapter>s.unlocked||evidence.find(e=>e.id===s.selectedEvidence)!.chapter>s.unlocked)return fail();
  if([...Object.keys(s.drafts),...Object.keys(s.attempts),...Object.keys(s.hints),...Object.keys(s.experiments),...Object.keys(s.notes)].some(id=>tasks.find(t=>t.id===id)!.chapter>s.unlocked))return fail();
- if(s.opened.concat(s.pinned).some(id=>evidence.find(e=>e.id===id)!.chapter>s.unlocked)||Object.keys(s.answers).some(id=>tasks.find(t=>t.id===id)!.chapter>s.unlocked))return fail();
+ if(s.opened.concat(s.pinned, s.unlockedEvidenceHints).some(id=>evidence.find(e=>e.id===id)!.chapter>s.unlocked)||Object.keys(s.answers).some(id=>tasks.find(t=>t.id===id)!.chapter>s.unlocked))return fail();
  for(let c=1;c<s.unlocked;c++)if(!chapterReadiness(s,c as Chapter).ready||!s.debriefs.includes(c as Chapter))return fail();
  if(s.screen==='debrief'&&!chapterReadiness(s,s.chapter).ready)return fail();
  if(['verdict','result'].includes(s.screen)&&(!tasks.every(t=>s.answers[t.id])||s.debriefs.length!==chapters.length))return fail();

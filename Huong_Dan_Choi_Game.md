@@ -1,4 +1,4 @@
-﻿# Hướng dẫn chơi — Hồ sơ Đảo Chiều
+# Hướng dẫn chơi — Hồ sơ Đảo Chiều
 
 ## Chọn độ khó
 
@@ -24,7 +24,7 @@ Theo phạm vi đã xác nhận, bản Dễ chỉ rút gọn nội dung và thu�
 5. Khi nộp đủ nhiệm vụ và các bài trọng tâm đạt ngưỡng, chọn Giải mã chương, đọc phần liên hệ kiến thức rồi mở chương tiếp theo.
 6. Sau giải mã chương cuối, chọn kết luận và gắn chứng cứ. Có thể xem kết quả, in hoặc chọn Hoàn thiện lập luận để quay lại.
 
-Không phạt thời gian hay số lần sửa. Các bài trong chương đã mở có thể được chọn tự do; không cần làm đúng từng bài theo một thứ tự cố định. Phần kiến thức mở theo giải mã chương và vẫn gồm đủ 2 nguyên lý, 3 quy luật, 6 cặp phạm trù.
+Không phạt thời gian. Có cơ chế trừ điểm độ tin cậy của hồ sơ khi người chơi sửa/nộp lại lập luận (-2 điểm cho mỗi lần nộp lại) hoặc khi mở khóa dòng gợi ý phân tích chứng cứ (-2 điểm cho mỗi gợi ý). Các bài trong chương đã mở có thể được chọn tự do; không cần làm đúng từng bài theo một thứ tự cố định. Phần kiến thức mở theo giải mã chương và vẫn gồm đủ 2 nguyên lý, 3 quy luật, 6 cặp phạm trù.
 
 ## Chế độ Dễ
 
