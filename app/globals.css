@@ -1388,6 +1388,7 @@ dialog.ui-files .inner-content {
 
 /* 4. Left column (task-panel-left) */
 .modal-overlay.point-and-click dialog.ui-notebook .task-panel-left {
+  position: relative !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -5199,8 +5200,8 @@ body[data-cinematic='true'] .mission-tracker-hud,
 }
 
 .modal-overlay.point-and-click dialog.ui-notebook .red-stamp-completed {
-  top: 10px !important;
-  right: 22px !important;
+  top: 14px !important;
+  right: 18px !important;
 }
 
 @keyframes stampDrop {

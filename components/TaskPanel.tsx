@@ -88,7 +88,16 @@ export default function TaskPanel() {
     dispatch({ type: 'submit', id: task.id, answer: a, at: new Date().toISOString() });
     setError('');
   };
-  return <aside className="task-panel" aria-label="Nhiệm vụ điều tra"><div className="task-panel-left" style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflow: 'hidden' }}>
+  return <aside className="task-panel" aria-label="Nhiệm vụ điều tra"><div className="task-panel-left" style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflow: 'hidden', position: 'relative' }}>
+    {isCompleted && (
+      <div className="red-stamp-completed" aria-label="Nhiệm vụ đã hoàn thành">
+        <div className="stamp-inner-border">
+          <span className="stamp-sub">HỒ SƠ HS–01 · {task.id}</span>
+          <strong className="stamp-main">ĐÃ HOÀN THÀNH</strong>
+          <span className="stamp-detail">✓ LẬP LUẬN CHUẨN XÁC</span>
+        </div>
+      </div>
+    )}
     <div className="task-panel-head"><span><NotebookPen size={17} /> Sổ điều tra</span><span>{index + 1} / {chapterTasks.length}</span></div><div className="task-pagination">{chapterTasks.map((t, i) => {
       const isTaskDone = !!state.answers[t.id] && evaluateChallenge(t.id, state.answers[t.id]).score === t.criteria.length;
       return <button aria-label={`Nhiệm vụ ${t.id}`} key={t.id} className={t.id === task.id ? 'active' : isTaskDone ? 'done completed' : state.answers[t.id] ? 'done' : ''} onClick={() => select(t.id)}>{t.id === task.id || isTaskDone ? <Check size={14} /> : String(i + 1).padStart(2, '0')}</button>;
@@ -170,15 +179,6 @@ export default function TaskPanel() {
     )}
 
   </div><div className="task-content" key={task.id} style={{ position: 'relative' }}>
-    {isCompleted && (
-      <div className="red-stamp-completed" aria-label="Nhiệm vụ đã hoàn thành">
-        <div className="stamp-inner-border">
-          <span className="stamp-sub">HỒ SƠ HS–01 · {task.id}</span>
-          <strong className="stamp-main">ĐÃ HOÀN THÀNH</strong>
-          <span className="stamp-detail">✓ LẬP LUẬN CHUẨN XÁC</span>
-        </div>
-      </div>
-    )}
     <span className="eyebrow">LẬP LUẬN {task.id.slice(1)}</span><h2>{task.title}</h2><p className="task-prompt">{task.prompt}</p><div className="related-evidence"><span><Link2 size={13} /> Đối chiếu</span>{task.evidence.map(id => { const isFound = isTracking ? (trackedMission?.foundEvidenceIds.includes(id) ?? false) : state.opened.includes(id); return <button key={id} type="button" disabled={!isFound} onClick={() => { if (isFound) { const ev = evidence.find(item => item.id === id); if (ev) setViewingEvidence(ev); dispatch({ type: 'evidence', id }); } }} title={isFound ? `Xem chi tiết chứng cứ ${id}` : `Chứng cứ ${id} chưa được thu thập (Hãy tìm kiếm trong phòng)`} className={isFound ? 'unlocked' : 'locked'} style={!isFound ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}>{id}</button>; })}{task.evidence?.length > 0 && <button type="button" className={`collect-mission-btn ${isCompleted ? 'completed' : isTracking ? 'active' : ''}`} onClick={toggleTrackMission} title={isCompleted ? 'Nhiệm vụ này đã hoàn thành' : isTracking ? 'Bỏ theo dõi nhiệm vụ này' : 'Thu thập nhiệm vụ tìm kiếm các chứng cứ này'} data-sfx="pin">{isCompleted ? <CheckCircle2 size={13} style={{ color: '#16a34a' }} /> : isTracking ? <Check size={13} /> : <Target size={13} />}<span>{isCompleted ? 'Đã hoàn thành' : isTracking ? 'Đã thu thập' : 'Thu thập nhiệm vụ'}</span></button>}</div><TaskForm task={task} answer={a} change={answer => dispatch({ type: 'draft', id: task.id, answer })} onViewEvidence={handleOpenEvidenceDetail} /><div className="hint-area">{hints < 2 && <button className="text-button" onClick={() => dispatch({ type: 'hint', id: task.id })}><Lightbulb size={16} /> {hints ? 'Gợi ý tiếp theo' : 'Cần một gợi ý?'} <small>{hints}/2</small></button>}{task.hints.slice(0, hints).map((h, i) => <p className="hint" key={i}>{h}</p>)}</div><details className="notes"><summary>Ghi chú riêng <small>không chấm điểm</small></summary><textarea aria-label="Ghi chú riêng" maxLength={500} value={state.notes[task.id] ?? ''} onChange={e => dispatch({ type: 'note', id: task.id, note: e.target.value })} placeholder="Căn cứ nào khiến bạn giữ hoặc đổi nhận định?" /></details>{error && <p className="form-error" role="alert">{error}</p>}{submitted && changed && <div className="resubmit-penalty-warning"><span>Sửa và nộp lại sẽ -2 điểm độ tin cậy của hồ sơ.</span></div>}<button className="primary submit-button" onClick={submit} disabled={!!submitted && !changed}><Send size={16} />{isCompleted && !changed ? '✓ Lập luận đã chuẩn xác (Đã hoàn thành)' : submitted && !changed ? 'Đã ghi nhận lập luận' : submitted ? 'Cập nhật lập luận (-2 điểm nộp lại)' : 'Ghi nhận lập luận'}</button>{evaluation && <div className="evaluation" role="status"><div className="evaluation-title"><CheckCircle2 size={18} /><strong>{evaluation.score}/{task.criteria.length} tiêu chí có căn cứ</strong></div>{changed && <small>Phản hồi của lần nộp trước; ghi nhận để đánh giá bản sửa.</small>}{task.criteria.map((c, i) => <details key={c}><summary>{evaluation.met[i] ? <Check size={14} /> : <AlertCircle size={14} />}<span>{c}</span></summary><p>{task.feedback[i]}</p></details>)}</div>}<div className="task-next">{index > 0 && <button className="text-button" onClick={() => select(chapterTasks[index - 1].id)}><ChevronLeft size={16} /> Trước</button>}{index < chapterTasks.length - 1 && <button className="text-button" onClick={() => select(chapterTasks[index + 1].id)}>Nhiệm vụ tiếp <ChevronRight size={16} /></button>}</div>{chapterComplete(state, state.chapter) && <button className="chapter-finish" onClick={() => dispatch({ type: 'debrief' })}>Giải mã chương {state.chapter}<ArrowRight size={18} /></button>}</div>
     {viewingEvidence && (
       <div
