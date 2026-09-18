@@ -131,6 +131,25 @@ describe('InfoTooltip - Hiển thị icon (i) và tooltip giải thích', () => 
     fireEvent.click(wrapper);
     expect(wrapper.classList.contains('active')).toBe(false);
   });
+
+  it('hỗ trợ tiêu đề và nội dung phong phú (rich content/JSX)', () => {
+    render(
+      <InfoTooltip
+        title="Tiêu đề gợi ý"
+        content={
+          <div className="tooltip-rich-list">
+            <span className="tooltip-pill pill-fact">Dữ kiện thực tế</span>
+            <p>Đã được kiểm chứng.</p>
+          </div>
+        }
+      />
+    );
+
+    const tooltipBubble = screen.getByRole('tooltip');
+    expect(tooltipBubble.textContent).toContain('Tiêu đề gợi ý');
+    expect(tooltipBubble.textContent).toContain('Dữ kiện thực tế');
+    expect(tooltipBubble.textContent).toContain('Đã được kiểm chứng.');
+  });
 });
 
 

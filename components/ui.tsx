@@ -4,8 +4,23 @@ import {X,ArrowUp,ArrowDown,Plus,Trash2,Check,Paperclip,Lock,Info} from 'lucide-
 import type {Option} from '../game/types';
 import {useGame} from './GameProvider';
 
-export function InfoTooltip({ text, label, align = 'center' }: { text: string; label?: string; align?: 'left' | 'center' | 'right' }) {
+export function InfoTooltip({
+  text,
+  content,
+  title,
+  label,
+  align = 'center',
+  width,
+}: {
+  text?: ReactNode;
+  content?: ReactNode;
+  title?: string;
+  label?: string;
+  align?: 'left' | 'center' | 'right';
+  width?: number | string;
+}) {
   const [active, setActive] = useState(false);
+  const body = content ?? text;
   return (
     <span
       className={`info-tooltip-wrap align-${align} ${active ? 'active' : ''}`}
@@ -17,13 +32,18 @@ export function InfoTooltip({ text, label, align = 'center' }: { text: string; l
       }}
       tabIndex={0}
       aria-label={label || 'Xem giải thích'}
-      title={label || text}
+      title={typeof text === 'string' ? text : label}
     >
       <span className="info-tooltip-trigger" aria-hidden="true">
         <Info size={11} strokeWidth={2.5} />
       </span>
-      <span className="info-tooltip-bubble" role="tooltip">
-        {text}
+      <span
+        className={`info-tooltip-bubble align-${align}`}
+        role="tooltip"
+        style={width ? { width, maxWidth: typeof width === 'number' ? `${width}px` : width, minWidth: 'auto' } : undefined}
+      >
+        {title && <div className="tooltip-rich-title">{title}</div>}
+        {body}
       </span>
     </span>
   );

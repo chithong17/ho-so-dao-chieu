@@ -5333,24 +5333,24 @@ body[data-cinematic='true'] .mission-tracker-hud,
 
 .info-tooltip-bubble {
   position: absolute;
-  bottom: calc(100% + 7px);
+  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   z-index: 99999 !important;
-  min-width: 190px;
-  max-width: 280px;
-  padding: 7px 10px;
-  border-radius: 6px;
-  background: #fffdf7 !important;
-  border: 1px solid #7c5a2c !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  min-width: 220px;
+  max-width: 340px;
+  padding: 10px 13px;
+  border-radius: 8px;
+  background: #fffdf8 !important;
+  border: 1.5px solid #8a6338 !important;
+  box-shadow: 0 8px 24px rgba(40, 25, 10, 0.28), 0 2px 6px rgba(40, 25, 10, 0.12) !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
   font-size: 11.5px !important;
   font-weight: 500 !important;
-  line-height: 1.4 !important;
+  line-height: 1.45 !important;
   color: #24170d !important;
   text-align: left;
   white-space: normal;
@@ -5363,28 +5363,28 @@ body[data-cinematic='true'] .mission-tracker-hud,
   top: 100%;
   left: 50%;
   margin-left: -5px;
-  border-width: 5px;
+  border-width: 6px 5px 0 5px;
   border-style: solid;
-  border-color: #7c5a2c transparent transparent transparent;
+  border-color: #8a6338 transparent transparent transparent;
 }
 
 .info-tooltip-bubble.align-left {
-  left: 0;
+  left: -8px;
   transform: translateX(0) translateY(4px);
 }
 .info-tooltip-bubble.align-left::after {
-  left: 9px;
+  left: 12px;
   margin-left: 0;
 }
 
 .info-tooltip-bubble.align-right {
   left: auto;
-  right: 0;
+  right: -8px;
   transform: translateX(0) translateY(4px);
 }
 .info-tooltip-bubble.align-right::after {
   left: auto;
-  right: 9px;
+  right: 12px;
   margin-left: 0;
 }
 
@@ -5409,11 +5409,84 @@ body[data-cinematic='true'] .mission-tracker-hud,
   transform: translateX(0) translateY(0);
 }
 
+/* Rich Tooltip Layout */
+.tooltip-rich-title {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #5c3c1a !important;
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(124, 90, 44, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.2px;
+}
+
+.tooltip-rich-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tooltip-rich-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(124, 90, 44, 0.18);
+}
+
+.tooltip-rich-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.tooltip-pill {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  padding: 2px 7px;
+  border-radius: 4px;
+  line-height: 1.3;
+}
+
+.tooltip-pill.pill-fact {
+  background: rgba(22, 163, 74, 0.14) !important;
+  color: #15803d !important;
+  border: 1px solid rgba(22, 163, 74, 0.35) !important;
+}
+
+.tooltip-pill.pill-supported {
+  background: rgba(217, 119, 6, 0.14) !important;
+  color: #b45309 !important;
+  border: 1px solid rgba(217, 119, 6, 0.35) !important;
+}
+
+.tooltip-pill.pill-unproven {
+  background: rgba(220, 38, 38, 0.14) !important;
+  color: #b91c1c !important;
+  border: 1px solid rgba(220, 38, 38, 0.35) !important;
+}
+
+.tooltip-rich-row p {
+  margin: 0 !important;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+  color: #3b2816 !important;
+}
+
+.tooltip-rich-row p strong {
+  color: #1a0f05 !important;
+  font-weight: 700;
+}
+
 /* Specific notebook overrides to ensure crystal clear readability */
 .modal-overlay.point-and-click dialog.ui-notebook .info-tooltip-bubble,
 .modal-overlay.point-and-click dialog.ui-notebook .info-tooltip-bubble * {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-  color: #24170d !important;
   text-shadow: none !important;
 }
 
