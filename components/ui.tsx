@@ -9,7 +9,7 @@ export function InfoTooltip({
   content,
   title,
   label,
-  align = 'center',
+  align = 'left',
   width,
 }: {
   text?: ReactNode;
