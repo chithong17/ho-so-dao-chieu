@@ -33,6 +33,18 @@ export function GameProvider({children}:{children:ReactNode}){
   }
   dispatch(action);
  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleInspect = (e: Event) => {
+      const detail = (e as CustomEvent<{ id: string }>).detail;
+      if (detail?.id) {
+        customDispatch({ type: 'evidence', id: detail.id });
+      }
+    };
+    window.addEventListener('hsdc-inspect-evidence', handleInspect);
+    return () => window.removeEventListener('hsdc-inspect-evidence', handleInspect);
+  }, [customDispatch]);
  const lastRaw=useRef<string|null>(null),lastRevision=useRef(0),pending=useRef<GameState|null>(null);
  const blocked=useRef(false);
  const read=useCallback((m:Mode,d:Difficulty)=>{

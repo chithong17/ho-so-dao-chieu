@@ -1,5 +1,5 @@
 import {afterEach,describe,it,expect,vi} from 'vitest';
-import {cleanup,render,screen,fireEvent} from '@testing-library/react';
+import {cleanup,render,screen,fireEvent,act} from '@testing-library/react';
 import {GameProvider} from '../../components/GameProvider';
 import TaskPanel from '../../components/TaskPanel';
 import MissionTrackerPanel from '../../components/MissionTrackerPanel';
@@ -153,4 +153,44 @@ describe('Thu thập nhiệm vụ & Mission Tracker HUD', () => {
     expect(newItems[0].classList.contains('pending')).toBe(true);
     expect(newItems[0].classList.contains('found')).toBe(false);
   });
+
+  it('renders collected evidence on page 1 of the notebook and opens detail modal on click', () => {
+    render(
+      <GameProvider>
+        <TaskPanel />
+        <MissionTrackerPanel />
+      </GameProvider>
+    );
+
+    // Initial state: page 1 shows polaroid decor
+    expect(screen.getByText(/Mỗi vấn đề/i)).toBeDefined();
+    expect(screen.queryByText(/Hồ sơ chứng cứ đã thu thập/i)).toBeNull();
+
+    // Start tracking mission
+    const collectBtn = screen.getByRole('button', { name: /thu thập nhiệm vụ/i });
+    fireEvent.click(collectBtn);
+
+    // Simulate discovering evidence EZ01
+    act(() => {
+      window.dispatchEvent(new CustomEvent('hsdc-inspect-evidence', { detail: { id: 'EZ01', source: 'phone' } }));
+    });
+
+    // Page 1 should now show the collected evidence section
+    expect(screen.getByText(/CHỨNG CỨ ĐÃ THU THẬP/i)).toBeDefined();
+    const evidenceCard = document.querySelector('.collected-evidence-card')!;
+    expect(evidenceCard).toBeDefined();
+    expect(evidenceCard.textContent).toContain('EZ01');
+
+    // Click on the evidence card to view detail
+    fireEvent.click(evidenceCard);
+
+    // Evidence detail modal should be opened
+    const closeBtn = screen.getByRole('button', { name: /Đóng chi tiết chứng cứ/i });
+    expect(closeBtn).toBeDefined();
+
+    // Close modal
+    fireEvent.click(closeBtn);
+    expect(screen.queryByRole('button', { name: /Đóng chi tiết chứng cứ/i })).toBeNull();
+  });
 });
+
