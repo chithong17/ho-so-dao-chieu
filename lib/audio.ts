@@ -22,8 +22,11 @@ const sfxFiles: Record<string, string> = {
 };
 
 export function ensureBgmPlaying() {
+  if (typeof window === 'undefined') return;
+  if (!bgms['intro']) initAudio();
   if (isMuted || currentBgmType === 'none') return;
-  const bgm = bgms[currentBgmType === 'landing' ? 'intro' : currentBgmType];
+  const effectiveType = currentBgmType === 'landing' ? 'intro' : currentBgmType;
+  const bgm = bgms[effectiveType];
   if (bgm && bgm.paused) {
     bgm.play().catch(()=>{});
   }
@@ -56,12 +59,22 @@ export function initAudio() {
       sfxs[key] = a;
     }
   }
+
+  if (currentBgmType !== 'none' && !isMuted) {
+    const effectiveType = currentBgmType === 'landing' ? 'intro' : currentBgmType;
+    if (bgms[effectiveType] && bgms[effectiveType].paused) {
+      bgms[effectiveType].play().catch(()=>{});
+    }
+  }
 }
 
 export function setMute(muted: boolean) {
   isMuted = muted;
   Object.values(bgms).forEach(a => a.muted = muted);
   Object.values(sfxs).forEach(a => a.muted = muted);
+  if (!muted) {
+    ensureBgmPlaying();
+  }
 }
 
 export function getMute() {
@@ -69,6 +82,9 @@ export function getMute() {
 }
 
 export function playBgm(type: 'landing' | 'intro' | 'investigation' | 'verdict' | 'none') {
+  if (typeof window !== 'undefined' && !bgms['intro']) {
+    initAudio();
+  }
   currentBgmType = type;
   if (isMuted) return;
   
@@ -106,6 +122,9 @@ function playSynthSfx(type: string) {
 }
 
 export function playSfx(type: string) {
+  if (typeof window !== 'undefined' && Object.keys(sfxs).length === 0) {
+    initAudio();
+  }
   if (isMuted) return;
   
   if (sfxs[type]) {

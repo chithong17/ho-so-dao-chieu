@@ -11160,3 +11160,31 @@ body:has(.landing) .competition-entry {
     font-size: 84px
   }
 }
+
+.competition-audio-toggle {
+  position: fixed;
+  right: 24px;
+  top: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: #ffd477;
+  background: rgba(23, 31, 40, 0.88);
+  border: 1px solid #344253;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+  backdrop-filter: blur(4px);
+}
+
+.competition-audio-toggle:hover {
+  background: #253342;
+  color: #fff;
+  border-color: #ffd477;
+  transform: scale(1.08);
+}

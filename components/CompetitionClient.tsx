@@ -1,11 +1,12 @@
 'use client';
 /* eslint-disable @next/next/no-html-link-for-pages */
-import {useCallback,useEffect,useMemo,useState} from 'react';
-import {ArrowLeft,ChevronDown,Clock,Copy,Play,ShieldCheck,Trophy,Users,X} from 'lucide-react';
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import {ArrowLeft,ChevronDown,Clock,Copy,Play,ShieldCheck,Trophy,Users,Volume2,VolumeX,X} from 'lucide-react';
 import Game from './Game';
 import {getConfig} from '../game/config';
 import {SCORE_RULES,type RoomSnapshot} from '../game/competition';
 import type {Action,Difficulty,GameState} from '../game/types';
+import {initAudio,playBgm,playSfx,getMute,setMute,ensureBgmPlaying} from '../lib/audio';
 
 async function request<T>(url:string,init?:RequestInit):Promise<T>{const response=await fetch(url,{...init,headers:{'content-type':'application/json',...(init?.headers??{})}});const data=await response.json() as T&{error?:string};if(!response.ok)throw new Error(data.error??'Không thể kết nối phòng.');return data;}
 const post=<T,>(url:string,body:unknown={})=>request<T>(url,{method:'POST',body:JSON.stringify(body)});
@@ -13,6 +14,7 @@ const clock=(ms:number)=>`${String(Math.floor(Math.max(0,ms)/60000)).padStart(2,
 
 export default function CompetitionClient(){
  const [room,setRoom]=useState<RoomSnapshot|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[tab,setTab]=useState<'create'|'join'>('create'),[difficulty,setDifficulty]=useState<Difficulty>('standard'),[chapterCount,setChapterCount]=useState(3),[duration,setDuration]=useState(15),[maxPlayers,setMaxPlayers]=useState(10),[code,setCode]=useState(''),[name,setName]=useState(''),[conclusion,setConclusion]=useState(''),[confidence,setConfidence]=useState(''),[showBoard,setShowBoard]=useState(false),[clientNow,setClientNow]=useState(0);
+ const [muted,setMutedState]=useState(getMute());
  const [gameSeed,setGameSeed]=useState<{roomId:string;state:GameState;version:number;showIntro:boolean}|null>(null);
  const roomId=room?.id??'',roomUrl=roomId?`/api/competition/rooms/${roomId}`:'';
  const updateUrl=(id?:string)=>history.replaceState(null,'',id?`/thi-dau?room=${id}`:'/thi-dau');
@@ -21,28 +23,71 @@ export default function CompetitionClient(){
  useEffect(()=>{document.documentElement.dataset.competition='true';const id=new URLSearchParams(location.search).get('room');if(id)request<{room:RoomSnapshot}>(`/api/competition/rooms/${id}`).then(x=>acceptRoom(x.room)).catch(e=>setError(e.message));return()=>{delete document.documentElement.dataset.competition;};},[acceptRoom]);
  useEffect(()=>{const timer=setTimeout(()=>setClientNow(Date.now()),0),interval=setInterval(()=>setClientNow(Date.now()),1000);return()=>{clearTimeout(timer);clearInterval(interval);};},[]);
  useEffect(()=>{if(!roomId)return;const interval=room?.status==='playing'?5000:1000,timer=setInterval(()=>request<{room:RoomSnapshot}>(`/api/competition/rooms/${roomId}`).then(x=>acceptRoom(x.room)).catch(()=>{}),interval);return()=>clearInterval(timer);},[roomId,room?.status,acceptRoom]);
- const create=()=>act(()=>post('/api/competition/rooms',{difficulty,chapterCount,durationMinutes:duration,maxPlayers}));
- const join=()=>act(()=>post('/api/competition/rooms/join',{code,name}));
+
+ useEffect(()=>{
+  const handleInteraction=(e:MouseEvent)=>{
+   initAudio();
+   ensureBgmPlaying();
+   const target=e.target as HTMLElement|null;
+   if(!target)return;
+   const sfxTarget=target.closest('[data-sfx]');
+   if(sfxTarget){
+    playSfx(sfxTarget.getAttribute('data-sfx')||'click');
+   }else if(target.closest('button')||target.closest('a')||target.closest('summary')){
+    playSfx('click');
+   }
+  };
+  window.addEventListener('click',handleInteraction,true);
+  return()=>window.removeEventListener('click',handleInteraction,true);
+ },[]);
+
+ useEffect(()=>{
+  initAudio();
+  if(!room||room.status==='lobby'){
+   playBgm('landing');
+  }else if(room.status==='countdown'){
+   playBgm('intro');
+  }else if(room.status==='playing'){
+   if(room.role==='host')playBgm('investigation');
+  }else if(room.status==='finished'||room.status==='cancelled'){
+   playBgm('verdict');
+  }
+ },[room?.status,room?.role]);
+
+ const countdownSec=room?.status==='countdown'&&room?.startsAt?Math.max(1,Math.ceil((room.startsAt-clientNow)/1000)):null;
+ const lastCountdownSec=useRef<number|null>(null);
+ useEffect(()=>{
+  if(countdownSec!==null&&countdownSec!==lastCountdownSec.current){
+   lastCountdownSec.current=countdownSec;
+   playSfx('click');
+  }
+ },[countdownSec]);
+
+ const toggleMute=()=>{initAudio();const next=!getMute();setMute(next);setMutedState(next);};
+ const audioToggleBtn=<button className="competition-audio-toggle" onClick={toggleMute} title={muted?'Bật âm thanh':'Tắt âm thanh'} aria-label={muted?'Bật âm thanh':'Tắt âm thanh'}>{muted?<VolumeX size={20}/>:<Volume2 size={20}/>}</button>;
+
+ const create=()=>{playSfx('click');return act(()=>post('/api/competition/rooms',{difficulty,chapterCount,durationMinutes:duration,maxPlayers}));};
+ const join=()=>{playSfx('click');return act(()=>post('/api/competition/rooms/join',{code,name}));};
  const command=(operation:string,body:unknown={})=>act(()=>post(`${roomUrl}/${operation}`,body));
  const leave=async()=>{if(roomId)await post(`${roomUrl}/leave`).catch(()=>null);setRoom(null);setGameSeed(null);updateUrl();};
  const send=useCallback(async(action:Action,version:number)=>{if(!roomId)throw new Error('Phòng đã đóng.');const data=await post<{room:RoomSnapshot}>(`/api/competition/rooms/${roomId}/actions`,{actionId:crypto.randomUUID(),expectedVersion:version,action});acceptRoom(data.room);if(!data.room.me?.state)throw new Error('Không tải được tiến trình.');return {state:data.room.me.state,version:data.room.me.version};},[roomId,acceptRoom]);
- const openLeaderboard=useCallback(()=>setShowBoard(true),[]);
- const closeLeaderboard=useCallback(()=>setShowBoard(false),[]);
+ const openLeaderboard=useCallback(()=>{playSfx('page_turn');setShowBoard(true);},[]);
+ const closeLeaderboard=useCallback(()=>{playSfx('click');setShowBoard(false);},[]);
  const started=room&&room.role==='player'&&room.me?.state&&room.startsAt&&clientNow>=room.startsAt&&['countdown','playing'].includes(room.status);
  const bridge=useMemo(()=>gameSeed?{state:gameSeed.state,version:gameSeed.version,showIntro:gameSeed.showIntro,send,exit:closeLeaderboard}:undefined,[gameSeed,send,closeLeaderboard]);
 
- if(!room)return <main className="competition-shell"><a href="/" className="competition-back"><ArrowLeft size={16}/> Về hồ sơ</a><section className="competition-card competition-entry-card"><span className="eyebrow">HỒ SƠ ĐẢO CHIỀU · THI ĐẤU</span><h1>Phòng điều tra trực tuyến</h1><p className="muted">Tạo phòng để điều hành hoặc nhập mã bốn chữ số để tham gia.</p><div className="competition-tabs"><button className={tab==='create'?'active':''} onClick={()=>setTab('create')}>Tạo phòng</button><button className={tab==='join'?'active':''} onClick={()=>setTab('join')}>Vào phòng</button></div>{tab==='create'?<div className="competition-form"><label>Độ khó<select value={difficulty} onChange={e=>{const next=e.target.value as Difficulty;setDifficulty(next);setChapterCount(getConfig(next).lastChapter);}}><option value="standard">Khó</option><option value="easy">Dễ</option></select></label><label>Số chương<select value={chapterCount} onChange={e=>setChapterCount(Number(e.target.value))}>{getConfig(difficulty).chapters.map(chapter=><option key={chapter.id} value={chapter.id}>{chapter.id} chương</option>)}</select></label><label>Thời gian<select value={duration} onChange={e=>setDuration(Number(e.target.value))}>{[5,10,15,20,25,30,40,50,60].map(v=><option key={v} value={v}>{v} phút</option>)}</select></label><label>Số người tối đa<input type="number" min="2" max="30" value={maxPlayers} onChange={e=>setMaxPlayers(Number(e.target.value))}/></label><button className="primary" disabled={busy} onClick={create}><Users size={18}/> Tạo phòng</button></div>:<div className="competition-form"><label>Mã phòng<input inputMode="numeric" maxLength={4} value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))} placeholder="0000"/></label><label>Tên hiển thị<input maxLength={24} value={name} onChange={e=>setName(e.target.value)} placeholder="Tên của bạn"/></label><button className="primary" disabled={busy||code.length!==4||name.trim().length<2} onClick={join}><Play size={18}/> Tham gia</button></div>}{error&&<p className="competition-error" role="alert">{error}</p>}</section></main>;
+ if(!room)return <main className="competition-shell">{audioToggleBtn}<a href="/" className="competition-back"><ArrowLeft size={16}/> Về hồ sơ</a><section className="competition-card competition-entry-card"><span className="eyebrow">HỒ SƠ ĐẢO CHIỀU · THI ĐẤU</span><h1>Phòng điều tra trực tuyến</h1><p className="muted">Tạo phòng để điều hành hoặc nhập mã bốn chữ số để tham gia.</p><div className="competition-tabs"><button className={tab==='create'?'active':''} onClick={()=>setTab('create')}>Tạo phòng</button><button className={tab==='join'?'active':''} onClick={()=>setTab('join')}>Vào phòng</button></div>{tab==='create'?<div className="competition-form"><label>Độ khó<select value={difficulty} onChange={e=>{const next=e.target.value as Difficulty;setDifficulty(next);setChapterCount(getConfig(next).lastChapter);}}><option value="standard">Khó</option><option value="easy">Dễ</option></select></label><label>Số chương<select value={chapterCount} onChange={e=>setChapterCount(Number(e.target.value))}>{getConfig(difficulty).chapters.map(chapter=><option key={chapter.id} value={chapter.id}>{chapter.id} chương</option>)}</select></label><label>Thời gian<select value={duration} onChange={e=>setDuration(Number(e.target.value))}>{[5,10,15,20,25,30,40,50,60].map(v=><option key={v} value={v}>{v} phút</option>)}</select></label><label>Số người tối đa<input type="number" min="2" max="30" value={maxPlayers} onChange={e=>setMaxPlayers(Number(e.target.value))}/></label><button className="primary" disabled={busy} onClick={create}><Users size={18}/> Tạo phòng</button></div>:<div className="competition-form"><label>Mã phòng<input inputMode="numeric" maxLength={4} value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))} placeholder="0000"/></label><label>Tên hiển thị<input maxLength={24} value={name} onChange={e=>setName(e.target.value)} placeholder="Tên của bạn"/></label><button className="primary" disabled={busy||code.length!==4||name.trim().length<2} onClick={join}><Play size={18}/> Tham gia</button></div>}{error&&<p className="competition-error" role="alert">{error}</p>}</section></main>;
 
- if(room.status==='finished'||room.status==='cancelled')return <main className="competition-shell"><section className="competition-card competition-results"><Trophy size={42}/><span className="eyebrow">KẾT QUẢ PHÒNG {room.code}</span><h1>{room.status==='cancelled'?'Phòng đã hủy':'Bảng xếp hạng cuối cùng'}</h1><Leaderboard room={room} final/><div className="competition-actions"><a className="secondary" href="/">Về trang chủ</a><button className="primary" onClick={leave}>Rời phòng</button></div></section></main>;
+ if(room.status==='finished'||room.status==='cancelled')return <main className="competition-shell">{audioToggleBtn}<section className="competition-card competition-results"><Trophy size={42}/><span className="eyebrow">KẾT QUẢ PHÒNG {room.code}</span><h1>{room.status==='cancelled'?'Phòng đã hủy':'Bảng xếp hạng cuối cùng'}</h1><Leaderboard room={room} final/><div className="competition-actions"><a className="secondary" href="/">Về trang chủ</a><button className="primary" onClick={leave}>Rời phòng</button></div></section></main>;
 
- if(room.role==='host'&&room.status!=='lobby')return <main className="competition-shell"><section className="competition-card competition-results"><span className="eyebrow">ĐANG ĐIỀU HÀNH · PHÒNG {room.code}</span><h1>{room.status==='countdown'?'Chuẩn bị bắt đầu':'Bảng xếp hạng trực tiếp'}</h1><p className="muted">Còn {clock((room.endsAt??clientNow)-clientNow)} · cập nhật mỗi 5 giây</p><Leaderboard room={room}/><div className="competition-actions"><button className="primary" onClick={()=>command('end')}>Kết thúc trận</button></div>{error&&<p className="competition-error">{error}</p>}</section></main>;
+ if(room.role==='host'&&room.status!=='lobby')return <main className="competition-shell">{audioToggleBtn}<section className="competition-card competition-results"><span className="eyebrow">ĐANG ĐIỀU HÀNH · PHÒNG {room.code}</span><h1>{room.status==='countdown'?'Chuẩn bị bắt đầu':'Bảng xếp hạng trực tiếp'}</h1><p className="muted">Còn {clock((room.endsAt??clientNow)-clientNow)} · cập nhật mỗi 5 giây</p><Leaderboard room={room}/><div className="competition-actions"><button className="primary" onClick={()=>{playSfx('alert');command('end');}}>Kết thúc trận</button></div>{error&&<p className="competition-error">{error}</p>}</section></main>;
 
  if(started&&bridge){const cinematicPlaying=!!room.playStartsAt&&clientNow<room.playStartsAt;return <div className="competition-game"><Game competition={bridge} onLeaderboard={openLeaderboard}/>{!cinematicPlaying&&<CompetitionTimer room={room} now={clientNow}/>} {showBoard&&!cinematicPlaying&&<CompetitionLeaderboard room={room} onClose={closeLeaderboard}/>}</div>;}
 
- if(room.status==='countdown'&&room.startsAt&&clientNow<room.startsAt)return <main className="competition-shell"><section className="competition-card competition-countdown"><span>TRẬN ĐẤU BẮT ĐẦU SAU</span><strong>{Math.max(1,Math.ceil((room.startsAt-clientNow)/1000))}</strong><p>Cinematic sẽ xuất hiện đồng thời cho mọi người.</p></section></main>;
+ if(room.status==='countdown'&&room.startsAt&&clientNow<room.startsAt)return <main className="competition-shell">{audioToggleBtn}<section className="competition-card competition-countdown"><span>TRẬN ĐẤU BẮT ĐẦU SAU</span><strong>{Math.max(1,Math.ceil((room.startsAt-clientNow)/1000))}</strong><p>Cinematic sẽ xuất hiện đồng thời cho mọi người.</p></section></main>;
 
  const players=room.members.filter(m=>m.role==='player'),allReady=players.length>=2&&players.every(p=>p.ready&&p.connected),options=getConfig(room.difficulty).initialOptions;
- return <main className="competition-shell"><section className="competition-card competition-lobby"><header><div><span className="eyebrow">PHÒNG CHỜ</span><h1>Mã phòng {room.code}</h1></div><button className="secondary" onClick={()=>navigator.clipboard?.writeText(room.code)}><Copy size={16}/> Sao chép</button></header><div className="competition-meta"><span><ShieldCheck size={16}/> {room.difficulty==='standard'?'Khó':'Dễ'}</span><span>{room.chapterCount} chương</span><span><Clock size={16}/> {room.durationSeconds/60} phút</span><span><Users size={16}/> {players.length}/{room.maxPlayers}</span></div><div className="competition-lobby-grid"><section><h2>Người chơi</h2><div className="competition-members">{players.map(p=><div key={p.id}><i className={p.connected?'online':''}/><strong>{p.name}</strong><span>{p.ready?'Sẵn sàng':p.connected?'Đang chuẩn bị':'Mất kết nối'}</span>{room.role==='host'&&<button aria-label={`Loại ${p.name}`} onClick={()=>command('remove-player',{memberId:p.id})}>×</button>}</div>)}{!players.length&&<p className="muted">Đang chờ người chơi nhập mã phòng…</p>}</div></section><aside>{room.role==='host'?<><h2>Điều hành</h2><p>Trận bắt đầu khi có ít nhất 2 người và tất cả đã sẵn sàng.</p><button className="primary" disabled={!allReady||busy} onClick={()=>command('start')}><Play size={18}/> Bắt đầu</button><button className="text-button" onClick={()=>command('end')}>Hủy phòng</button></>:<><h2>Nhận định ban đầu</h2><label>Điều gì có thể đã xảy ra?<select value={conclusion} onChange={e=>{setConclusion(e.target.value);if(room.me?.ready)command('ready',{conclusion:e.target.value,confidence,ready:false});}}><option value="">Chọn nhận định</option>{options.map(o=><option key={o.id} value={o.id}>{o.label}</option>)}</select></label><label>Mức độ tin tưởng<select value={confidence} onChange={e=>{setConfidence(e.target.value);if(room.me?.ready)command('ready',{conclusion,confidence:e.target.value,ready:false});}}><option value="">Chọn mức độ</option>{['Thấp','Vừa','Cao'].map(v=><option key={v}>{v}</option>)}</select></label><button className="primary" disabled={!conclusion||!confidence||busy} onClick={()=>command('ready',{conclusion,confidence,ready:!room.me?.ready})}>{room.me?.ready?'Hủy sẵn sàng':'Sẵn sàng'}</button></>}</aside></div><details className="competition-rules"><summary>Quy tắc tính điểm <ChevronDown size={16}/></summary><p>Chứng cứ thuộc nhiệm vụ hiện tại +{SCORE_RULES.evidence}; tiêu chí đúng +{SCORE_RULES.criterion}; hoàn thành nhiệm vụ +{SCORE_RULES.task}; hoàn thành chương +{SCORE_RULES.chapter}; gợi ý {SCORE_RULES.hint}; trả lời sai {SCORE_RULES.wrong}; kết thúc tốt nhất +{SCORE_RULES.bestFinish}, kết thúc khác +{SCORE_RULES.otherFinish}.</p></details>{error&&<p className="competition-error">{error}</p>}</section></main>;
+ return <main className="competition-shell">{audioToggleBtn}<section className="competition-card competition-lobby"><header><div><span className="eyebrow">PHÒNG CHỜ</span><h1>Mã phòng {room.code}</h1></div><button className="secondary" onClick={()=>{playSfx('success');navigator.clipboard?.writeText(room.code);}}><Copy size={16}/> Sao chép</button></header><div className="competition-meta"><span><ShieldCheck size={16}/> {room.difficulty==='standard'?'Khó':'Dễ'}</span><span>{room.chapterCount} chương</span><span><Clock size={16}/> {room.durationSeconds/60} phút</span><span><Users size={16}/> {players.length}/{room.maxPlayers}</span></div><div className="competition-lobby-grid"><section><h2>Người chơi</h2><div className="competition-members">{players.map(p=><div key={p.id}><i className={p.connected?'online':''}/><strong>{p.name}</strong><span>{p.ready?'Sẵn sàng':p.connected?'Đang chuẩn bị':'Mất kết nối'}</span>{room.role==='host'&&<button aria-label={`Loại ${p.name}`} onClick={()=>{playSfx('alert');command('remove-player',{memberId:p.id});}}>×</button>}</div>)}{!players.length&&<p className="muted">Đang chờ người chơi nhập mã phòng…</p>}</div></section><aside>{room.role==='host'?<><h2>Điều hành</h2><p>Trận bắt đầu khi có ít nhất 2 người và tất cả đã sẵn sàng.</p><button className="primary" disabled={!allReady||busy} onClick={()=>{playSfx('chapter');command('start');}}><Play size={18}/> Bắt đầu</button><button className="text-button" onClick={()=>{playSfx('alert');command('end');}}>Hủy phòng</button></>:<><h2>Nhận định ban đầu</h2><label>Điều gì có thể đã xảy ra?<select value={conclusion} onChange={e=>{setConclusion(e.target.value);if(room.me?.ready)command('ready',{conclusion:e.target.value,confidence,ready:false});}}><option value="">Chọn nhận định</option>{options.map(o=><option key={o.id} value={o.id}>{o.label}</option>)}</select></label><label>Mức độ tin tưởng<select value={confidence} onChange={e=>{setConfidence(e.target.value);if(room.me?.ready)command('ready',{conclusion,confidence:e.target.value,ready:false});}}><option value="">Chọn mức độ</option>{['Thấp','Vừa','Cao'].map(v=><option key={v}>{v}</option>)}</select></label><button className="primary" disabled={!conclusion||!confidence||busy} onClick={()=>{playSfx('stamp');command('ready',{conclusion,confidence,ready:!room.me?.ready});}}>{room.me?.ready?'Hủy sẵn sàng':'Sẵn sàng'}</button></>}</aside></div><details className="competition-rules"><summary>Quy tắc tính điểm <ChevronDown size={16}/></summary><p>Chứng cứ thuộc nhiệm vụ hiện tại +{SCORE_RULES.evidence}; tiêu chí đúng +{SCORE_RULES.criterion}; hoàn thành nhiệm vụ +{SCORE_RULES.task}; hoàn thành chương +{SCORE_RULES.chapter}; gợi ý {SCORE_RULES.hint}; trả lời sai {SCORE_RULES.wrong}; kết thúc tốt nhất +{SCORE_RULES.bestFinish}, kết thúc khác +{SCORE_RULES.otherFinish}.</p></details>{error&&<p className="competition-error">{error}</p>}</section></main>;
 }
 
 export function CompetitionTimer({room,now}:{room:RoomSnapshot;now:number}){return <div className="competition-timer" aria-label="Thời gian còn lại">{clock((room.endsAt??now)-now)}</div>}
