@@ -11124,27 +11124,6 @@ body:has(.landing) .competition-entry {
   font-size: 12px
 }
 
-.competition-start-lock {
-  position: fixed;
-  z-index: 600;
-  inset: 0;
-  background: #090d12d9;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 9vh;
-  pointer-events: all
-}
-
-.competition-start-lock strong {
-  font-size: 20px
-}
-
-.competition-start-lock span {
-  color: var(--gold-light)
-}
-
 @media(max-width:720px) {
   .competition-entry {
     left: 18px;
