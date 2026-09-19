@@ -2433,28 +2433,34 @@ td {
   font-size: 14px
 }
 
-/* Redesigned Chapter Debrief Layout */
+/* Redesigned Chapter Debrief Layout - Expanded Wide Display */
 .debrief-page {
-  max-width: 1160px;
-  margin: auto;
-  padding: 45px 28px 75px;
+  width: 96%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 38px 24px 80px;
+}
+
+.debrief-page .summary-heading {
+  max-width: 1100px;
+  margin-bottom: 28px;
 }
 
 .debrief-section {
-  margin-top: 48px;
-  padding-top: 36px;
+  margin-top: 44px;
+  padding-top: 32px;
   border-top: 1px solid #283542;
 }
 
 .debrief-section-header {
-  margin-bottom: 26px;
+  margin-bottom: 22px;
 }
 
 .debrief-section-header .section-title-wrap {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   flex-wrap: wrap;
 }
 
@@ -2502,44 +2508,49 @@ td {
 }
 
 .section-hint-inline {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--muted);
   font-weight: 400;
-  margin-left: 6px;
+  margin-left: 8px;
 }
 
-/* SECTION 1: Balanced Horizontal Polaroid Cards (Không bị bó dài) */
+/* SECTION 1: Extra Wide Balanced Horizontal Evidence Cards */
 .debrief-evidence-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px 20px;
+  gap: 24px 28px;
   margin-top: 18px;
 }
 
-@media (max-width: 820px) {
+@media (max-width: 960px) {
   .debrief-evidence-grid {
     grid-template-columns: 1fr;
   }
 }
 
 .debrief-polaroid-card {
-  background: #fdfbf7;
-  border: 1px solid #dfd6c3;
-  border-radius: 6px;
-  padding: 14px 16px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.12);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  width: 100% !important;
+  max-width: none !important;
+  background: #fdfbf7 !important;
+  border: 1px solid #ded4bf !important;
+  border-radius: 6px !important;
+  padding: 16px 22px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.32), 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
   outline: none;
-  color: #1e252e;
+  color: #1e252e !important;
+  box-sizing: border-box !important;
 }
 
 .debrief-polaroid-card:hover {
   transform: translateY(-4px) !important;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 0 2px var(--gold);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--gold) !important;
   z-index: 10;
 }
 
@@ -2553,10 +2564,10 @@ td {
   top: -11px;
   left: 50%;
   transform: translateX(-50%);
-  width: 76px;
-  height: 22px;
+  width: 86px;
+  height: 24px;
   background: rgba(238, 230, 205, 0.92);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(2px);
   border-left: 1px dashed rgba(160, 140, 100, 0.45);
   border-right: 1px dashed rgba(160, 140, 100, 0.45);
@@ -2565,47 +2576,51 @@ td {
 }
 
 .polaroid-top-row {
-  display: flex;
-  gap: 14px;
-  align-items: center;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 18px !important;
+  align-items: center !important;
+  text-align: left !important;
+  width: 100% !important;
 }
 
 .debrief-polaroid-card .polaroid-photo-frame {
-  width: 110px;
-  height: 80px;
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-  background: #131a22;
-  border: 1px solid rgba(0,0,0,0.15);
-  flex-shrink: 0;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+  width: 130px !important;
+  height: 92px !important;
+  min-width: 130px !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: #131a22 !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  flex-shrink: 0 !important;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.45) !important;
 }
 
 .debrief-polaroid-card .polaroid-photo-img {
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  filter: brightness(0.82) contrast(1.1);
-  transition: transform 0.3s ease;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: cover !important;
+  background-position: center !important;
+  position: relative !important;
+  filter: brightness(0.82) contrast(1.1) !important;
+  transition: transform 0.3s ease !important;
 }
 
 .debrief-polaroid-card:hover .polaroid-photo-img {
-  transform: scale(1.06);
+  transform: scale(1.06) !important;
 }
 
 .debrief-polaroid-card .polaroid-stamp {
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 6px;
+  left: 6px;
   background: #c2410c;
   color: #fff;
   font-family: Consolas, monospace;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 800;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: 2px;
   letter-spacing: 0.5px;
   z-index: 2;
@@ -2613,31 +2628,31 @@ td {
 
 .debrief-polaroid-card .polaroid-app-tag {
   position: absolute;
-  bottom: 5px;
-  right: 5px;
+  bottom: 6px;
+  right: 6px;
   background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(4px);
   color: #e2e8f0;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 600;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 2px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   z-index: 2;
 }
 
 .polaroid-view-overlay {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 6px;
+  right: 6px;
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: 2px;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.75);
   color: #fff;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 600;
   opacity: 0;
   transition: opacity 0.2s;
@@ -2649,71 +2664,83 @@ td {
 }
 
 .polaroid-meta-col {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex: 1;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  gap: 5px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
 }
 
 .debrief-polaroid-card .polaroid-title {
-  font-size: 14.5px;
-  font-weight: 700;
-  color: #1a222c;
-  line-height: 1.35;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1a222c !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+  text-align: left !important;
 }
 
 .debrief-polaroid-card .polaroid-author-time {
-  font-size: 11.5px;
-  color: #64748b;
-  font-family: var(--font-body);
+  font-size: 12.5px !important;
+  color: #64748b !important;
+  font-family: var(--font-body) !important;
+  text-align: left !important;
 }
 
 .polaroid-click-hint {
-  font-size: 11px;
-  color: #b8860b;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
+  font-size: 11.5px !important;
+  color: #b8860b !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  margin-top: 3px !important;
 }
 
-/* Wide Solution Box */
+/* Wide Solution Box Across Full Card */
 .debrief-evidence-solution {
-  background: #f4efe1;
-  border: 1px solid #dcd1ba;
-  border-left: 3.5px solid #b8860b;
-  border-radius: 4px;
-  padding: 8px 12px;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: #f4efe1 !important;
+  border: 1px solid #dcd1ba !important;
+  border-left: 4px solid #b8860b !important;
+  border-radius: 4px !important;
+  padding: 11px 16px !important;
+  margin-top: 13px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  gap: 5px !important;
 }
 
 .debrief-evidence-solution .solution-badge {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #855500;
-  letter-spacing: 0.5px;
-  font-family: Consolas, monospace;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #855500 !important;
+  letter-spacing: 0.5px !important;
+  font-family: Consolas, monospace !important;
+  text-transform: uppercase !important;
 }
 
 .debrief-evidence-solution .solution-badge svg {
   color: #15803d;
+  flex-shrink: 0;
 }
 
 .debrief-evidence-solution .solution-text {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #241e14;
-  margin: 0;
-  font-weight: 500;
-  font-family: var(--font-body);
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  color: #241e14 !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+  font-family: var(--font-body) !important;
+  text-align: left !important;
 }
 
 /* Task performance pills strip */

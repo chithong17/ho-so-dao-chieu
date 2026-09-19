@@ -68,7 +68,7 @@ export function Debrief() {
             return (
               <div
                 key={ev.id}
-                className="debrief-polaroid-card taped-polaroid-item"
+                className="debrief-polaroid-card"
                 style={{ transform: `rotate(${cardAngle}deg)` }}
                 onClick={() => setViewingEvidence(ev)}
                 role="button"
