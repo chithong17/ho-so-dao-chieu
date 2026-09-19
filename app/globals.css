@@ -10980,12 +10980,6 @@ body:has(.landing) .competition-entry {
   padding: 0;
   background: rgba(4, 7, 10, 0.88);
   backdrop-filter: blur(4px);
-  animation: lbOverlayFadeIn 0.2s ease-out;
-}
-
-@keyframes lbOverlayFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .competition-leaderboard-board {
