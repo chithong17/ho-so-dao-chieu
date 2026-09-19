@@ -20,7 +20,7 @@ function CinematicIntro({ onComplete }: { onComplete: () => void }) {
 
   const slides = [
     { img: '/cinematic_1.jpg', text: '19:40. Đêm triển lãm học phần. Nhóm Mạch Nối chuẩn bị cho lượt trình bày cuối.' },
-    { img: '/cinematic_1b.jpg', text: 'Mỗi thành viên tin rằng phần việc của mình đã hoàn thành. Nhưng chưa ai kiểm thử toàn bộ luồng.' },
+    { img: '/cinematic_1b.jpg', text: 'Mỗi thành viên tin rằng phần việc của mình đã hoàn thành. Nhưng chưa ai test toàn bộ luồng.' },
     { img: '/cinematic_2.jpg', text: '19:50. Tên dự án không còn trong danh sách trình bày. Bản demo đã bị ẩn, hay đã xảy ra điều gì khác?' },
     { img: '/cinematic_23.jpg', text: 'Một ảnh chụp tin nhắn của Nam xuất hiện: “...mình không thể tiếp tục làm như cũ.”' },
     { img: '/cinematic_3.jpg', text: 'Một đoạn tin nhắn có thể khiến mọi người nghi ngờ. Nhưng nó có phải là toàn bộ sự thật?' },
@@ -82,36 +82,36 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro, competition
   return (
     <div className="room-container">
       <div className="room-scene">
-        
-        {scene === 'intro' && <CinematicIntro onComplete={() => { 
-          if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('hs01_intro_seen', '1'); setScene('desk'); 
+
+        {scene === 'intro' && <CinematicIntro onComplete={() => {
+          if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('hs01_intro_seen', '1'); setScene('desk');
         }} />}
 
-                        {scene === 'desk' && (
+        {scene === 'desk' && (
           <>
-            <img 
-              src="/scene_desk.jpg" 
-              alt="Desk View" 
-              className="room-bg" 
-              draggable="false" 
+            <img
+              src="/scene_desk.jpg"
+              alt="Desk View"
+              className="room-bg"
+              draggable="false"
               style={{ filter: 'sepia(0.3) saturate(1.2) brightness(1.1) hue-rotate(-5deg)' }}
             />
-            
+
             <Interactable
               x="39%" y="34%" width="16%" height="23%"
               label="Máy tính - nhật ký kỹ thuật"
               icon={<Laptop size={24} />}
               onClick={() => onInteract('laptop')} sfx="laptop"
             />
-            
+
             <Interactable
               x="28%" y="54%" width="14%" height="12%"
               label="Hồ sơ vụ án (Sổ điều tra)"
               icon={<Book size={24} />}
               onClick={() => onInteract('notebook')} sfx="page_turn"
             />
-            
-                                    <Interactable
+
+            <Interactable
               x="46%" y="61%" width="9%" height="8%"
               label="Điện thoại - liên lạc nhóm"
               icon={<Smartphone size={24} />}
@@ -152,18 +152,18 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro, competition
         <button className="nav-arrow right" onClick={toggleScene}>
           <ChevronRight size={48} />
         </button>
-        
+
         {/* Exit Button */}
         <button className="exit-room-btn" onClick={onExit}>
           X
         </button>
-        <button 
-          className="exit-room-btn" 
-          style={{ left: 'auto', right: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }} 
+        <button
+          className="exit-room-btn"
+          style={{ left: 'auto', right: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
           onClick={toggleMute}
           title={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}
         >
-          {muted ? <VolumeX size={20}/> : <Volume2 size={20}/>}
+          {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
         </button>
 
         {(scene === 'desk' || scene === 'wall') && (

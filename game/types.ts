@@ -10,7 +10,7 @@ export type Task = { id: string; chapter: Chapter; concept: ConceptId; concepts?
 export type Answer =
  | { kind: 'easyOrder'; order: string[]; conclusion: string }
  | { kind: 'classify'; categories: Record<string,string>; evidence: string[] }
- | { kind: 'chain'; order: string[]; evidence: string[]; relation: string }
+ | { kind: 'chain'; order: string[]; evidence?: string[]; relation: string }
  | { kind: 'relations'; priority: string[]; monitor: string[]; reason: string }
  | { kind: 'choices'; values: Record<string,string> }
  | { kind: 'report'; order: string[]; reason: string }

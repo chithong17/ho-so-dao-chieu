@@ -24,10 +24,10 @@ Kết thúc Dễ: V1/V2 → nhánh 1; V4 hoặc thiếu cơ sở → nhánh 2. C
 
 Chạy `npm run test:unit`, `npm run typecheck`, `npm run test:e2e`, `npm run build`.
 
-Bộ kiểm thử đơn vị cũ có một dữ liệu sai: đáp án gọi là yếu ở T01 thực ra đạt 3/4, bằng ngưỡng qua chương. Đã sửa dữ liệu kiểm thử thành 2/4; không đổi ngưỡng hoặc cách chấm Tiêu chuẩn.
+Bộ test đơn vị cũ có một dữ liệu sai: đáp án gọi là yếu ở T01 thực ra đạt 3/4, bằng ngưỡng qua chương. Đã sửa dữ liệu test thành 2/4; không đổi ngưỡng hoặc cách chấm Tiêu chuẩn.
 
 Thời lượng 8–12 phút là mục tiêu nội dung, chưa phải kết quả thử với ba người mới. Xuất bản là bước bàn giao riêng như PLAN.md.
 
-Kết quả kiểm tra khi bàn giao: TypeScript đạt; 53 kiểm thử đơn vị đạt; 8 kịch bản Playwright đạt (5 đạt trong lượt đầy đủ, 3 kịch bản được chạy lại sau khi điều chỉnh bộ kiểm thử theo hành vi hiện có). Hai kịch bản chơi trọn lượt xác nhận Dễ đạt 9/9 và Tiêu chuẩn đạt 44/44, đều đi đến kết thúc 4.
+Kết quả kiểm tra khi bàn giao: TypeScript đạt; 53 test đơn vị đạt; 8 kịch bản Playwright đạt (5 đạt trong lượt đầy đủ, 3 kịch bản được chạy lại sau khi điều chỉnh bộ test theo hành vi hiện có). Hai kịch bản chơi trọn lượt xác nhận Dễ đạt 9/9 và Tiêu chuẩn đạt 44/44, đều đi đến kết thúc 4.
 
-Build thành công. Công cụ build báo cảnh báo cú pháp CSS có sẵn trong khối `@media print`; không sửa stylesheet vì phạm vi yêu cầu giữ nguyên giao diện. Khi kiểm thử, giữ nguyên hành vi cũ: header và nút ghim trên điện thoại bị CSS ẩn; nếu quay lại phòng rất sớm, đoạn mở đầu có thể phát lại; thông báo xung đột có thể nằm sau phòng nên dùng nút thoát phòng để tải bản mới nhất.
+Build thành công. Công cụ build báo cảnh báo cú pháp CSS có sẵn trong khối `@media print`; không sửa stylesheet vì phạm vi yêu cầu giữ nguyên giao diện. Khi test, giữ nguyên hành vi cũ: header và nút ghim trên điện thoại bị CSS ẩn; nếu quay lại phòng rất sớm, đoạn mở đầu có thể phát lại; thông báo xung đột có thể nằm sau phòng nên dùng nút thoát phòng để tải bản mới nhất.

@@ -53,7 +53,7 @@ Chương 1 mở EZ01–EZ04; chương 2 thêm EZ05–EZ07. Các tài liệu cũ 
 - Chương 2: T04–T07; nộp đủ, T05 và T07 tối thiểu 3/4.
 - Chương 3: T08–T11; nộp đủ, T09 tối thiểu 3/4 và T11 đạt 4/4.
 - T01 là phân loại nhận định; T04 mới là bài so sánh ba nhóm. T06 là sắp báo cáo; T07 là bài mâu thuẫn quy trình.
-- T01/T02 yêu cầu gắn hai chứng cứ trong câu trả lời. Các bài khác không có thao tác gắn chứng cứ bắt buộc khi nộp.
+- T01 yêu cầu gắn hai chứng cứ trong câu trả lời. Các bài khác không có thao tác gắn chứng cứ bắt buộc khi nộp.
 - T11 giữ mô phỏng 60 phút. Kết quả tổng tối đa 44 tiêu chí; kết luận cuối gắn tối đa bốn chứng cứ.
 
 ## Bản lưu

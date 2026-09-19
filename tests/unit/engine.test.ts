@@ -14,7 +14,7 @@ describe('Nội dung hồ sơ',()=>{
 describe('Đánh giá lập luận',()=>{
  for(const t of tasks){it(`${t.id} đáp án chuẩn đạt 4/4`,()=>{expect(answerComplete(t.id,perfect[t.id])).toBe(true);expect(evaluateChallenge(t.id,perfect[t.id]).score).toBe(4);expect(answerComplete(t.id,emptyAnswer(t.id))).toBe(false);});}
  it('một tiêu chí sai giảm một điểm, không chấm theo tốc độ',()=>{expect(evaluateChallenge('T01',{kind:'classify',categories:{s1:'fact',s2:'unproven',s3:'unproven',s4:'fact'},evidence:['E07','E08']}).score).toBe(3);});
- it('mạng không thay cho cơ chế dữ liệu trong chuỗi',()=>{const e=evaluateChallenge('T02',{kind:'chain',order:['requirement','network','reject','failure'],evidence:['E04','E05'],relation:'decision'});expect(e.met).toEqual([false,false,true,true]);});
+ it('mạng không thay cho cơ chế dữ liệu trong chuỗi',()=>{const e=evaluateChallenge('T02',{kind:'chain',order:['requirement','network','reject','failure'],relation:'decision'});expect(e.met).toEqual([false,false,true,true]);});
  it('không chấp nhận thẻ trùng hoặc thiếu thẻ ảnh hưởng',()=>{expect(evaluateChallenge('T06',{kind:'report',order:['req','incompat','test','test','measure','retest'],reason:'structure'}).met).toEqual([false,true,false,true]);});
  it('không đánh đồng A nguyên trạng với A′',()=>{expect(evaluateChallenge('T09',{kind:'choices',values:{model:'free',fromA:'autonomy',fromB:'standards',return:'higher'}}).score).toBe(3);});
  it('tăng trang và đổi màu không đủ để đạt năng lực cốt lõi',()=>{expect(evaluateChallenge('T10',{kind:'choices',values:{v1:'progress',v2:'best',v3:'capability',limit:'limited'}}).score).toBe(2);});

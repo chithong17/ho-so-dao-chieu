@@ -3,7 +3,7 @@ import {createState,reduceGame} from '../game/engine';
 import {tasks} from '../game/tasks';
 export const perfect:Record<string,Answer>={
  T01:{kind:'classify',categories:{s1:'fact',s2:'unproven',s3:'unproven',s4:'supported'},evidence:['E07','E08']},
- T02:{kind:'chain',order:['requirement','mismatch','reject','failure'],evidence:['E04','E05'],relation:'decision'},
+ T02:{kind:'chain',order:['requirement','mismatch','reject','failure'],evidence:[],relation:'decision'},
  T03:{kind:'relations',priority:['req_update','handover_test'],monitor:['test_result','condition_fallback'],reason:'core'},
  T04:{kind:'choices',values:{cases:'specific',common:'incompatible',detail:'field',limit:'limited'}},
  T05:{kind:'choices',values:{fixed:'reject',network:'external',impact:'caused',change:'conditional'}},
