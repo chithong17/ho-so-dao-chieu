@@ -2045,13 +2045,14 @@ td {
 
 .sort-stack li {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
   background: #19212c;
   border: 1px solid #465143;
-  padding: 9px 8px;
+  padding: 6px 10px;
   border-radius: 4px;
-  margin: 7px 0
+  margin: 6px 0;
+  min-height: 38px
 }
 
 .sort-stack li>b {
@@ -2063,25 +2064,30 @@ td {
 .sort-stack li>span {
   font-size: 10px;
   flex: 1;
-  line-height: 1.65
+  line-height: 1.4
 }
 
 .sort-controls {
   display: flex;
-  flex-direction: column;
-  gap: 1px
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0
 }
 
 .sort-controls button {
   border: 0;
   background: #2a3540;
-  width: 30px;
-  min-height: 30px;
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 3px;
-  color: #a7b8c3
+  color: #a7b8c3;
+  padding: 0;
+  cursor: pointer
 }
 
 .empty-slot {
@@ -5934,16 +5940,37 @@ dialog.ui-files .inner-content {
   background: transparent !important;
   border: 1px dashed rgba(26, 20, 15, 0.4) !important;
   color: #1a140f !important;
+  padding: 6px 10px !important;
+  margin: 5px 0 !important;
+  min-height: 38px !important;
+  border-radius: 6px !important;
 }
 
 .modal-overlay.point-and-click dialog.ui-notebook .sort-stack li>b {
   color: rgba(26, 20, 15, 0.6) !important;
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .sort-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+}
+
 .modal-overlay.point-and-click dialog.ui-notebook .sort-controls button {
   background: rgba(246, 225, 178, 0.4) !important;
   color: #1a140f !important;
   border: 1px solid rgba(26, 20, 15, 0.3) !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
 }
 
 .modal-overlay.point-and-click dialog.ui-notebook .sort-controls button:disabled {
