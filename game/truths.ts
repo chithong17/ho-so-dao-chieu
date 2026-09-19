@@ -23,28 +23,28 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         number: '01',
         title: 'Lỗi dữ liệu nội bộ (Nguyên nhân cốt lõi)',
         highlight: 'E03 → E04 → E05 (Lệch name và fullName)',
-        description: 'Lúc 18:10, Quân gửi email thông báo: trường name đổi thành fullName và API bắt buộc trường mới này (E03). Tuy nhiên, phần giao diện do Nam phụ trách chưa kịp cập nhật, vẫn gửi trường name cũ (E04). Lúc 19:20, Nam chạy test cục bộ trên máy (registration.log - E05): API từ chối lưu vì thiếu fullName. Luồng đăng ký đã gãy ngay trên máy local từ trước khi có sự cố mạng.',
+        description: 'Lúc 18:10, Quân đổi trường name thành fullName bắt buộc trong API (E03), nhưng giao diện của Nam chưa kịp cập nhật nên vẫn gửi name cũ (E04). Lúc 19:20, Nam test cục bộ thì bị API từ chối lưu vì thiếu fullName (E05). Luồng đăng ký đã gãy ngay trên máy local từ trước khi có sự cố mạng.',
         badges: ['E03', 'E04', 'E05']
       },
       {
         number: '02',
         title: 'Vai trò của sự cố mạng (Điều kiện bên ngoài / Ngẫu nhiên)',
         highlight: '19:35 – 19:45 gián đoạn kết nối',
-        description: 'Mạng khu vực bị ngắt 10 phút từ 19:35 (E06). Sự cố mạng chỉ cản trở việc chia sẻ online và đồng bộ từ xa, hoàn toàn KHÔNG PHẢI nguyên nhân sinh ra lỗi lệch fullName vốn đã xuất hiện và làm sập luồng đăng ký từ 19:20.',
+        description: 'Mạng khu vực bị ngắt 10 phút lúc 19:35 (E06). Sự cố này chỉ cản trở đồng bộ từ xa, hoàn toàn KHÔNG PHẢI nguyên nhân sinh ra lỗi lệch fullName vốn đã làm sập luồng đăng ký từ 19:20.',
         badges: ['E06']
       },
       {
         number: '03',
         title: 'Sự thật về tin nhắn của Nam & Quyết định của nhóm',
         highlight: 'Nam không xóa code · Mai chủ động set HIDDEN',
-        description: 'Đọc đầy đủ hội thoại lúc 19:42 (E07): Nam bức xúc vì đổi yêu cầu không báo trước, nhưng xác nhận mã nguồn vẫn còn nguyên trên máy và đề nghị chốt dữ liệu để test lại. Linh đề xuất tạm rút demo vì chưa test; Mai dùng quyền Team Lead đổi trạng thái sang HIDDEN lúc 19:50 (E08). Hoàn toàn không có ai xóa mã nguồn hay phá hoại dự án.',
+        description: 'Hội thoại đầy đủ lúc 19:42 (E07) cho thấy Nam chỉ bức xúc vì đổi yêu cầu, mã nguồn vẫn còn nguyên trên máy. Linh đề xuất tạm rút demo vì chưa test; Mai dùng quyền Team Lead đổi trạng thái sang HIDDEN lúc 19:50 (E08). Hoàn toàn không có ai xóa mã nguồn hay phá hoại dự án.',
         badges: ['E07', 'E08']
       },
       {
         number: '04',
         title: 'Điểm mù quy trình: Thiếu kiểm thử tích hợp toàn luồng',
         highlight: 'Xong từng phần ≠ Toàn hệ thống hoạt động',
-        description: 'Bảng chuẩn bị (E09) cho thấy các thành viên đều báo hoàn thành phần việc riêng lẻ được giao. Tuy nhiên, không ai nhận trách nhiệm kiểm thử tích hợp đầu-cuối toàn hệ thống khi ghép giao diện, API và cơ sở dữ liệu trước giờ mở màn triển lãm.',
+        description: 'Bảng chuẩn bị (E09) cho thấy các thành viên đều xong phần việc riêng, nhưng không ai nhận trách nhiệm kiểm thử tích hợp đầu-cuối khi ghép giao diện, API và cơ sở dữ liệu trước giờ mở màn triển lãm.',
         badges: ['E09']
       }
     ]

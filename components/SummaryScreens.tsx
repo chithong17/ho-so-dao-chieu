@@ -45,16 +45,14 @@ export function Debrief() {
         <p>{lesson.text}</p>
       </div>
 
-      {/* SECTION 1: Danh sách chứng cứ đã thu thập (dạng băng dính) + lời giải hiển thị trực tiếp */}
+      {/* SECTION 1: Danh sách chứng cứ đã thu thập (dạng băng dính rộng, không bị bó dài) + lời giải */}
       <section className="debrief-section debrief-evidence-section">
         <div className="debrief-section-header">
           <div className="section-title-wrap">
-            <span className="section-badge"><FolderOpen size={16} /> MỤC 01</span>
+            <span className="section-badge"><FolderOpen size={15} /> MỤC 01</span>
             <h2>Danh mục chứng cứ thu thập & Lời giải vụ án</h2>
+            <span className="section-hint-inline">(Bấm vào thẻ để xem tài liệu gốc)</span>
           </div>
-          <p className="section-subtitle">
-            Tất cả các tài liệu và vết tích đã được thu thập trong Chương 0{state.chapter}. Lời giải pháp lý và ý nghĩa chứng minh thực tế được trình bày trực tiếp dưới mỗi chứng cứ. Bấm vào bất kỳ chứng cứ nào để mở rộng tài liệu gốc.
-          </p>
         </div>
 
         <div className="debrief-evidence-grid">
@@ -64,8 +62,8 @@ export function Debrief() {
               : ev.app === 'terminal' 
                 ? '/scene_wall.jpg' 
                 : '/bg_room.jpg';
-            const tapeAngle = idx % 2 === 0 ? -1.8 : 1.8;
-            const cardAngle = idx % 3 === 0 ? -0.8 : idx % 3 === 1 ? 0.8 : -0.3;
+            const tapeAngle = idx % 2 === 0 ? -1.5 : 1.5;
+            const cardAngle = idx % 3 === 0 ? -0.4 : idx % 3 === 1 ? 0.4 : 0;
 
             return (
               <div
@@ -89,29 +87,33 @@ export function Debrief() {
                   style={{ transform: `translateX(-50%) rotate(${tapeAngle}deg)` }}
                 />
 
-                {/* Photo Frame with scene thumbnail */}
-                <div className="polaroid-photo-frame">
-                  <div
-                    className="polaroid-photo-img"
-                    style={{ backgroundImage: `url(${bgImg})` }}
-                  >
-                    <span className="card-badge polaroid-stamp">{ev.id}</span>
-                    <span className="polaroid-app-tag">
-                      {ev.app === 'chat' ? 'Tin nhắn' : ev.app === 'terminal' ? 'Nhật ký' : ev.app === 'mail' ? 'Hộp thư' : ev.app === 'lab' ? 'Mô phỏng' : 'Tài liệu'}
-                    </span>
-                    <span className="polaroid-view-overlay">
-                      <Eye size={15} /> Xem tài liệu gốc
+                {/* Top horizontal row: Photo frame + metadata */}
+                <div className="polaroid-top-row">
+                  <div className="polaroid-photo-frame">
+                    <div
+                      className="polaroid-photo-img"
+                      style={{ backgroundImage: `url(${bgImg})` }}
+                    >
+                      <span className="card-badge polaroid-stamp">{ev.id}</span>
+                      <span className="polaroid-app-tag">
+                        {ev.app === 'chat' ? 'Tin nhắn' : ev.app === 'terminal' ? 'Nhật ký' : ev.app === 'mail' ? 'Hộp thư' : ev.app === 'lab' ? 'Mô phỏng' : 'Tài liệu'}
+                      </span>
+                      <span className="polaroid-view-overlay">
+                        <Eye size={12} /> Xem
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="polaroid-meta-col">
+                    <strong className="polaroid-title">{ev.title}</strong>
+                    <span className="polaroid-author-time">{ev.author} · {ev.time}</span>
+                    <span className="polaroid-click-hint">
+                      <ExternalLink size={11} /> Bấm xem chi tiết
                     </span>
                   </div>
                 </div>
 
-                {/* Polaroid Metadata */}
-                <div className="polaroid-caption">
-                  <strong className="polaroid-title">{ev.title}</strong>
-                  <span className="polaroid-author-time">{ev.author} · {ev.time}</span>
-                </div>
-
-                {/* SECTION 1 CORE REQUIREMENT: Solution displayed directly on the card */}
+                {/* Bottom wide row: Solution displayed directly on the card */}
                 <div className="debrief-evidence-solution">
                   <div className="solution-badge">
                     <CheckCircle2 size={13} />
@@ -119,37 +121,20 @@ export function Debrief() {
                   </div>
                   <p className="solution-text">{ev.summary}</p>
                 </div>
-
-                {/* Quick inspect trigger */}
-                <div className="polaroid-card-footer">
-                  <button
-                    type="button"
-                    className="polaroid-inspect-btn"
-                    onClick={e => {
-                      e.stopPropagation();
-                      setViewingEvidence(ev);
-                    }}
-                  >
-                    <ExternalLink size={13} /> Xem toàn bộ văn bản gốc
-                  </button>
-                </div>
               </div>
             );
           })}
         </div>
       </section>
 
-      {/* SECTION 2: Giải thích chân tướng của chương (tương tự 1.3 trong COT_TRUYEN_VA_DAP_AN.md) */}
+      {/* SECTION 2: Giải thích chân tướng của chương (theo 1.3 COT_TRUYEN_VA_DAP_AN.md) */}
       {truth && (
         <section className="debrief-section debrief-truth-section">
           <div className="debrief-section-header">
             <div className="section-title-wrap">
-              <span className="section-badge gold"><FileSearch size={16} /> MỤC 02</span>
+              <span className="section-badge gold"><FileSearch size={15} /> MỤC 02</span>
               <h2>Giải mã chân tướng — Bản chất sự kiện</h2>
             </div>
-            <p className="section-subtitle">
-              Đối chiếu dữ kiện thực tế và phân tích bản chất khách quan, tháo gỡ toàn bộ những hiểu lầm và suy đoán cảm tính trong hồ sơ vụ án.
-            </p>
           </div>
 
           <div className="truth-hero-banner">
@@ -173,7 +158,7 @@ export function Debrief() {
                 <p className="truth-card-desc">{pt.description}</p>
                 {pt.badges && pt.badges.length > 0 && (
                   <div className="truth-card-badges">
-                    <span className="badge-label">Chứng cứ chứng minh:</span>
+                    <span className="badge-label">Chứng cứ:</span>
                     {pt.badges.map(b => (
                       <span key={b} className="truth-evidence-badge">{b}</span>
                     ))}
@@ -189,18 +174,15 @@ export function Debrief() {
       <section className="debrief-section debrief-knowledge-section">
         <div className="debrief-section-header">
           <div className="section-title-wrap">
-            <span className="section-badge blue"><Layers size={16} /> MỤC 03</span>
+            <span className="section-badge blue"><Layers size={15} /> MỤC 03</span>
             <h2>Liên hệ kiến thức & Phương pháp luận Triết học</h2>
           </div>
-          <p className="section-subtitle">
-            Soi chiếu các hiện tượng trong vụ án bằng 2 Nguyên lý, 3 Quy luật và 6 Cặp phạm trù của Phép biện chứng duy vật để rút ra bài học phương pháp luận.
-          </p>
         </div>
 
         {/* Methodological Takeaway Banner */}
         <div className="debrief-takeaway-banner">
           <div className="takeaway-icon-box">
-            <ShieldCheck size={28} />
+            <ShieldCheck size={26} />
           </div>
           <div className="takeaway-content">
             <span className="takeaway-kicker">BÀI HỌC PHƯƠNG PHÁP LUẬN CẦN GHI NHỚ</span>
@@ -208,31 +190,24 @@ export function Debrief() {
           </div>
         </div>
 
-        {/* Task performance recap */}
-        <div className="debrief-tasks-summary">
-          <span className="eyebrow">KẾT QUẢ ĐỐI CHIẾU LẬP LUẬN CỦA BẠN QUA CÁC NHIỆM VỤ</span>
-          <div className="debrief-recap">
+        {/* Compact task performance strip */}
+        <div className="debrief-task-strip">
+          <span className="task-strip-label">ĐIỂM NHIỆM VỤ:</span>
+          <div className="task-strip-pills">
             {chapterTasks.map(t => {
               const a = state.answers[t.id];
               const e = a ? evaluateChallenge(t.id, a) : { score: 0, met: t.criteria.map(() => false) };
               return (
-                <div key={t.id}>
-                  <span className="score-circle">
-                    {e.score}<small>/{t.criteria.length}</small>
-                  </span>
-                  <div>
-                    <strong>{t.title}</strong>
-                    <p>{t.feedback[e.met.findIndex(m => !m) < 0 ? 0 : e.met.findIndex(m => !m)]}</p>
-                  </div>
-                  <button
-                    aria-label={`Sửa ${t.id}`}
-                    className="icon-button"
-                    onClick={() => dispatch({ type: 'task', id: t.id })}
-                    title={`Làm lại nhiệm vụ ${t.id}`}
-                  >
-                    <RotateCcw size={17} />
-                  </button>
-                </div>
+                <button
+                  key={t.id}
+                  className="task-pill"
+                  onClick={() => dispatch({ type: 'task', id: t.id })}
+                  title={`Bấm để xem/sửa ${t.id}`}
+                >
+                  <strong>{t.id}</strong>
+                  <span>{e.score}/{t.criteria.length}</span>
+                  <RotateCcw size={12} />
+                </button>
               );
             })}
           </div>
@@ -240,7 +215,7 @@ export function Debrief() {
 
         {/* Concept Cards */}
         <div className="debrief-concepts-wrap">
-          <span className="eyebrow" style={{ marginBottom: '14px', display: 'block' }}>
+          <span className="eyebrow" style={{ marginBottom: '12px', display: 'block' }}>
             CÁC CẶP PHẠM TRÙ & QUY LUẬT BIỆN CHỨNG TRỌNG TÂM
           </span>
           <ConceptCards ids={chapterTasks.flatMap(taskConcepts)} />

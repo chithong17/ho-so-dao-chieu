@@ -2501,32 +2501,45 @@ td {
   max-width: 860px;
 }
 
-/* SECTION 1: Polaroid Evidence Grid with Visible Solution */
+.section-hint-inline {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+/* SECTION 1: Balanced Horizontal Polaroid Cards (Không bị bó dài) */
 .debrief-evidence-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 32px 24px;
-  margin-top: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 20px;
+  margin-top: 18px;
+}
+
+@media (max-width: 820px) {
+  .debrief-evidence-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .debrief-polaroid-card {
   background: #fdfbf7;
-  border: 1px solid #e2dac9;
-  border-radius: 4px;
-  padding: 14px 14px 18px;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.25);
+  border: 1px solid #dfd6c3;
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.12);
   position: relative;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
   outline: none;
   color: #1e252e;
 }
 
 .debrief-polaroid-card:hover {
-  transform: translateY(-8px) scale(1.02) !important;
-  box-shadow: 0 20px 42px rgba(0,0,0,0.65), 0 0 0 2px var(--gold);
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 0 2px var(--gold);
   z-index: 10;
 }
 
@@ -2537,13 +2550,13 @@ td {
 
 .debrief-polaroid-card .polaroid-tape {
   position: absolute;
-  top: -14px;
+  top: -11px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90px;
-  height: 26px;
-  background: rgba(238, 230, 205, 0.9);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  width: 76px;
+  height: 22px;
+  background: rgba(238, 230, 205, 0.92);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.18);
   backdrop-filter: blur(2px);
   border-left: 1px dashed rgba(160, 140, 100, 0.45);
   border-right: 1px dashed rgba(160, 140, 100, 0.45);
@@ -2551,15 +2564,22 @@ td {
   pointer-events: none;
 }
 
+.polaroid-top-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
 .debrief-polaroid-card .polaroid-photo-frame {
-  width: 100%;
-  height: 160px;
-  border-radius: 3px;
+  width: 110px;
+  height: 80px;
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
   background: #131a22;
   border: 1px solid rgba(0,0,0,0.15);
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.45);
+  flex-shrink: 0;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
 }
 
 .debrief-polaroid-card .polaroid-photo-img {
@@ -2568,80 +2588,76 @@ td {
   background-size: cover;
   background-position: center;
   position: relative;
-  transition: transform 0.35s ease, filter 0.35s ease;
   filter: brightness(0.82) contrast(1.1);
+  transition: transform 0.3s ease;
 }
 
 .debrief-polaroid-card:hover .polaroid-photo-img {
   transform: scale(1.06);
-  filter: brightness(0.95) contrast(1.05);
 }
 
 .debrief-polaroid-card .polaroid-stamp {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 5px;
+  left: 5px;
   background: #c2410c;
   color: #fff;
   font-family: Consolas, monospace;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 3px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-  letter-spacing: 1px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
   z-index: 2;
 }
 
 .debrief-polaroid-card .polaroid-app-tag {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(15, 23, 42, 0.84);
+  bottom: 5px;
+  right: 5px;
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(4px);
   color: #e2e8f0;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  border-radius: 2px;
   border: 1px solid rgba(255,255,255,0.15);
   z-index: 2;
 }
 
 .polaroid-view-overlay {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  top: 5px;
+  right: 5px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  border-radius: 3px;
-  background: rgba(0,0,0,0.72);
-  backdrop-filter: blur(4px);
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: rgba(0,0,0,0.75);
   color: #fff;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 600;
   opacity: 0;
-  transform: translateY(4px);
-  transition: all 0.2s ease;
+  transition: opacity 0.2s;
   z-index: 2;
 }
 
 .debrief-polaroid-card:hover .polaroid-view-overlay {
   opacity: 1;
-  transform: translateY(0);
 }
 
-.debrief-polaroid-card .polaroid-caption {
-  margin-top: 13px;
+.polaroid-meta-col {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: 1;
+  min-width: 0;
 }
 
 .debrief-polaroid-card .polaroid-title {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   color: #1a222c;
   line-height: 1.35;
@@ -2649,73 +2665,116 @@ td {
 
 .debrief-polaroid-card .polaroid-author-time {
   font-size: 11.5px;
-  color: #5f6b7a;
+  color: #64748b;
   font-family: var(--font-body);
 }
 
-/* The visible solution block on each card */
+.polaroid-click-hint {
+  font-size: 11px;
+  color: #b8860b;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+/* Wide Solution Box */
 .debrief-evidence-solution {
-  background: #f3eedc;
-  border: 1px solid #dcceb1;
-  border-left: 4px solid #b8860b;
+  background: #f4efe1;
+  border: 1px solid #dcd1ba;
+  border-left: 3.5px solid #b8860b;
   border-radius: 4px;
-  padding: 11px 13px;
-  margin-top: 12px;
-  flex-grow: 1;
+  padding: 8px 12px;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .debrief-evidence-solution .solution-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  gap: 5px;
+  font-size: 10.5px;
   font-weight: 700;
   color: #855500;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   font-family: Consolas, monospace;
 }
 
 .debrief-evidence-solution .solution-badge svg {
   color: #15803d;
-  stroke-width: 2.5;
 }
 
 .debrief-evidence-solution .solution-text {
-  font-size: 13px;
-  line-height: 1.55;
-  color: #262016;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #241e14;
   margin: 0;
   font-weight: 500;
   font-family: var(--font-body);
 }
 
-.polaroid-card-footer {
-  margin-top: 13px;
+/* Task performance pills strip */
+.debrief-task-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #17212b;
+  border: 1px solid #2d3b48;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
-.polaroid-inspect-btn {
-  width: 100%;
-  padding: 8px 12px;
-  background: #ebe3ce;
-  border: 1px solid #c8baa2;
-  border-radius: 4px;
-  color: #382e21;
-  font-size: 12px;
-  font-weight: 600;
+.task-strip-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-family: Consolas, monospace;
+}
+
+.task-strip-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.task-pill {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: background 0.16s, border-color 0.16s, color 0.16s;
+  gap: 8px;
+  padding: 5px 11px;
+  background: #1d2b38;
+  border: 1px solid #36495a;
+  border-radius: 4px;
+  color: var(--ink);
+  font-size: 12px;
+  transition: all 0.16s ease;
+  min-height: auto;
 }
 
-.polaroid-inspect-btn:hover {
-  background: #ddd1b7;
-  border-color: #b19f80;
-  color: #1a140b;
+.task-pill:hover {
+  border-color: var(--gold);
+  background: #233444;
+}
+
+.task-pill strong {
+  color: var(--gold-light);
+  font-family: Consolas, monospace;
+}
+
+.task-pill span {
+  color: var(--green);
+  font-weight: 600;
+  font-family: Consolas, monospace;
+}
+
+.task-pill svg {
+  color: var(--muted);
 }
 
 /* SECTION 2: Truth Section (Cốt truyện chân tướng 1.3) */
