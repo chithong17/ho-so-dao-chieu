@@ -1,14 +1,16 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { playBgm, playSfx } from '../lib/audio';
-import { ArrowLeft, ArrowRight, BookOpen, FileCheck2, Lightbulb, Printer, RotateCcw, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ExternalLink, Eye, FileCheck2, FileSearch, FolderOpen, Layers, Lightbulb, Printer, RotateCcw, ShieldCheck, Sparkles } from 'lucide-react';
 import { useGame } from './GameProvider';
 import { taskConcepts } from '../game/config';
 import { easyLessons } from '../game/easy';
-
+import { chapterTruths } from '../game/truths';
+import { EvidenceContent } from './EvidenceReader';
+import { Modal } from './ui';
 
 import { evaluateChallenge, simulateRecovery, simulateEasyRecovery } from '../game/engine';
-import type { ConceptId, Verdict } from '../game/types';
+import type { ConceptId, Evidence, Verdict } from '../game/types';
 import { Choice, EvidencePicker } from './ui';
 
 export function ConceptCards({ ids }: { ids: ConceptId[] }) {
@@ -26,10 +28,262 @@ export function Debrief() {
   useEffect(() => { playSfx('chapter'); }, []);
   const { state, dispatch, config: baseConfig } = useGame();
   const config = { ...baseConfig, lastChapter: state.chapterLimit ?? baseConfig.lastChapter };
-  const { tasks } = config;
+  const { tasks, evidence } = config;
   const chapterTasks = tasks.filter(t => t.chapter === state.chapter);
+  const chapterEvidence = evidence.filter(e => e.chapter === state.chapter);
   const lesson = state.difficulty === 'easy' ? easyLessons[state.chapter as 1 | 2] : chapterLessons[state.chapter];
-  return <main className="summary-page"><div className="summary-heading"><span className="eyebrow">GIẢI MÃ CHƯƠNG 0{state.chapter}</span><h1>{lesson.title}</h1><p>{lesson.text}</p></div><div className="note"><ShieldCheck size={20} /><p><b>Điểm cần nhớ:</b> {lesson.takeaway}</p></div><div className="debrief-recap">{chapterTasks.map(t => { const a = state.answers[t.id], e = evaluateChallenge(t.id, a); return <div key={t.id}><span className="score-circle">{e.score}<small>/{t.criteria.length}</small></span><div><strong>{t.title}</strong><p>{t.feedback[e.met.findIndex(m => !m) < 0 ? 0 : e.met.findIndex(m => !m)]}</p></div><button aria-label={`Sửa ${t.id}`} className="icon-button" onClick={() => dispatch({ type: 'task', id: t.id })}><RotateCcw size={17} /></button></div>; })}</div><ConceptCards ids={chapterTasks.flatMap(taskConcepts)} /><div className="summary-actions"><button className="secondary" onClick={() => dispatch({ type: 'chapter', chapter: state.chapter })}><ArrowLeft size={17} /> Xem lại lập luận</button><button className="primary" onClick={() => dispatch({ type: 'next' })}>{state.chapter === config.lastChapter ? 'Viết kết luận cuối' : 'Mở chương tiếp theo'}<ArrowRight size={18} /></button></div></main>;
+  const truth = chapterTruths[state.chapter];
+
+  const [viewingEvidence, setViewingEvidence] = useState<Evidence | null>(null);
+
+  return (
+    <main className="summary-page debrief-page">
+      {/* Page Header */}
+      <div className="summary-heading">
+        <span className="eyebrow">GIẢI MÃ CHƯƠNG 0{state.chapter}</span>
+        <h1>{lesson.title}</h1>
+        <p>{lesson.text}</p>
+      </div>
+
+      {/* SECTION 1: Danh sách chứng cứ đã thu thập (dạng băng dính) + lời giải hiển thị trực tiếp */}
+      <section className="debrief-section debrief-evidence-section">
+        <div className="debrief-section-header">
+          <div className="section-title-wrap">
+            <span className="section-badge"><FolderOpen size={16} /> MỤC 01</span>
+            <h2>Danh mục chứng cứ thu thập & Lời giải vụ án</h2>
+          </div>
+          <p className="section-subtitle">
+            Tất cả các tài liệu và vết tích đã được thu thập trong Chương 0{state.chapter}. Lời giải pháp lý và ý nghĩa chứng minh thực tế được trình bày trực tiếp dưới mỗi chứng cứ. Bấm vào bất kỳ chứng cứ nào để mở rộng tài liệu gốc.
+          </p>
+        </div>
+
+        <div className="debrief-evidence-grid">
+          {chapterEvidence.map((ev, idx) => {
+            const bgImg = ev.app === 'chat' || ev.app === 'files' 
+              ? '/scene_desk.jpg' 
+              : ev.app === 'terminal' 
+                ? '/scene_wall.jpg' 
+                : '/bg_room.jpg';
+            const tapeAngle = idx % 2 === 0 ? -1.8 : 1.8;
+            const cardAngle = idx % 3 === 0 ? -0.8 : idx % 3 === 1 ? 0.8 : -0.3;
+
+            return (
+              <div
+                key={ev.id}
+                className="debrief-polaroid-card taped-polaroid-item"
+                style={{ transform: `rotate(${cardAngle}deg)` }}
+                onClick={() => setViewingEvidence(ev)}
+                role="button"
+                tabIndex={0}
+                title={`Bấm để xem tài liệu gốc: ${ev.id} · ${ev.title}`}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setViewingEvidence(ev);
+                  }
+                }}
+              >
+                {/* Adhesive Tape */}
+                <div
+                  className="polaroid-tape"
+                  style={{ transform: `translateX(-50%) rotate(${tapeAngle}deg)` }}
+                />
+
+                {/* Photo Frame with scene thumbnail */}
+                <div className="polaroid-photo-frame">
+                  <div
+                    className="polaroid-photo-img"
+                    style={{ backgroundImage: `url(${bgImg})` }}
+                  >
+                    <span className="card-badge polaroid-stamp">{ev.id}</span>
+                    <span className="polaroid-app-tag">
+                      {ev.app === 'chat' ? 'Tin nhắn' : ev.app === 'terminal' ? 'Nhật ký' : ev.app === 'mail' ? 'Hộp thư' : ev.app === 'lab' ? 'Mô phỏng' : 'Tài liệu'}
+                    </span>
+                    <span className="polaroid-view-overlay">
+                      <Eye size={15} /> Xem tài liệu gốc
+                    </span>
+                  </div>
+                </div>
+
+                {/* Polaroid Metadata */}
+                <div className="polaroid-caption">
+                  <strong className="polaroid-title">{ev.title}</strong>
+                  <span className="polaroid-author-time">{ev.author} · {ev.time}</span>
+                </div>
+
+                {/* SECTION 1 CORE REQUIREMENT: Solution displayed directly on the card */}
+                <div className="debrief-evidence-solution">
+                  <div className="solution-badge">
+                    <CheckCircle2 size={13} />
+                    <span>LỜI GIẢI & Ý NGHĨA CHỨNG MINH</span>
+                  </div>
+                  <p className="solution-text">{ev.summary}</p>
+                </div>
+
+                {/* Quick inspect trigger */}
+                <div className="polaroid-card-footer">
+                  <button
+                    type="button"
+                    className="polaroid-inspect-btn"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setViewingEvidence(ev);
+                    }}
+                  >
+                    <ExternalLink size={13} /> Xem toàn bộ văn bản gốc
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* SECTION 2: Giải thích chân tướng của chương (tương tự 1.3 trong COT_TRUYEN_VA_DAP_AN.md) */}
+      {truth && (
+        <section className="debrief-section debrief-truth-section">
+          <div className="debrief-section-header">
+            <div className="section-title-wrap">
+              <span className="section-badge gold"><FileSearch size={16} /> MỤC 02</span>
+              <h2>Giải mã chân tướng — Bản chất sự kiện</h2>
+            </div>
+            <p className="section-subtitle">
+              Đối chiếu dữ kiện thực tế và phân tích bản chất khách quan, tháo gỡ toàn bộ những hiểu lầm và suy đoán cảm tính trong hồ sơ vụ án.
+            </p>
+          </div>
+
+          <div className="truth-hero-banner">
+            <div className="truth-hero-header">
+              <span className="truth-tag">{truth.tag}</span>
+              <h3>{truth.headline}</h3>
+            </div>
+            <p className="truth-summary-lead">{truth.summary}</p>
+          </div>
+
+          <div className="truth-cards-grid">
+            {truth.points.map(pt => (
+              <article key={pt.number} className="truth-point-card">
+                <div className="truth-card-header">
+                  <span className="truth-card-num">{pt.number}</span>
+                  <div className="truth-card-heading">
+                    <h4>{pt.title}</h4>
+                    <span className="truth-highlight-pill">{pt.highlight}</span>
+                  </div>
+                </div>
+                <p className="truth-card-desc">{pt.description}</p>
+                {pt.badges && pt.badges.length > 0 && (
+                  <div className="truth-card-badges">
+                    <span className="badge-label">Chứng cứ chứng minh:</span>
+                    {pt.badges.map(b => (
+                      <span key={b} className="truth-evidence-badge">{b}</span>
+                    ))}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 3: Liên hệ kiến thức triết học Mác – Lênin */}
+      <section className="debrief-section debrief-knowledge-section">
+        <div className="debrief-section-header">
+          <div className="section-title-wrap">
+            <span className="section-badge blue"><Layers size={16} /> MỤC 03</span>
+            <h2>Liên hệ kiến thức & Phương pháp luận Triết học</h2>
+          </div>
+          <p className="section-subtitle">
+            Soi chiếu các hiện tượng trong vụ án bằng 2 Nguyên lý, 3 Quy luật và 6 Cặp phạm trù của Phép biện chứng duy vật để rút ra bài học phương pháp luận.
+          </p>
+        </div>
+
+        {/* Methodological Takeaway Banner */}
+        <div className="debrief-takeaway-banner">
+          <div className="takeaway-icon-box">
+            <ShieldCheck size={28} />
+          </div>
+          <div className="takeaway-content">
+            <span className="takeaway-kicker">BÀI HỌC PHƯƠNG PHÁP LUẬN CẦN GHI NHỚ</span>
+            <blockquote className="takeaway-quote">{lesson.takeaway}</blockquote>
+          </div>
+        </div>
+
+        {/* Task performance recap */}
+        <div className="debrief-tasks-summary">
+          <span className="eyebrow">KẾT QUẢ ĐỐI CHIẾU LẬP LUẬN CỦA BẠN QUA CÁC NHIỆM VỤ</span>
+          <div className="debrief-recap">
+            {chapterTasks.map(t => {
+              const a = state.answers[t.id];
+              const e = a ? evaluateChallenge(t.id, a) : { score: 0, met: t.criteria.map(() => false) };
+              return (
+                <div key={t.id}>
+                  <span className="score-circle">
+                    {e.score}<small>/{t.criteria.length}</small>
+                  </span>
+                  <div>
+                    <strong>{t.title}</strong>
+                    <p>{t.feedback[e.met.findIndex(m => !m) < 0 ? 0 : e.met.findIndex(m => !m)]}</p>
+                  </div>
+                  <button
+                    aria-label={`Sửa ${t.id}`}
+                    className="icon-button"
+                    onClick={() => dispatch({ type: 'task', id: t.id })}
+                    title={`Làm lại nhiệm vụ ${t.id}`}
+                  >
+                    <RotateCcw size={17} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Concept Cards */}
+        <div className="debrief-concepts-wrap">
+          <span className="eyebrow" style={{ marginBottom: '14px', display: 'block' }}>
+            CÁC CẶP PHẠM TRÙ & QUY LUẬT BIỆN CHỨNG TRỌNG TÂM
+          </span>
+          <ConceptCards ids={chapterTasks.flatMap(taskConcepts)} />
+        </div>
+      </section>
+
+      {/* Action Buttons */}
+      <div className="summary-actions">
+        <button
+          className="secondary"
+          onClick={() => dispatch({ type: 'chapter', chapter: state.chapter })}
+        >
+          <ArrowLeft size={17} /> Xem lại lập luận chương
+        </button>
+        <button
+          className="primary"
+          onClick={() => dispatch({ type: 'next' })}
+        >
+          {state.chapter === config.lastChapter ? 'Viết kết luận chung cuộc' : 'Mở chương tiếp theo'}
+          <ArrowRight size={18} />
+        </button>
+      </div>
+
+      {/* Modal for viewing raw evidence details */}
+      {viewingEvidence && (
+        <Modal
+          title={`Hồ sơ HS-01 / Chứng cứ ${viewingEvidence.id}: ${viewingEvidence.title}`}
+          onClose={() => setViewingEvidence(null)}
+        >
+          <div className="debrief-evidence-modal-body">
+            <EvidenceContent item={viewingEvidence} />
+            <div className="modal-evidence-solution-box">
+              <div className="solution-badge">
+                <CheckCircle2 size={16} />
+                <strong>LỜI GIẢI VỤ ÁN & Ý NGHĨA CHỨNG MINH THỰC TẾ</strong>
+              </div>
+              <p>{viewingEvidence.summary}</p>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </main>
+  );
 }
 
 export function VerdictScreen() {

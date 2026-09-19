@@ -102,7 +102,29 @@ export function InfoTooltip({
   );
 }
 
-export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) { const ref = useRef<HTMLDialogElement>(null); useEffect(() => { const old = document.activeElement as HTMLElement | null; ref.current?.showModal(); return () => old?.focus(); }, []); return <dialog ref={ref} onCancel={onClose} aria-label={title}><div className="modal-head"><h2>{title}</h2><button className="icon-button" aria-label="Đóng" onClick={onClose}><X size={20} /></button></div>{children}</dialog>; }
+export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const old = document.activeElement as HTMLElement | null;
+    if (typeof ref.current?.showModal === 'function') {
+      ref.current.showModal();
+    } else if (ref.current) {
+      ref.current.setAttribute('open', '');
+    }
+    return () => old?.focus();
+  }, []);
+  return (
+    <dialog ref={ref} onCancel={onClose} aria-label={title}>
+      <div className="modal-head">
+        <h2>{title}</h2>
+        <button className="icon-button" aria-label="Đóng" onClick={onClose}>
+          <X size={20} />
+        </button>
+      </div>
+      {children}
+    </dialog>
+  );
+}
 export function Choice({ label, value, options, onChange }: { label: ReactNode; value: string; options: Option[]; onChange: (v: string) => void }) { return <fieldset className="choice-field"><legend>{label}</legend><div className="choice-list">{options.map(o => <label className={`choice ${value === o.id ? 'selected' : ''}`} key={o.id}><input type="radio" name={typeof label === 'string' ? label : 'choice'} checked={value === o.id} onChange={() => onChange(o.id)} /><span>{o.label}</span>{value === o.id && <Check size={15} />}</label>)}</div></fieldset>; }
 export function Chips({ label, options, value, max, onChange }: { label: ReactNode; options: Option[]; value: string[]; max: number; onChange: (v: string[]) => void }) { return <fieldset className="choice-field"><legend>{label} <small>{value.length}/{max}</small></legend><div className="chip-list">{options.map(o => <button type="button" className={`chip ${value.includes(o.id) ? 'selected' : ''}`} aria-pressed={value.includes(o.id)} key={o.id} disabled={!value.includes(o.id) && value.length >= max} onClick={() => onChange(value.includes(o.id) ? value.filter(x => x !== o.id) : [...value, o.id])}>{value.includes(o.id) ? <Check size={14} /> : <Plus size={14} />} {o.label}</button>)}</div></fieldset>; }
 export function EvidencePicker({ value, max = 2, ids, onChange }: { value: string[]; max?: number; ids: string[]; onChange: (v: string[]) => void }) {

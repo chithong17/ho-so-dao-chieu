@@ -92,7 +92,10 @@ export function playBgm(type: 'landing' | 'intro' | 'investigation' | 'verdict' 
     // Treat landing as intro since user didn't upload landing
     const effectiveType = type === 'landing' ? 'intro' : type;
     if (key === effectiveType) {
-      audio.play().catch(e => console.warn('BGM play prevented', e));
+      const p = audio.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(e => console.warn('BGM play prevented', e));
+      }
     } else {
       audio.pause();
     }
@@ -129,7 +132,10 @@ export function playSfx(type: string) {
   
   if (sfxs[type]) {
     sfxs[type].currentTime = 0;
-    sfxs[type].play().catch(()=>{});
+    const p = sfxs[type].play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {});
+    }
   } else {
     playSynthSfx(type);
   }
