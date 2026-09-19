@@ -10930,7 +10930,7 @@ body:has(.landing) .competition-entry {
 .competition-timer {
   position: fixed;
   z-index: 700;
-  top: 70px;
+  top: 16px;
   left: 50%;
   transform: translateX(-50%);
   color: var(--gold-light);
@@ -10939,6 +10939,35 @@ body:has(.landing) .competition-entry {
   line-height: 1;
   text-shadow: 0 2px 4px #000, 0 0 12px #000;
   pointer-events: none
+}
+
+.competition-game .leaderboard-hotspot {
+  z-index: 110;
+  pointer-events: auto;
+  border-color: rgba(217, 164, 65, .2);
+  background: rgba(217, 164, 65, .015)
+}
+
+.competition-game .leaderboard-hotspot:hover,
+.competition-game .leaderboard-hotspot:focus-visible {
+  border-color: rgba(255, 194, 76, .8);
+  background: rgba(217, 164, 65, .08);
+  outline: none;
+  box-shadow: inset 0 0 24px rgba(217, 164, 65, .08)
+}
+
+.competition-game .leaderboard-hotspot .interactable-hint {
+  width: max-content;
+  max-width: 90%;
+  padding: 7px 10px;
+  color: #ffd477;
+  background: rgba(12, 14, 15, .72);
+  border-radius: 4px
+}
+
+.competition-game .leaderboard-hotspot:hover .interactable-hint,
+.competition-game .leaderboard-hotspot:focus-visible .interactable-hint {
+  opacity: 1
 }
 
 .competition-leaderboard-overlay {
@@ -11101,7 +11130,7 @@ body:has(.landing) .competition-entry {
   }
 
   .competition-timer {
-    top: 62px
+    top: 12px
   }
 
   .competition-leaderboard-overlay {

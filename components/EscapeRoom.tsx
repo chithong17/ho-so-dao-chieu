@@ -9,6 +9,7 @@ import MissionTrackerPanel from './MissionTrackerPanel';
 interface EscapeRoomProps {
   onInteract: (objId: string) => void;
   onExit: () => void;
+  competitionBoard?: boolean;
 }
 
 type Scene = 'intro' | 'desk' | 'wall';
@@ -62,7 +63,7 @@ function CinematicIntro({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-export default function EscapeRoom({ onInteract, onExit, forceIntro }: EscapeRoomProps & { forceIntro?: boolean }) {
+export default function EscapeRoom({ onInteract, onExit, forceIntro, competitionBoard = false }: EscapeRoomProps & { forceIntro?: boolean }) {
   const [scene, setScene] = useState<Scene>(forceIntro ? 'intro' : (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('hs01_intro_seen') ? 'desk' : 'intro'));
   const [showTutorial, setShowTutorial] = useState(false);
   React.useEffect(() => { if (scene === 'intro') playBgm('intro'); else playBgm('investigation'); }, [scene]);
@@ -151,10 +152,12 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro }: EscapeRoo
               onClick={() => onInteract('files')} sfx="folder"
             />
             <Interactable
-              x="48%" y="8%" width="38%" height="45%"
-              label="Bảng lập luận · mô hình tái dựng"
+              x={competitionBoard?'51.5%':'48%'} y={competitionBoard?'5%':'8%'}
+              width={competitionBoard?'34%':'38%'} height={competitionBoard?'49%':'45%'}
+              label={competitionBoard?'Bảng xếp hạng · Top 10':'Bảng lập luận · mô hình tái dựng'}
               icon={<Pin size={24} />}
               onClick={() => onInteract('board')} sfx="page_turn"
+              className={competitionBoard?'leaderboard-hotspot':''}
             />
           </>
         )}

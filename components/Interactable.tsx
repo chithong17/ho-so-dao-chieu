@@ -10,12 +10,14 @@ interface InteractableProps {
   onClick: () => void;
   icon?: React.ReactNode;
   sfx?: string;
+  className?: string;
 }
 
-export default function Interactable({ x, y, width, height, label, onClick, icon, sfx }: InteractableProps) {
+export default function Interactable({ x, y, width, height, label, onClick, icon, sfx, className = '' }: InteractableProps) {
   return (
     <button
-      className="interactable-obj"
+      type="button"
+      className={`interactable-obj ${className}`.trim()}
       style={{
         left: x,
         top: y,
