@@ -230,11 +230,51 @@ export function Debrief() {
             {truth.conclusion && (
               <div className="truth-timeline-conclusion">
                 <div className="conclusion-badge">
-                  <Compass size={16} />
+                  <Compass size={15} />
                   <span>{truth.conclusion.badge}</span>
                 </div>
-                <h4>{truth.conclusion.title}</h4>
-                <p>{truth.conclusion.text}</p>
+                <h3 className="conclusion-title">{truth.conclusion.title}</h3>
+                <div className="conclusion-gold-rule">
+                  <span className="rule-diamond">✦</span>
+                </div>
+
+                {/* Timeline progression flow ribbon */}
+                {truth.conclusion.sequence && truth.conclusion.sequence.length > 0 && (
+                  <div className="conclusion-flow-ribbon">
+                    <span className="flow-ribbon-label">DIỄN TIẾN CHUỖI NHÂN QUẢ:</span>
+                    <div className="flow-ribbon-steps">
+                      {truth.conclusion.sequence.map((step, sIdx) => (
+                        <div key={sIdx} className="flow-step-node">
+                          {sIdx > 0 && <span className="flow-step-arrow">→</span>}
+                          <span className="flow-step-pill">{parseFormattedText(step)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Structured Takeaways Cards Grid */}
+                {truth.conclusion.takeaways && truth.conclusion.takeaways.length > 0 ? (
+                  <div className="conclusion-takeaways-grid">
+                    {truth.conclusion.takeaways.map((item, tIdx) => (
+                      <div key={tIdx} className="conclusion-takeaway-card">
+                        <div className="takeaway-card-head">
+                          <span className="takeaway-badge">{item.badge}</span>
+                          <h5>{item.title}</h5>
+                        </div>
+                        <ul className="takeaway-bullet-list">
+                          {item.points.map((p, pIdx) => (
+                            <li key={pIdx} className="takeaway-bullet-item">
+                              {parseFormattedText(p)}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="conclusion-text">{parseFormattedText(truth.conclusion.text)}</p>
+                )}
               </div>
             )}
           </div>
