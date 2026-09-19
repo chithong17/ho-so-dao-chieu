@@ -183,7 +183,7 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro }: EscapeRoo
         {(scene === 'desk' || scene === 'wall') && (
           <>
             <MissionTrackerPanel />
-            <CaseNotebook onClick={() => onInteract('notebook')} />
+            <CaseNotebook />
           </>
         )}
       </div>

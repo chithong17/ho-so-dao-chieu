@@ -217,15 +217,16 @@ export default function TaskPanel() {
         >
           <div className="notebook-evidence-modal-head">
             <div className="modal-title">
-              <span className="modal-dossier-label">HỒ SƠ CHỨNG CỨ</span>
-              <span className="modal-badge">{viewingEvidence.id}</span>
-              <strong title={viewingEvidence.title}>{viewingEvidence.title}</strong>
+              <span className="modal-dossier-label" style={{ color: '#f6c86e' }}>HỒ SƠ CHỨNG CỨ</span>
+              <span className="modal-badge" style={{ color: '#ffffff', background: '#dc2626' }}>{viewingEvidence.id}</span>
+              <strong title={viewingEvidence.title} style={{ color: '#ffffff' }}>{viewingEvidence.title}</strong>
             </div>
             <button
               type="button"
               className="modal-close-btn"
               onClick={() => setViewingEvidence(null)}
               aria-label="Đóng chi tiết chứng cứ"
+              style={{ color: '#ffffff' }}
             >
               ✕
             </button>

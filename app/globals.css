@@ -464,8 +464,8 @@ dialog.ui-files .inner-content {
   text-shadow: none !important;
 }
 
-/* For notebook, text should look like dark ink on yellow paper */
-.modal-overlay.point-and-click dialog.ui-notebook * {
+/* For notebook, text should look like dark ink on yellow paper (excluding evidence detail modal) */
+.modal-overlay.point-and-click dialog.ui-notebook *:not(.notebook-evidence-modal-overlay, .notebook-evidence-modal-overlay *) {
   color: #2b2620 !important;
   text-shadow: none !important;
   font-family: 'Patrick Hand', cursive !important;
@@ -1410,8 +1410,8 @@ dialog.ui-files .inner-content {
   border-radius: 2px !important;
 }
 
-/* 6. Fonts and ink style */
-.modal-overlay.point-and-click dialog.ui-notebook * {
+/* 6. Fonts and ink style (excluding evidence detail modal which has its own themed dossier styling) */
+.modal-overlay.point-and-click dialog.ui-notebook *:not(.notebook-evidence-modal-overlay, .notebook-evidence-modal-overlay *) {
   color: #1a140f !important;
   font-family: 'Patrick Hand', cursive !important;
   text-shadow: none !important;
@@ -4939,86 +4939,93 @@ body[data-cinematic='true'] .mission-tracker-hud,
   to { opacity: 1; transform: scale(1); }
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal-head,
 .notebook-evidence-modal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  background: #251a13;
-  border-bottom: 2px solid #8c6e4e;
-  gap: 12px;
-  flex-shrink: 0;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 18px !important;
+  background: #251a13 !important;
+  border-bottom: 2px solid #8c6e4e !important;
+  gap: 12px !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35) !important;
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal-head .modal-title,
 .notebook-evidence-modal-head .modal-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 1;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  flex: 1 !important;
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal-head .modal-dossier-label,
 .notebook-evidence-modal-head .modal-dossier-label {
   font-family: 'Courier Prime', Consolas, monospace !important;
-  font-size: 11px;
-  font-weight: 700;
-  color: #d4a359 !important;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #f6c86e !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal-head .modal-badge,
 .notebook-evidence-modal-head .modal-badge {
   font-family: 'Courier Prime', Consolas, monospace !important;
-  font-size: 12px;
-  font-weight: 700;
-  background: #8b261e;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  background: #dc2626 !important;
   color: #ffffff !important;
-  padding: 2px 9px;
-  border-radius: 4px;
-  letter-spacing: 1px;
-  border: 1px solid #b91c1c;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  flex-shrink: 0;
+  padding: 2px 9px !important;
+  border-radius: 4px !important;
+  letter-spacing: 1px !important;
+  border: 1px solid #ef4444 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  flex-shrink: 0 !important;
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal-head .modal-title strong,
 .notebook-evidence-modal-head .modal-title strong {
   font-family: 'Courier Prime', Georgia, serif !important;
-  font-size: 15px;
-  font-weight: 700;
-  color: #fdf6e7 !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: 0.3px;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  letter-spacing: 0.3px !important;
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal-head .modal-close-btn,
 .notebook-evidence-modal-head .modal-close-btn {
   background: #3c2a1c !important;
-  border: 1px solid #7c5c3e !important;
-  color: #eedcc6 !important;
+  border: 1.5px solid #d4a359 !important;
+  color: #ffffff !important;
   font-size: 15px !important;
   line-height: 1 !important;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
   font-family: sans-serif !important;
 }
 
+.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal-head .modal-close-btn:hover,
 .notebook-evidence-modal-head .modal-close-btn:hover {
-  background: #8b261e !important;
-  border-color: #dc2626 !important;
+  background: #dc2626 !important;
+  border-color: #ef4444 !important;
   color: #ffffff !important;
-  transform: rotate(90deg);
+  transform: rotate(90deg) !important;
 }
 
 .notebook-evidence-modal-body {

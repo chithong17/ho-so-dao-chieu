@@ -49,6 +49,7 @@ export default function CaseNotebook({ onClick, className = '', style }: CaseNot
   }
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     if (onClick) {
       onClick();
     }
