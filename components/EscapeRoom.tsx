@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Interactable from './Interactable';
 import { Terminal, FolderClosed, Pin, ChevronLeft, ChevronRight, Laptop, Smartphone, Book, Volume2, VolumeX } from 'lucide-react';
 import { getMute, setMute } from '../lib/audio';
+import CaseNotebook from './CaseNotebook';
+import MissionTrackerPanel from './MissionTrackerPanel';
 
 interface EscapeRoomProps {
   onInteract: (objId: string) => void;
@@ -173,10 +175,17 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro }: EscapeRoo
           className="exit-room-btn" 
           style={{ left: 'auto', right: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }} 
           onClick={toggleMute}
-          title={muted ? 'B?t �m thanh' : 'T?t �m thanh'}
+          title={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}
         >
           {muted ? <VolumeX size={20}/> : <Volume2 size={20}/>}
         </button>
+
+        {(scene === 'desk' || scene === 'wall') && (
+          <>
+            <MissionTrackerPanel />
+            <CaseNotebook onClick={() => onInteract('notebook')} />
+          </>
+        )}
       </div>
     </div>
   );

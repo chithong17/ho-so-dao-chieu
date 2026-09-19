@@ -4897,19 +4897,21 @@ body[data-cinematic='true'] .mission-tracker-hud,
   margin-top: 2px;
 }
 
-/* Modal Overlay for viewing evidence detail inside notebook */
+/* ===================================================
+   NOTEBOOK EVIDENCE DETAIL MODAL (VINTAGE DETECTIVE DOSSIER)
+   =================================================== */
 .notebook-evidence-modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background: rgba(4, 6, 12, 0.82);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(12, 9, 6, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  animation: fadeInModal 0.2s ease-out;
+  padding: 20px;
+  animation: fadeInModal 0.22s ease-out;
 }
 
 @keyframes fadeInModal {
@@ -4919,17 +4921,17 @@ body[data-cinematic='true'] .mission-tracker-hud,
 
 .notebook-evidence-modal {
   position: relative;
-  width: 92%;
-  max-width: 680px;
-  max-height: 85vh;
-  background: #111722;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  width: 94%;
+  max-width: 760px;
+  max-height: 88vh;
+  background: #f6efe2;
+  border: 2px solid #58412b;
+  border-radius: 8px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(180, 140, 95, 0.4), inset 0 0 40px rgba(160, 120, 75, 0.12);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: scaleUpModal 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: scaleUpModal 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes scaleUpModal {
@@ -4942,10 +4944,11 @@ body[data-cinematic='true'] .mission-tracker-hud,
   align-items: center;
   justify-content: space-between;
   padding: 12px 18px;
-  background: #182230;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #251a13;
+  border-bottom: 2px solid #8c6e4e;
   gap: 12px;
   flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
 .notebook-evidence-modal-head .modal-title {
@@ -4953,190 +4956,687 @@ body[data-cinematic='true'] .mission-tracker-hud,
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1;
+}
+
+.notebook-evidence-modal-head .modal-dossier-label {
+  font-family: 'Courier Prime', Consolas, monospace !important;
+  font-size: 11px;
+  font-weight: 700;
+  color: #d4a359 !important;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .notebook-evidence-modal-head .modal-badge {
-  font-family: Consolas, monospace !important;
+  font-family: 'Courier Prime', Consolas, monospace !important;
   font-size: 12px;
   font-weight: 700;
-  background: #2563eb;
+  background: #8b261e;
   color: #ffffff !important;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 4px;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  border: 1px solid #b91c1c;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
 }
 
 .notebook-evidence-modal-head .modal-title strong {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: 'Courier Prime', Georgia, serif !important;
   font-size: 15px;
-  font-weight: 600;
-  color: #f1f5f9 !important;
+  font-weight: 700;
+  color: #fdf6e7 !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.3px;
 }
 
 .notebook-evidence-modal-head .modal-close-btn {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #cbd5e1 !important;
-  font-size: 16px !important;
+  background: #3c2a1c !important;
+  border: 1px solid #7c5c3e !important;
+  color: #eedcc6 !important;
+  font-size: 15px !important;
   line-height: 1 !important;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   font-family: sans-serif !important;
 }
 
 .notebook-evidence-modal-head .modal-close-btn:hover {
-  background: rgba(239, 68, 68, 0.25) !important;
-  border-color: rgba(239, 68, 68, 0.5) !important;
-  color: #f87171 !important;
+  background: #8b261e !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+  transform: rotate(90deg);
 }
 
 .notebook-evidence-modal-body {
-  padding: 16px;
+  padding: 18px 20px;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: #0d1219;
+  gap: 16px;
+  background: #f4ecdc;
 }
 
-.notebook-evidence-modal-body .evidence-caption {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border-left: 3px solid #3b82f6;
-  border-radius: 4px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+.notebook-evidence-modal-body::-webkit-scrollbar {
+  width: 6px;
 }
 
-.notebook-evidence-modal-body .evidence-caption .case-tag {
-  font-family: Consolas, monospace !important;
-  font-size: 11px;
-  font-weight: 700;
-  background: rgba(59, 130, 246, 0.2);
-  color: #93c5fd !important;
-  padding: 1px 6px;
+.notebook-evidence-modal-body::-webkit-scrollbar-track {
+  background: #e8decc;
   border-radius: 3px;
-  flex-shrink: 0;
 }
 
-.notebook-evidence-modal-body .evidence-caption p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: #cbd5e1 !important;
+.notebook-evidence-modal-body::-webkit-scrollbar-thumb {
+  background: #9d8263;
+  border-radius: 3px;
+}
+
+.notebook-evidence-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #765d41;
+}
+
+/* ===================================================
+   EVIDENCE CONTENT STYLING INSIDE NOTEBOOK MODAL
+   =================================================== */
+
+/* Container resets */
+.notebook-evidence-modal .mail-app,
+.notebook-evidence-modal .document-app,
+.notebook-evidence-modal .terminal-app,
+.notebook-evidence-modal .chat-app {
+  margin: 0 !important;
+  min-height: auto !important;
+}
+
+/* 1. DOCUMENT APP & PAPER SHEET (E04, E08, E09, E10, E11, E12, E14, E15, E16) */
+.notebook-evidence-modal .document-app {
+  border: 1px solid #cfbeaa !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background: #fffefb !important;
+  box-shadow: 0 4px 14px rgba(60, 40, 20, 0.08) !important;
+}
+
+.notebook-evidence-modal .document-toolbar {
+  background: #e6dac6 !important;
+  border-bottom: 1px solid #cfbeaa !important;
+  color: #453424 !important;
+  padding: 10px 16px !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.notebook-evidence-modal .document-toolbar * {
+  color: #453424 !important;
+  font-family: 'Courier Prime', monospace !important;
+}
+
+.notebook-evidence-modal .paper-sheet {
+  position: relative !important;
+  background: #fffefb !important;
+  color: #1a140f !important;
+  padding: 24px 28px !important;
+  min-height: auto !important;
+  line-height: 1.75 !important;
+  border: none !important;
+}
+
+.notebook-evidence-modal .paper-sheet * {
+  color: #1a140f !important;
+}
+
+.notebook-evidence-modal .paper-kicker {
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.5px !important;
+  color: #8b261e !important;
+  margin-bottom: 12px !important;
+}
+
+.notebook-evidence-modal .paper-sheet h2 {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #1a140f !important;
+  line-height: 1.35 !important;
+  margin: 0 0 10px 0 !important;
+  letter-spacing: -0.3px !important;
+}
+
+.notebook-evidence-modal .paper-byline {
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 12px !important;
+  color: #634d38 !important;
+  display: flex !important;
+  gap: 8px !important;
+  margin-bottom: 14px !important;
+}
+
+.notebook-evidence-modal .paper-byline * {
+  color: #634d38 !important;
+}
+
+.notebook-evidence-modal .paper-rule {
+  height: 1px !important;
+  background: #d8cbba !important;
+  margin: 14px 0 18px !important;
+}
+
+.notebook-evidence-modal .paper-sheet p {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  color: #211911 !important;
+  margin: 0 0 14px 0 !important;
 }
 
-/* Typography and color resets for evidence content inside notebook modal */
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal * {
+.notebook-evidence-modal .paper-stamp {
+  display: inline-block !important;
+  margin-top: 18px !important;
+  border: 2px solid #8b261e !important;
+  color: #8b261e !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.5px !important;
+  padding: 6px 14px !important;
+  text-align: center !important;
+  transform: rotate(-3deg) !important;
+  border-radius: 4px !important;
+  background: rgba(139, 38, 30, 0.04) !important;
+  box-shadow: 0 0 0 1px rgba(139, 38, 30, 0.2) !important;
+}
+
+.notebook-evidence-modal .paper-stamp * {
+  color: #8b261e !important;
+  font-family: 'Courier Prime', monospace !important;
+}
+
+/* 2. MAIL APP (E02, E03, E13, E17) */
+.notebook-evidence-modal .mail-app {
+  background: #fffefc !important;
+  border: 1px solid #d4c5b1 !important;
+  border-radius: 8px !important;
+  color: #211911 !important;
+  overflow: visible !important;
+  box-shadow: 0 4px 14px rgba(60, 40, 20, 0.08) !important;
+}
+
+.notebook-evidence-modal .mail-toolbar {
+  background: #ebe0cf !important;
+  border-bottom: 1px solid #d8cab7 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 10px 18px !important;
+  font-size: 12px !important;
+  color: #453424 !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-weight: 600 !important;
+}
+
+.notebook-evidence-modal .mail-toolbar * {
+  color: #453424 !important;
+}
+
+.notebook-evidence-modal .mail-path {
+  display: flex !important;
+  gap: 6px !important;
+  padding: 14px 22px 4px !important;
+  font-size: 11px !important;
+  color: #78624d !important;
+  font-family: 'Courier Prime', monospace !important;
+}
+
+.notebook-evidence-modal .mail-path * {
+  color: #78624d !important;
+}
+
+.notebook-evidence-modal .mail-subject {
+  padding: 12px 22px 10px !important;
+}
+
+.notebook-evidence-modal .mail-subject h2 {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  color: #1a140f !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.notebook-evidence-modal .mail-tag {
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  background: #e6dbcb !important;
+  padding: 2px 7px !important;
+  border-radius: 3px !important;
+  color: #453424 !important;
+  display: inline-block !important;
+}
+
+.notebook-evidence-modal .mail-sender {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 12px 22px !important;
+  border-bottom: 1px solid #e8decf !important;
+}
+
+.notebook-evidence-modal .mail-sender strong {
+  font-size: 13px !important;
+  color: #1a140f !important;
+  display: block !important;
+}
+
+.notebook-evidence-modal .mail-sender small {
+  color: #6a533f !important;
+  font-size: 11px !important;
+  display: block !important;
+}
+
+.notebook-evidence-modal .mail-sender span {
+  color: #78624d !important;
+  font-size: 11px !important;
+  margin-top: 2px !important;
+}
+
+.notebook-evidence-modal .mail-sender time {
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 11px !important;
+  color: #78624d !important;
+  margin-left: auto !important;
+  white-space: nowrap !important;
+}
+
+.notebook-evidence-modal .mail-body {
+  padding: 20px 22px !important;
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+  color: #211911 !important;
+  overflow: visible !important;
+}
+
+.notebook-evidence-modal .mail-body p {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  color: #f1f5f9 !important;
+  color: #211911 !important;
+  margin: 0 0 12px 0 !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .terminal-app,
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .terminal-app * {
-  font-family: Consolas, 'Courier New', monospace !important;
-  color: #a7f3d0 !important;
+.notebook-evidence-modal .mail-footer {
+  border-top: 1px solid #e8decf !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  color: #78624d !important;
+  font-size: 11px !important;
+  background: #f5eee2 !important;
+  font-family: 'Courier Prime', monospace !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .terminal-app .log-error * {
+.notebook-evidence-modal .mail-footer * {
+  color: #78624d !important;
+}
+
+/* 3. TABLES (INSIDE DOCUMENTS & MAILS) */
+.notebook-evidence-modal .table-scroll {
+  overflow-x: auto !important;
+  width: 100% !important;
+  margin: 14px 0 !important;
+  border: 1px solid #d4c5b1 !important;
+  border-radius: 6px !important;
+}
+
+.notebook-evidence-modal table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  text-align: left !important;
+  background: #fffefb !important;
+}
+
+.notebook-evidence-modal th {
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #1a140f !important;
+  background: #eae0cf !important;
+  border-bottom: 2px solid #cfbea8 !important;
+  border-right: 1px solid #dfd3c3 !important;
+  padding: 10px 12px !important;
+}
+
+.notebook-evidence-modal td {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 13px !important;
+  color: #211911 !important;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid #e8dcce !important;
+  border-right: 1px solid #f0e6da !important;
+  background: #fffefb !important;
+}
+
+.notebook-evidence-modal tr:nth-child(even) td {
+  background: #f7f1e5 !important;
+}
+
+.notebook-evidence-modal .handover-progress {
+  margin: 12px 0 16px !important;
+  padding: 10px 14px !important;
+  background: #f5eedf !important;
+  border: 1px solid #dfd3c3 !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.notebook-evidence-modal .handover-progress span,
+.notebook-evidence-modal .handover-progress b {
+  color: #1a140f !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 12px !important;
+}
+
+.notebook-evidence-modal .handover-progress div {
+  width: 100% !important;
+  height: 7px !important;
+  background: #dfd3c3 !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+}
+
+.notebook-evidence-modal .handover-progress i {
+  display: block !important;
+  height: 100% !important;
+  background: #15803d !important;
+}
+
+/* 4. TERMINAL APP (E05, E06, E08) */
+.notebook-evidence-modal .terminal-app {
+  background: #080d0a !important;
+  border: 1px solid #1f3b28 !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 0 25px rgba(0, 35, 10, 0.4), 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden !important;
+  min-height: auto !important;
+}
+
+.notebook-evidence-modal .terminal-tabs {
+  padding: 10px 16px !important;
+  background: #0f1c13 !important;
+  border-bottom: 1px solid #1f3b28 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  color: #4ade80 !important;
+  font: 11px/1 'Courier Prime', monospace !important;
+  font-weight: 700 !important;
+}
+
+.notebook-evidence-modal .terminal-tabs * {
+  color: #4ade80 !important;
+  font-family: 'Courier Prime', monospace !important;
+}
+
+.notebook-evidence-modal .terminal-meta {
+  padding: 10px 16px !important;
+  color: #6ee7b7 !important;
+  font: 11px 'Courier Prime', monospace !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid #13281b !important;
+}
+
+.notebook-evidence-modal .terminal-meta * {
+  color: #6ee7b7 !important;
+}
+
+.notebook-evidence-modal .terminal-meta .status-dot {
+  display: inline-block !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: #22c55e !important;
+  box-shadow: 0 0 6px #22c55e !important;
+  margin-right: 6px !important;
+}
+
+.notebook-evidence-modal .terminal-lines {
+  padding: 14px 0 18px !important;
+}
+
+.notebook-evidence-modal .terminal-lines > div {
+  display: flex !important;
+  gap: 14px !important;
+  padding: 5px 16px !important;
+  font: 12.5px/1.6 'Courier Prime', Consolas, monospace !important;
+  color: #86efac !important;
+}
+
+.notebook-evidence-modal .terminal-lines code {
+  color: #86efac !important;
+  font-family: 'Courier Prime', Consolas, monospace !important;
+}
+
+.notebook-evidence-modal .terminal-lines .line-number {
+  color: #274f34 !important;
+  font-size: 11px !important;
+  user-select: none !important;
+}
+
+.notebook-evidence-modal .terminal-lines .log-error {
+  background: rgba(239, 68, 68, 0.15) !important;
   color: #fca5a5 !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .terminal-app .log-warn * {
+.notebook-evidence-modal .terminal-lines .log-error code {
+  color: #fca5a5 !important;
+  font-weight: 700 !important;
+}
+
+.notebook-evidence-modal .terminal-lines .log-warn {
+  background: rgba(245, 158, 11, 0.12) !important;
   color: #fde047 !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .terminal-app .line-number {
-  color: #475569 !important;
+.notebook-evidence-modal .terminal-lines .log-warn code {
+  color: #fde047 !important;
+  font-weight: 700 !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .chat-app,
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .chat-app * {
-  color: #f1f5f9 !important;
+.notebook-evidence-modal .terminal-lines .log-ok code {
+  color: #4ade80 !important;
+  font-weight: 700 !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .chat-app small {
+.notebook-evidence-modal .terminal-prompt {
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+  font: 11px 'Courier Prime', monospace !important;
+  color: #4ade80 !important;
+  padding: 10px 16px !important;
+  border-top: 1px solid #13281b !important;
+  background: #09120c !important;
+}
+
+.notebook-evidence-modal .terminal-prompt * {
+  color: #4ade80 !important;
+}
+
+/* 5. CHAT APP (E01, E07) */
+.notebook-evidence-modal .chat-app {
+  background: #16202c !important;
+  border: 1px solid #2a3b4e !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden !important;
+}
+
+.notebook-evidence-modal .chat-header {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: center !important;
+  padding: 12px 16px !important;
+  background: #0f1722 !important;
+  border-bottom: 1px solid #2a3b4e !important;
+}
+
+.notebook-evidence-modal .chat-header strong {
+  color: #f8fafc !important;
+  font-size: 13px !important;
+}
+
+.notebook-evidence-modal .chat-header small {
   color: #94a3b8 !important;
+  font-size: 11px !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .chat-app .message-author {
+.notebook-evidence-modal .chat-date {
+  color: #94a3b8 !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 10px !important;
+  margin: 14px auto 10px !important;
+  text-align: center !important;
+}
+
+.notebook-evidence-modal .chat-messages {
+  padding: 0 16px 18px !important;
+}
+
+.notebook-evidence-modal .message-author {
+  font-size: 12px !important;
   color: #60a5fa !important;
+  font-weight: 600 !important;
+  margin-bottom: 4px !important;
 }
 
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .mail-app,
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .mail-app * {
-  color: #1e293b !important;
-}
-
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .mail-app .mail-sender small,
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .mail-app time {
-  color: #64748b !important;
-}
-
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .paper-sheet,
-.modal-overlay.point-and-click dialog.ui-notebook .notebook-evidence-modal .paper-sheet * {
-  color: #1e293b !important;
-}
-
-/* Evidence Hint and Unlock styles */
-.evidence-hint-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-
-.evidence-hint-wrapper .evidence-hint-placeholder {
-  font-size: 12px;
+.notebook-evidence-modal .message-author span {
   color: #94a3b8 !important;
-  font-style: italic;
-  margin: 0;
-  line-height: 1.5;
+  font-weight: normal !important;
+  font-size: 10px !important;
 }
 
-.evidence-hint-wrapper .evidence-hint-text {
-  font-size: 12px;
-  color: #cbd5e1 !important;
-  margin: 0;
-  line-height: 1.6;
+.notebook-evidence-modal .bubble {
+  background: #253342 !important;
+  border: 1px solid #36485c !important;
+  padding: 10px 14px !important;
+  border-radius: 0 10px 10px 10px !important;
 }
 
-.unlock-hint-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #fbbf24 !important;
-  background: rgba(245, 158, 11, 0.12) !important;
-  border: 1px solid rgba(245, 158, 11, 0.4) !important;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: fit-content;
-  margin-top: 4px;
+.notebook-evidence-modal .bubble p {
+  color: #f1f5f9 !important;
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
 }
 
-.unlock-hint-btn:hover {
-  background: rgba(245, 158, 11, 0.22) !important;
-  border-color: rgba(245, 158, 11, 0.7) !important;
-  transform: translateY(-1px);
+.notebook-evidence-modal .bubble small {
+  color: #94a3b8 !important;
+  font-size: 10px !important;
+}
+
+.notebook-evidence-modal .chat-message.outgoing .bubble {
+  background: #1e3a5f !important;
+  border-color: #2b5282 !important;
+  border-radius: 10px 0 10px 10px !important;
+}
+
+.notebook-evidence-modal .crop-notice span {
+  color: #f59e0b !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 11px !important;
+}
+
+/* 6. EVIDENCE CAPTION & HINT MEMO */
+.notebook-evidence-modal-body .evidence-caption {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: flex-start !important;
+  padding: 14px 18px !important;
+  background: #ede3ce !important;
+  border: 1px solid #cbb89e !important;
+  border-left: 5px solid #8b261e !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 6px rgba(50, 35, 20, 0.06) !important;
+}
+
+.notebook-evidence-modal-body .evidence-caption .case-tag {
+  font-family: 'Courier Prime', Consolas, monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  background: #8b261e !important;
+  color: #ffffff !important;
+  padding: 2px 7px !important;
+  border-radius: 3px !important;
+  letter-spacing: 0.5px !important;
+  flex-shrink: 0 !important;
+}
+
+.notebook-evidence-modal-body .evidence-caption .evidence-hint-placeholder {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 13px !important;
+  color: #66523e !important;
+  font-style: italic !important;
+  margin: 0 0 6px 0 !important;
+  line-height: 1.5 !important;
+}
+
+.notebook-evidence-modal-body .evidence-caption .evidence-hint-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 13.5px !important;
+  color: #1a140f !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  line-height: 1.6 !important;
+}
+
+.notebook-evidence-modal-body .evidence-caption .unlock-hint-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 7px 14px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #fff9ed !important;
+  background: #78350f !important;
+  border: 1px solid #92400e !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  width: fit-content !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  font-family: 'Courier Prime', monospace !important;
+}
+
+.notebook-evidence-modal-body .evidence-caption .unlock-hint-btn:hover {
+  background: #92400e !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22) !important;
 }
 
 .evidence-hint-badge {

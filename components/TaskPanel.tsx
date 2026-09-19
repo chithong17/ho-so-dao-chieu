@@ -1,6 +1,6 @@
 import { playSfx } from '../lib/audio';
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Lightbulb, Link2, NotebookPen, Send, CheckCircle2, AlertCircle, Target, FileText } from 'lucide-react';
 import { chainOptions, relationOptions, reportOptions, recoveryActions } from '../game/tasks';
 import { answerComplete, caseCredibility, chapterComplete, chapterReadiness, emptyAnswer, evaluateChallenge } from '../game/engine';
@@ -57,6 +57,17 @@ export default function TaskPanel() {
   const task = tasks.find(t => t.id === state.activeTask)!;
   const [error, setError] = useState('');
   const [viewingEvidence, setViewingEvidence] = useState<Evidence | null>(null);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setViewingEvidence(null);
+      }
+    };
+    if (viewingEvidence) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [viewingEvidence]);
   const a = state.drafts[task.id] ?? state.answers[task.id] ?? emptyAnswer(task.id);
   const submitted = state.answers[task.id];
   const evaluation = submitted ? evaluateChallenge(task.id, submitted) : null;
@@ -206,8 +217,9 @@ export default function TaskPanel() {
         >
           <div className="notebook-evidence-modal-head">
             <div className="modal-title">
+              <span className="modal-dossier-label">HỒ SƠ CHỨNG CỨ</span>
               <span className="modal-badge">{viewingEvidence.id}</span>
-              <strong>{viewingEvidence.title}</strong>
+              <strong title={viewingEvidence.title}>{viewingEvidence.title}</strong>
             </div>
             <button
               type="button"
