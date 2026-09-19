@@ -11188,3 +11188,162 @@ body:has(.landing) .competition-entry {
   border-color: #ffd477;
   transform: scale(1.08);
 }
+
+/* ===================================================
+   SIMPLE 2-STEP ONBOARDING TUTORIAL
+   =================================================== */
+
+.tutorial-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1005;
+  pointer-events: none;
+  transition: opacity 0.4s ease-out;
+}
+
+.tutorial-container.tutorial-fading-out {
+  opacity: 0;
+}
+
+.tutorial-dim-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 15, 0.48);
+  backdrop-filter: blur(1px);
+  z-index: 998;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.tutorial-pointer-group {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 1006;
+  pointer-events: none;
+  transition: right 0.22s cubic-bezier(0.2, 0, 0.2, 1), top 0.22s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.tutorial-message-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fbf5e6;
+  color: #2a1d12;
+  font-family: 'Patrick Hand', 'Segoe UI', cursive, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 2px solid #5a4128;
+  box-shadow: 3px 4px 0px rgba(45, 30, 15, 0.85), 0 8px 24px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+  user-select: none;
+  animation: tutorialCardFloat 2.4s ease-in-out infinite alternate;
+}
+
+.tutorial-badge-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d97706;
+  box-shadow: 0 0 10px #f59e0b, 0 0 16px #f59e0b;
+  flex-shrink: 0;
+  display: inline-block;
+  animation: tutorialDotPulse 1.2s ease-in-out infinite alternate;
+}
+
+.tutorial-arrow-img {
+  width: 82px;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 12px rgba(255, 204, 77, 0.5));
+  animation: tutorialArrowBounce 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Notebook soft warm golden glow (Step 1) */
+.case-notebook-hud.tutorial-highlight {
+  z-index: 1001 !important;
+  position: fixed !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  filter: drop-shadow(0 0 18px rgba(255, 204, 77, 0.95)) drop-shadow(0 0 35px rgba(245, 158, 11, 0.7)) brightness(1.12) !important;
+  animation: tutorialNotebookGlow 1.8s ease-in-out infinite alternate !important;
+}
+
+/* Collect mission button warm pulsing glow (Step 2) */
+.collect-mission-btn.tutorial-highlight {
+  position: relative !important;
+  z-index: 1002 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 0 3px #ffd477, 0 0 20px rgba(255, 195, 50, 0.9), 0 0 36px rgba(255, 165, 0, 0.6) !important;
+  animation: tutorialBtnGlow 1.4s ease-in-out infinite alternate !important;
+}
+
+@keyframes tutorialArrowBounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(14px);
+  }
+}
+
+@keyframes tutorialNotebookGlow {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 14px rgba(255, 204, 77, 0.8)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.5)) brightness(1.05);
+  }
+  100% {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 24px rgba(255, 215, 0, 1)) drop-shadow(0 0 45px rgba(255, 180, 0, 0.85)) brightness(1.18);
+  }
+}
+
+@keyframes tutorialBtnGlow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px #ffd477, 0 0 14px rgba(255, 195, 50, 0.75);
+  }
+  100% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 4px #ffe699, 0 0 28px rgba(255, 200, 60, 1), 0 0 42px rgba(255, 160, 20, 0.8);
+  }
+}
+
+@keyframes tutorialCardFloat {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes tutorialDotPulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+[data-motion="reduce"] .tutorial-arrow-img,
+[data-motion="reduce"] .tutorial-message-card,
+[data-motion="reduce"] .tutorial-badge-dot,
+[data-motion="reduce"] .case-notebook-hud.tutorial-highlight,
+[data-motion="reduce"] .collect-mission-btn.tutorial-highlight {
+  animation: none !important;
+}
+

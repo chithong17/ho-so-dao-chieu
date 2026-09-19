@@ -65,7 +65,6 @@ function CinematicIntro({ onComplete }: { onComplete: () => void }) {
 
 export default function EscapeRoom({ onInteract, onExit, forceIntro, competitionBoard = false }: EscapeRoomProps & { forceIntro?: boolean }) {
   const [scene, setScene] = useState<Scene>(forceIntro ? 'intro' : (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('hs01_intro_seen') ? 'desk' : 'intro'));
-  const [showTutorial, setShowTutorial] = useState(false);
   React.useEffect(() => { if (scene === 'intro') playBgm('intro'); else playBgm('investigation'); }, [scene]);
   const [muted, setMutedState] = React.useState(getMute());
 
@@ -86,28 +85,7 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro, competition
         
         {scene === 'intro' && <CinematicIntro onComplete={() => { 
           if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('hs01_intro_seen', '1'); setScene('desk'); 
-          if(document.documentElement.dataset.competition!=='true')setTimeout(() => setShowTutorial(true), 1000); 
         }} />}
-
-        {showTutorial && (
-          <div className="tutorial-overlay" style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, 
-            background: 'rgba(0,0,0,0.7)', zIndex: 100, 
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-            animation: 'fadeIn 0.5s ease-out'
-          }} onClick={() => setShowTutorial(false)}>
-            <img 
-              src="/tutorial_bg.jpg" 
-              alt="Chỉ thị điều tra" 
-              style={{
-                width: '90%', maxWidth: '1000px', height: 'auto', 
-                boxShadow: '0 20px 50px rgba(0,0,0,0.8)', 
-                borderRadius: '8px'
-              }} 
-            />
-          </div>
-        )}
 
                         {scene === 'desk' && (
           <>
