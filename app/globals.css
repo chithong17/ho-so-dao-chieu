@@ -2910,54 +2910,123 @@ td {
 .truth-point-card.timeline-card {
   width: 100%;
   box-sizing: border-box;
-  background: linear-gradient(135deg, rgba(23, 32, 43, 0.94), rgba(18, 25, 34, 0.96));
-  border: 1px solid rgba(217, 164, 65, 0.3);
-  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(22, 30, 40, 0.96), rgba(16, 23, 32, 0.98));
+  border: 1px solid rgba(217, 164, 65, 0.32);
+  border-radius: 12px;
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   text-align: left;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .truth-point-card.timeline-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(245, 158, 11, 0.7);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6), 0 0 18px rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.75);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(245, 158, 11, 0.25);
 }
 
 .truth-card-header {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .truth-card-heading {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
+  width: 100%;
 }
 
 .truth-card-heading h4 {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
-  color: var(--ink);
+  color: #f8fafc;
   margin: 0;
   line-height: 1.35;
+  letter-spacing: -0.2px;
 }
 
 .truth-highlight-pill {
   font-size: 11.5px;
   font-weight: 600;
-  color: var(--gold-light);
-  background: rgba(217, 164, 65, 0.12);
-  padding: 3px 8px;
-  border-radius: 4px;
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.12);
+  padding: 3px 10px;
+  border-radius: 6px;
   display: inline-block;
   width: fit-content;
-  border: 1px solid rgba(217, 164, 65, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  letter-spacing: 0.2px;
+}
+
+/* Bullet Points List for clean scannable layout */
+.timeline-bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timeline-bullet-item {
+  position: relative;
+  padding-left: 20px;
+  font-size: 13.5px;
+  line-height: 1.68;
+  color: #cbd5e1;
+  font-family: var(--font-body);
+}
+
+.timeline-bullet-item::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.85);
+}
+
+/* Key Text Highlighting */
+.truth-strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.truth-code {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.16);
+  color: #fde68a;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 1px 6px;
+  border-radius: 4px;
+  vertical-align: baseline;
+}
+
+.truth-gold-text {
+  color: #fbbf24;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+}
+
+.truth-warn-text {
+  color: #f87171;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
 .truth-card-desc {
@@ -2972,15 +3041,18 @@ td {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: auto;
+  margin-top: 2px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
   font-size: 11px;
 }
 
 .truth-card-badges .badge-label {
-  color: #7b8b9c;
+  color: #64748b;
   font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .truth-evidence-badge {

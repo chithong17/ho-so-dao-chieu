@@ -18,6 +18,26 @@ export function ConceptCards({ ids }: { ids: ConceptId[] }) {
   return <div className="concept-grid">{[...new Set(ids)].map(id => { const c = concepts.find(c => c.id === id)!; return <article className="concept-card" key={id}><span className="concept-id">{id.startsWith('NL') ? 'NGUYÊN LÝ' : id.startsWith('QL') ? 'QUY LUẬT' : 'CẶP PHẠM TRÙ'} · {id}</span><h3>{c.title}</h3><p>{c.explanation}</p><details><summary>Liên hệ hồ sơ & giới hạn</summary><p><b>Trong hồ sơ:</b> {c.application}</p><p className="concept-limit"><Lightbulb size={16} />{c.limit}</p></details><footer><BookOpen size={13} /><span>phepduyvatbienchung.pdf · tr. {c.pages[0]}–{c.pages[1]}<br />Trang in {c.pages[0] + 83}–{c.pages[1] + 83} · {c.slide}</span></footer></article>; })}{!ids.length && <p className="note">Hoàn thành một chương để mở phần giải mã kiến thức tương ứng.</p>}</div>;
 }
 
+function parseFormattedText(text: string) {
+  const regex = /(\*\*.*?\*\*|`.*?`|\[warn\].*?\[\/warn\]|\[gold\].*?\[\/gold\])/g;
+  const parts = text.split(regex);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="truth-strong">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return <code key={i} className="truth-code">{part.slice(1, -1)}</code>;
+    }
+    if (part.startsWith('[warn]') && part.endsWith('[/warn]')) {
+      return <span key={i} className="truth-warn-text">{part.slice(6, -7)}</span>;
+    }
+    if (part.startsWith('[gold]') && part.endsWith('[/gold]')) {
+      return <span key={i} className="truth-gold-text">{part.slice(6, -7)}</span>;
+    }
+    return part;
+  });
+}
+
 const chapterLessons = {
   1: { title: 'Bài học chương 1: Đừng kết luận từ một dấu hiệu.', text: 'Tin nhắn bị cắt và dự án biến mất là những hiện tượng cần kiểm tra. Chỉ khi đối chiếu hội thoại đầy đủ, nhật ký trạng thái và kết quả test, người chơi mới có cơ sở phân biệt hành vi thực tế với suy đoán.', takeaway: 'Khi một kết quả xuất hiện, hãy tìm chuỗi tác động tạo ra nó; việc xảy ra trước hoặc gây ấn tượng mạnh chưa tự nó là nguyên nhân.' },
   2: { title: 'Bài học chương 2: Nhìn hệ thống, nhưng không khái quát vội.', text: 'Sự cố của Mạch Nối không chỉ nằm ở một trường dữ liệu. Nó bộc lộ mối liên hệ giữa yêu cầu, bàn giao, test và tổ chức công việc. Tuy vậy, mỗi dự án vẫn có hoàn cảnh và lỗi cụ thể riêng.', takeaway: 'Xem xét toàn diện không có nghĩa coi mọi yếu tố ngang nhau. Hãy tìm quan hệ chủ yếu, phân biệt điều kiện bên ngoài với nguyên nhân trực tiếp và tổ chức thông tin theo đúng mục đích.' },
@@ -170,7 +190,17 @@ export function Debrief() {
                           <span className="truth-highlight-pill">{pt.highlight}</span>
                         </div>
                       </div>
-                      <p className="truth-card-desc">{pt.description}</p>
+                      {pt.bullets && pt.bullets.length > 0 ? (
+                        <ul className="timeline-bullet-list">
+                          {pt.bullets.map((bullet, bIdx) => (
+                            <li key={bIdx} className="timeline-bullet-item">
+                              {parseFormattedText(bullet)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="truth-card-desc">{pt.description}</p>
+                      )}
                       {pt.badges && pt.badges.length > 0 && (
                         <div className="truth-card-badges">
                           <span className="badge-label">Chứng cứ liên quan:</span>

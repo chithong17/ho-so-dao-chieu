@@ -4,6 +4,7 @@ export interface TruthPoint {
   title: string;
   highlight: string;
   description: string;
+  bullets?: string[];
   badges?: string[];
 }
 
@@ -36,6 +37,11 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Lỗi dữ liệu nội bộ (Nguyên nhân cốt lõi)',
         highlight: 'E03 → E04 → E05 (Lệch name và fullName)',
         description: 'Lúc 18:10, Quân đổi trường name thành fullName bắt buộc trong API (E03), nhưng giao diện của Nam chưa kịp cập nhật nên vẫn gửi name cũ (E04). Lúc 19:20, Nam test cục bộ thì bị API từ chối lưu vì thiếu fullName (E05). Luồng đăng ký đã gãy ngay trên máy local từ trước khi có sự cố mạng.',
+        bullets: [
+          '**18:10** — Quân đổi trường `name` thành [gold]`fullName` bắt buộc[/gold] trong API (E03), nhưng giao diện của Nam chưa kịp cập nhật nên vẫn gửi `name` cũ (E04).',
+          '**19:20** — Nam test cục bộ thì bị API [warn]từ chối lưu dữ liệu[/warn] vì thiếu trường `fullName` (E05).',
+          '**Bản chất** — Luồng đăng ký đã [gold]sập ngay trên máy local[/gold] từ trước khi có sự cố rớt mạng.'
+        ],
         badges: ['E03', 'E04', 'E05']
       },
       {
@@ -44,6 +50,11 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Vai trò của sự cố mạng (Điều kiện bên ngoài / Ngẫu nhiên)',
         highlight: '19:35 – 19:45 gián đoạn kết nối',
         description: 'Mạng khu vực bị ngắt 10 phút lúc 19:35 (E06). Sự cố này chỉ cản trở đồng bộ từ xa, hoàn toàn KHÔNG PHẢI nguyên nhân sinh ra lỗi lệch fullName vốn đã làm sập luồng đăng ký từ 19:20.',
+        bullets: [
+          '**19:35 – 19:45** — Mạng khu vực bị ngắt 10 phút, gián đoạn kết nối từ xa (E06).',
+          '[warn]Không phải nguyên nhân[/warn] — Sự cố mạng chỉ cản trở đồng bộ, [gold]không sinh ra lỗi lệch fullName[/gold] vốn đã làm sập hệ thống từ 19:20.',
+          '**Quan hệ triết học** — Mạng rớt chỉ là [gold]điều kiện ngẫu nhiên bên ngoài[/gold], không phải nguyên nhân tất nhiên bên trong.'
+        ],
         badges: ['E06']
       },
       {
@@ -52,6 +63,11 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Sự thật về tin nhắn của Nam & Quyết định của nhóm',
         highlight: 'Nam không xóa code · Mai chủ động set HIDDEN',
         description: 'Hội thoại đầy đủ lúc 19:42 (E07) cho thấy Nam chỉ bức xúc vì đổi yêu cầu, mã nguồn vẫn còn nguyên trên máy. Linh đề xuất tạm rút demo vì chưa test; Mai dùng quyền Team Lead đổi trạng thái sang HIDDEN lúc 19:50 (E08). Hoàn toàn không có ai xóa mã nguồn hay phá hoại dự án.',
+        bullets: [
+          '**19:42** — Hội thoại đầy đủ cho thấy Nam chỉ bức xúc vì đổi yêu cầu gấp, [gold]mã nguồn vẫn còn nguyên[/gold] trên máy (E07).',
+          '**19:50** — Linh đề xuất tạm rút demo; Mai dùng quyền Team Lead [gold]chủ động đổi trạng thái sang HIDDEN[/gold] vì chưa kịp test (E08).',
+          '**Sự thật** — Hoàn toàn [gold]không có ai xóa mã nguồn hay cố tình phá hoại[/gold] dự án.'
+        ],
         badges: ['E07', 'E08']
       },
       {
@@ -60,6 +76,11 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Điểm mù quy trình: Thiếu kiểm thử tích hợp toàn luồng',
         highlight: 'Xong từng phần ≠ Toàn hệ thống hoạt động',
         description: 'Bảng chuẩn bị (E09) cho thấy các thành viên đều xong phần việc riêng, nhưng không ai nhận trách nhiệm kiểm thử tích hợp đầu-cuối khi ghép giao diện, API và cơ sở dữ liệu trước giờ mở màn triển lãm.',
+        bullets: [
+          '**Thực trạng** — Bảng chuẩn bị (E09) cho thấy từng thành viên đều hoàn thành tốt phần việc độc lập của mình.',
+          '[warn]Điểm mù quy trình[/warn] — Không ai nhận trách nhiệm [gold]kiểm thử tích hợp toàn luồng[/gold] khi ghép giao diện, API và cơ sở dữ liệu.',
+          '**Bài học** — [gold]Xong từng phần việc riêng ≠ Toàn hệ thống hoạt động thống nhất[/gold].'
+        ],
         badges: ['E09']
       }
     ]
@@ -80,6 +101,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Cái riêng và Cái chung (Đối chiếu 3 hồ sơ)',
         highlight: 'C-A và C-B chung lỗ hổng tích hợp',
         description: 'Cả C-A (Mạch Nối) và C-B cùng mắc khuyết điểm thiếu kiểm thử tích hợp khi ghép nối (E10). Tuy nhiên, C-A lệch trường dữ liệu, C-B gọi sai đường dẫn API; đó là những nét riêng cụ thể. Nhóm C có quy ước thống nhất và bản chạy local nên vẫn hoạt động dù mất mạng.',
+        bullets: [
+          '**Cái chung** — Cả C-A (Mạch Nối) và C-B cùng mắc khuyết điểm [warn]thiếu kiểm thử tích hợp[/warn] khi ghép nối (E10).',
+          '**Cái riêng** — C-A lệch trường dữ liệu, C-B gọi sai đường dẫn API; nhóm C có quy ước thống nhất nên bản local vẫn chạy tốt.'
+        ],
         badges: ['E10']
       },
       {
@@ -88,6 +113,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Tất nhiên và Ngẫu nhiên trong sự cố',
         highlight: 'Mạng ổn định không tự hết lỗi dữ liệu',
         description: 'Dữ liệu thiếu trường bắt buộc tất nhiên dẫn đến việc API từ chối. Mất mạng là biến cố ngẫu nhiên bên ngoài. Khi chạy thử nghiệm mô phỏng: nếu không sửa dữ liệu, dù mạng có ổn định thì hệ thống vẫn báo lỗi; chỉ khi sửa đúng nguyên nhân trực tiếp thì kết quả mới đổi.',
+        bullets: [
+          '**Tất nhiên** — Dữ liệu thiếu trường bắt buộc [warn]tất nhiên dẫn đến việc API từ chối[/warn].',
+          '**Ngẫu nhiên** — Mất mạng là biến cố bên ngoài; dù mạng ổn định thì [warn]hệ thống vẫn báo lỗi[/warn] nếu không sửa đúng dữ liệu.'
+        ],
         badges: ['T05']
       },
       {
@@ -96,6 +125,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Tổ chức báo cáo sự cố (Nội dung & Hình thức)',
         highlight: '6 mảnh ghép theo chuỗi nhân quả',
         description: '6 mảnh dữ kiện rời rạc trong E12 chỉ thực sự có giá trị khi tổ chức theo trật tự logic: Yêu cầu → Không tương thích → Test thất bại → Hậu quả tạm ẩn → Biện pháp chuyển đổi → Nghiệm thu lại.',
+        bullets: [
+          '**Thực trạng** — 6 mảnh dữ kiện rời rạc trong E12 chỉ thực sự có giá trị khi xếp theo [gold]chuỗi quan hệ nhân quả[/gold].',
+          '**Trật tự chuẩn** — [gold]Yêu cầu → Không tương thích → Test thất bại → Tạm ẩn → Chuyển đổi → Nghiệm thu[/gold].'
+        ],
         badges: ['E12']
       },
       {
@@ -104,6 +137,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Mâu thuẫn biện chứng trong quy trình nhóm',
         highlight: 'Phương án A vs Phương án B',
         description: 'Nhóm giằng co giữa hai mặt đối lập: Phương án A (quá tự do, nhanh nhưng vỡ chuẩn) và Phương án B (quá chặt chẽ, duyệt tập trung tạo điểm nghẽn) (E11, E13). Hai mặt này vừa cần nhau vừa kìm hãm nhau; giải pháp là phân quyền theo mô-đun kết hợp chuẩn chung.',
+        bullets: [
+          '**Hai mặt đối lập** — Phương án A (*quá tự do, vỡ chuẩn*) đối lập Phương án B (*quá chặt chẽ, tạo điểm nghẽn duyệt*) (E11, E13).',
+          '**Giải pháp biện chứng** — Kết hợp [gold]phân quyền theo mô-đun[/gold] với [gold]chuẩn chung kiểm thử tự động[/gold].'
+        ],
         badges: ['E11', 'E13']
       }
     ]
@@ -124,6 +161,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Chuyển hóa Lượng – Chất trong hệ thống',
         highlight: 'Mô hình luồng A → D (Nối B → C)',
         description: 'Số lượng liên kết là mặt lượng (E14). Thêm nhiều liên kết tùy tiện không làm hệ thống chạy. Chỉ khi nối đúng mắt xích cấu trúc trọng yếu (B → C) thì luồng xử lý mới thông suốt từ đầu đến cuối (bước nhảy về chất).',
+        bullets: [
+          '**Mặt lượng** — Số lượng liên kết tăng tùy tiện không làm hệ thống chạy (E14).',
+          '**Bước nhảy về chất** — Chỉ khi nối đúng [gold]mắt xích cấu trúc then chốt (B → C)[/gold] thì luồng xử lý mới thông suốt từ đầu đến cuối.'
+        ],
         badges: ['E14']
       },
       {
@@ -132,6 +173,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Quy trình A′ — Phủ định của phủ định',
         highlight: 'Kế thừa có chọn lọc ở trình độ cao hơn',
         description: 'Quy trình mới A′ (E15) không quay về sự hỗn loạn của A, cũng không duy trì nút thắt phê duyệt của B. A′ kế thừa quyền chủ động theo mô-đun của A, kết hợp với chuẩn chung và kiểm thử tự động của B.',
+        bullets: [
+          '**Kế thừa chọn lọc** — Quy trình mới A′ (E15) không hỗn loạn như A, cũng không thắt nút như B.',
+          '**Trình độ cao hơn** — Kế thừa tính chủ động theo mô-đun của A, kết hợp với chuẩn chung và kiểm thử tự động của B.'
+        ],
         badges: ['E15']
       },
       {
@@ -140,6 +185,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Phát triển thực sự vs Mở rộng hình thức',
         highlight: 'Bản V3 nâng cao năng lực cốt lõi',
         description: 'V1 (đổi màu) và V2 (thêm tính năng phụ) chỉ là thay đổi hình thức bên ngoài (E16). Chỉ có bản V3 sửa đúng luồng dữ liệu và vượt qua kiểm thử mới là bước phát triển thực chất của sản phẩm.',
+        bullets: [
+          '**Hình thức bên ngoài** — V1 (đổi màu) và V2 (thêm tính năng phụ) chỉ là thay đổi hình thức bên ngoài (E16).',
+          '**Phát triển thực chất** — [gold]Bản V3 sửa đúng luồng dữ liệu[/gold] và vượt qua kiểm thử mới là bước phát triển thực chất của sản phẩm.'
+        ],
         badges: ['E16']
       },
       {
@@ -148,6 +197,10 @@ export const chapterTruths: Record<number, ChapterTruth> = {
         title: 'Biến Khả năng thành Hiện thực (Kế hoạch 60 phút)',
         highlight: 'A1 → A2 → A3 → A4 (55 phút + 5 phút dự phòng)',
         description: 'Mã nguồn, bản sao lưu, dữ liệu mẫu là tiền đề khách quan có sẵn (E17). Chuỗi hành động 4 bước theo đúng quan hệ phụ thuộc trước – sau giúp chuyển hóa khả năng thành hiện thực nghiệm thu thành công.',
+        bullets: [
+          '**Tiền đề khách quan** — Mã nguồn, bản sao lưu, dữ liệu mẫu đã có sẵn (E17).',
+          '**Hành động có điều kiện** — Chuỗi [gold]A1 → A2 → A3 → A4 (55 phút + 5 phút dự phòng)[/gold] giúp chuyển hóa khả năng thành hiện thực thành công.'
+        ],
         badges: ['E17']
       }
     ]
