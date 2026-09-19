@@ -139,6 +139,13 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro, competition
               icon={<Smartphone size={24} />}
               onClick={() => onInteract('phone')} sfx="phone"
             />
+            {competitionBoard && <Interactable
+              x="61.5%" y="6%" width="16.5%" height="28%"
+              label="Bảng xếp hạng · Top 10"
+              icon={<Pin size={24} />}
+              onClick={() => onInteract('leaderboard')} sfx="page_turn"
+              className="leaderboard-hotspot"
+            />}
           </>
         )}
 
@@ -152,12 +159,10 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro, competition
               onClick={() => onInteract('files')} sfx="folder"
             />
             <Interactable
-              x={competitionBoard?'51.5%':'48%'} y={competitionBoard?'5%':'8%'}
-              width={competitionBoard?'34%':'38%'} height={competitionBoard?'49%':'45%'}
-              label={competitionBoard?'Bảng xếp hạng · Top 10':'Bảng lập luận · mô hình tái dựng'}
+              x="48%" y="8%" width="38%" height="45%"
+              label="Bảng lập luận · mô hình tái dựng"
               icon={<Pin size={24} />}
               onClick={() => onInteract('board')} sfx="page_turn"
-              className={competitionBoard?'leaderboard-hotspot':''}
             />
           </>
         )}

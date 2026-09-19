@@ -36,7 +36,7 @@ function Investigation(){const {state,config,dispatch,setHome,competitive,openCo
  
   const handleInteract = (objId: string) => {
     if (objId === 'notebook') {setActiveObj('notebook');return;}
-    if (objId === 'board' && competitive && openCompetitionLeaderboard) {openCompetitionLeaderboard();return;}
+    if (objId === 'leaderboard' && competitive && openCompetitionLeaderboard) {openCompetitionLeaderboard();return;}
     const sources={phone:'phone',laptop:'laptop',files:'files',board:'board'} as const;
     const source=sources[objId as keyof typeof sources];
     if(!source)return;
