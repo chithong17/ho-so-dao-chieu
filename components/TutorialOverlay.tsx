@@ -149,10 +149,10 @@ export default function TutorialOverlay() {
     return null;
   }
 
-  // Exact arrow dimensions and tip offsets (arrow.png: 1536x1024, tip at 1458, 853)
+  // Exact arrow dimensions and nose offsets (arrow.png: 1536x1024, nose at 1273, 561)
   const arrowWidth = 76;
-  const tipOffsetX = 72; // 76 * (1458 / 1536)
-  const tipOffsetY = 42; // 50.7 * (853 / 1024)
+  const tipOffsetX = 63; // 76 * (1273 / 1536)
+  const tipOffsetY = 28; // 50.7 * (561 / 1024)
 
   let arrowLeft = 0;
   let arrowTop = 0;
@@ -160,23 +160,23 @@ export default function TutorialOverlay() {
   let msgTop = 0;
 
   if (step === 1) {
-    // Step 1: Point at notebook HUD in bottom-right corner
-    const tipTargetX = targetRect.left + 15;
-    const tipTargetY = targetRect.top + 25;
+    // Step 1: Point at notebook HUD in bottom-right corner (toward the cover)
+    const tipTargetX = targetRect.left + 8;
+    const tipTargetY = targetRect.top + targetRect.height * 0.4;
     arrowLeft = tipTargetX - tipOffsetX;
     arrowTop = tipTargetY - tipOffsetY;
 
-    msgLeft = targetRect.left - 230;
-    msgTop = arrowTop - 46;
+    msgLeft = arrowLeft - 40;
+    msgTop = arrowTop - 50;
   } else {
-    // Step 2: Point directly at "Nhận nhiệm vụ" button inside notebook
-    const tipTargetX = targetRect.left - 2;
+    // Step 2: Point directly into "Nhận nhiệm vụ" button inside notebook
+    const tipTargetX = targetRect.left + 16;
     const tipTargetY = targetRect.top + targetRect.height / 2;
     arrowLeft = tipTargetX - tipOffsetX;
     arrowTop = tipTargetY - tipOffsetY;
 
-    msgLeft = targetRect.left - 210;
-    msgTop = targetRect.top - 46;
+    msgLeft = targetRect.left - 130;
+    msgTop = arrowTop - 50;
   }
 
   const maxMsgLeft = typeof window !== 'undefined' ? Math.max(16, window.innerWidth - 320) : 1000;
