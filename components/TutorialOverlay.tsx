@@ -149,47 +149,65 @@ export default function TutorialOverlay() {
     return null;
   }
 
-  // Calculate dynamic position based on targetRect
-  const targetLeft = targetRect.left;
-  const targetCenterY = targetRect.top + targetRect.height / 2;
+  // Exact arrow dimensions and tip offsets (arrow.png: 1536x1024, tip at 1458, 853)
+  const arrowWidth = 76;
+  const tipOffsetX = 72; // 76 * (1458 / 1536)
+  const tipOffsetY = 42; // 50.7 * (853 / 1024)
 
-  const isEnoughSpaceLeft = targetLeft >= 220;
+  let arrowLeft = 0;
+  let arrowTop = 0;
+  let msgLeft = 0;
+  let msgTop = 0;
+
+  if (step === 1) {
+    // Step 1: Point at notebook HUD in bottom-right corner
+    const tipTargetX = targetRect.left + 15;
+    const tipTargetY = targetRect.top + 25;
+    arrowLeft = tipTargetX - tipOffsetX;
+    arrowTop = tipTargetY - tipOffsetY;
+
+    msgLeft = targetRect.left - 230;
+    msgTop = arrowTop - 46;
+  } else {
+    // Step 2: Point directly at "Nhận nhiệm vụ" button inside notebook
+    const tipTargetX = targetRect.left - 2;
+    const tipTargetY = targetRect.top + targetRect.height / 2;
+    arrowLeft = tipTargetX - tipOffsetX;
+    arrowTop = tipTargetY - tipOffsetY;
+
+    msgLeft = targetRect.left - 210;
+    msgTop = targetRect.top - 46;
+  }
+
+  const maxMsgLeft = typeof window !== 'undefined' ? Math.max(16, window.innerWidth - 320) : 1000;
+  msgLeft = Math.min(Math.max(16, msgLeft), maxMsgLeft);
+  msgTop = Math.max(16, msgTop);
 
   return (
     <div className={`tutorial-container ${isFadingOut ? 'tutorial-fading-out' : ''}`}>
-      {/* Darkened Screen Overlay */}
-      <div className="tutorial-dim-overlay" />
-
-      {/* Floating Pointer & Message Group */}
+      {/* Translucent frosted message card */}
       <div
-        className="tutorial-pointer-group"
-        style={
-          isEnoughSpaceLeft
-            ? {
-                right: `calc(100vw - ${targetLeft - 12}px)`,
-                top: `${Math.max(12, targetCenterY - 60)}px`,
-              }
-            : {
-                left: `${Math.max(12, targetRect.left - 40)}px`,
-                bottom: `calc(100vh - ${targetRect.top - 12}px)`,
-                alignItems: 'flex-start',
-              }
-        }
+        className="tutorial-message-card"
+        style={{
+          left: `${msgLeft}px`,
+          top: `${msgTop}px`,
+        }}
       >
-        {/* Vintage detective paper note message */}
-        <div className="tutorial-message-card">
-          <span className="tutorial-badge-dot" />
-          <span>{step === 1 ? 'Mở sổ hồ sơ vụ án.' : 'Nhấn ‘Nhận nhiệm vụ’ để bắt đầu điều tra.'}</span>
-        </div>
-
-        {/* Tutorial animated arrow */}
-        <img
-          src="/arrow.png"
-          alt="Mũi tên hướng dẫn"
-          className="tutorial-arrow-img"
-          draggable={false}
-        />
+        <span className="tutorial-badge-dot" />
+        <span>{step === 1 ? 'Mở sổ hồ sơ vụ án.' : 'Nhấn ‘Nhận nhiệm vụ’ để bắt đầu điều tra.'}</span>
       </div>
+
+      {/* Tutorial animated arrow with radiant warm light */}
+      <img
+        src="/arrow.png"
+        alt="Mũi tên hướng dẫn"
+        className="tutorial-arrow-img"
+        draggable={false}
+        style={{
+          left: `${arrowLeft}px`,
+          top: `${arrowTop}px`,
+        }}
+      />
     </div>
   );
 }
