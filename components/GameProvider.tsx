@@ -11,9 +11,9 @@ export type TrackedMission = {
 } | null;
 
 export type CompetitionBridge={state:GameState;version:number;showIntro:boolean;send:(action:Action,version:number)=>Promise<{state:GameState;version:number}>;exit:()=>void};
-type Context={state:GameState;config:ReturnType<typeof getConfig>;dispatch:Dispatch<Action>;ready:boolean;saveStatus:string;conflict:boolean;resolveConflict:()=>void;enter:(m:Mode,fresh?:boolean,difficulty?:Difficulty)=>void;home:boolean;setHome:(v:boolean)=>void;paused:boolean;setPaused:(v:boolean)=>void;reduced:boolean;setReduced:(v:boolean)=>void;trackedMission:TrackedMission;setTrackedMission:React.Dispatch<React.SetStateAction<TrackedMission>>;competitive:boolean;competitionIntro:boolean};
+type Context={state:GameState;config:ReturnType<typeof getConfig>;dispatch:Dispatch<Action>;ready:boolean;saveStatus:string;conflict:boolean;resolveConflict:()=>void;enter:(m:Mode,fresh?:boolean,difficulty?:Difficulty)=>void;home:boolean;setHome:(v:boolean)=>void;paused:boolean;setPaused:(v:boolean)=>void;reduced:boolean;setReduced:(v:boolean)=>void;trackedMission:TrackedMission;setTrackedMission:React.Dispatch<React.SetStateAction<TrackedMission>>;competitive:boolean;competitionIntro:boolean;openCompetitionLeaderboard?:()=>void};
 const GameContext=createContext<Context|null>(null);
-export function GameProvider({children,competition}:{children:ReactNode;competition?:CompetitionBridge}){
+export function GameProvider({children,competition,openCompetitionLeaderboard}:{children:ReactNode;competition?:CompetitionBridge;openCompetitionLeaderboard?:()=>void}){
  const [state,dispatch]=useReducer(reduceGame,undefined,()=>competition?.state??createState());
  const [ready,setReady]=useState(!!competition),[saveStatus,setSaveStatus]=useState(competition?'Đã kết nối phòng thi đấu':'Đang mở hồ sơ…'),[conflict,setConflict]=useState(false),[home,setHome]=useState(false),[paused,setPaused]=useState(false),[reduced,setReduced]=useState(false);
  const [trackedMission,setTrackedMission]=useState<TrackedMission>(null);
@@ -98,6 +98,6 @@ export function GameProvider({children,competition}:{children:ReactNode;competit
   lastRevision.current=next.revision;dispatch({type:'load',state:next});setHome(false);setPaused(false);setTrackedMission(null);
  };
  const resolveConflict=()=>{const saved=read(state.mode,state.difficulty);if(saved){pending.current=null;dispatch({type:'load',state:saved});lastRevision.current=saved.revision;setSaveStatus('Đã tải tiến trình mới nhất');}};
- return <GameContext.Provider value={{state,config:getConfig(state.difficulty),dispatch:customDispatch,ready,saveStatus,conflict,resolveConflict,enter,home,setHome:setHomeSafe,paused,setPaused,reduced,setReduced,trackedMission,setTrackedMission,competitive:!!competition,competitionIntro:competition?.showIntro??false}}>{children}</GameContext.Provider>;
+ return <GameContext.Provider value={{state,config:getConfig(state.difficulty),dispatch:customDispatch,ready,saveStatus,conflict,resolveConflict,enter,home,setHome:setHomeSafe,paused,setPaused,reduced,setReduced,trackedMission,setTrackedMission,competitive:!!competition,competitionIntro:competition?.showIntro??false,openCompetitionLeaderboard}}>{children}</GameContext.Provider>;
 }
 export function useGame(){const c=useContext(GameContext);if(!c)throw new Error('GameProvider missing');return c;}
