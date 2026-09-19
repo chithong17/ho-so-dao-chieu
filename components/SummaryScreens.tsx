@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { playBgm, playSfx } from '../lib/audio';
-import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ExternalLink, Eye, FileCheck2, FileSearch, FolderOpen, Layers, Lightbulb, Printer, RotateCcw, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Clock, Compass, ExternalLink, Eye, FileCheck2, FileSearch, FolderOpen, Layers, Lightbulb, Printer, RotateCcw, ShieldCheck, Sparkles } from 'lucide-react';
 import { useGame } from './GameProvider';
 import { taskConcepts } from '../game/config';
 import { easyLessons } from '../game/easy';
@@ -51,16 +51,15 @@ export function Debrief() {
           <div className="section-title-wrap">
             <span className="section-badge"><FolderOpen size={15} /> MỤC 01</span>
             <h2>Chứng cứ đã thu thập ({chapterEvidence.length})</h2>
-            <span className="section-hint-inline">(Bấm vào ảnh để xem chi tiết & lời giải vụ án)</span>
           </div>
         </div>
 
         <div className="debrief-notebook-polaroids-grid">
           {chapterEvidence.map((ev, idx) => {
-            const bgImg = ev.app === 'chat' || ev.app === 'files' 
-              ? '/scene_desk.jpg' 
-              : ev.app === 'terminal' 
-                ? '/scene_wall.jpg' 
+            const bgImg = ev.app === 'chat' || ev.app === 'files'
+              ? '/scene_desk.jpg'
+              : ev.app === 'terminal'
+                ? '/scene_wall.jpg'
                 : '/bg_room.jpg';
             const tapeAngle = idx % 2 === 0 ? -2 : 2;
             const cardAngle = idx % 4 === 0 ? -1.5 : idx % 4 === 1 ? 1.2 : idx % 4 === 2 ? -0.8 : 1.5;
@@ -132,27 +131,82 @@ export function Debrief() {
             <p className="truth-summary-lead">{truth.summary}</p>
           </div>
 
-          <div className="truth-cards-grid">
-            {truth.points.map(pt => (
-              <article key={pt.number} className="truth-point-card">
-                <div className="truth-card-header">
-                  <span className="truth-card-num">{pt.number}</span>
-                  <div className="truth-card-heading">
-                    <h4>{pt.title}</h4>
-                    <span className="truth-highlight-pill">{pt.highlight}</span>
+          {/* Timeline presentation based on timeline.png */}
+          <div className="truth-timeline-container">
+            {/* The winding dashed timeline spine from timeline.png */}
+            <div className="truth-timeline-spine" aria-hidden="true">
+              <img
+                src="/timeline.png"
+                alt=""
+                className="timeline-spine-img"
+              />
+            </div>
+
+            {/* Alternating timeline event steps */}
+            <div className="truth-timeline-steps">
+              {truth.points.map((pt, idx) => {
+                const isLeft = idx % 2 === 0;
+                return (
+                  <div
+                    key={pt.number}
+                    className={`truth-timeline-step ${isLeft ? 'step-left' : 'step-right'}`}
+                  >
+                    <div className="timeline-step-marker-row">
+                      <div className="timeline-node-pin">
+                        <span className="timeline-node-num">{pt.number}</span>
+                      </div>
+                      {pt.time && (
+                        <span className="timeline-step-time">
+                          <Clock size={12} />
+                          {pt.time}
+                        </span>
+                      )}
+                    </div>
+
+                    <article className="truth-point-card timeline-card">
+                      <div className="truth-card-header">
+                        <div className="truth-card-heading">
+                          <h4>{pt.title}</h4>
+                          <span className="truth-highlight-pill">{pt.highlight}</span>
+                        </div>
+                      </div>
+                      <p className="truth-card-desc">{pt.description}</p>
+                      {pt.badges && pt.badges.length > 0 && (
+                        <div className="truth-card-badges">
+                          <span className="badge-label">Chứng cứ liên quan:</span>
+                          {pt.badges.map(b => {
+                            const evItem = evidence.find(e => e.id === b);
+                            return (
+                              <button
+                                key={b}
+                                type="button"
+                                className="truth-evidence-badge clickable"
+                                onClick={() => evItem && setViewingEvidence(evItem)}
+                                title={evItem ? `Bấm xem chứng cứ ${b}: ${evItem.title}` : `Chứng cứ ${b}`}
+                              >
+                                {b}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </article>
                   </div>
+                );
+              })}
+            </div>
+
+            {/* Timeline Conclusion Box right under the arrow of timeline.png */}
+            {truth.conclusion && (
+              <div className="truth-timeline-conclusion">
+                <div className="conclusion-badge">
+                  <Compass size={16} />
+                  <span>{truth.conclusion.badge}</span>
                 </div>
-                <p className="truth-card-desc">{pt.description}</p>
-                {pt.badges && pt.badges.length > 0 && (
-                  <div className="truth-card-badges">
-                    <span className="badge-label">Chứng cứ:</span>
-                    {pt.badges.map(b => (
-                      <span key={b} className="truth-evidence-badge">{b}</span>
-                    ))}
-                  </div>
-                )}
-              </article>
-            ))}
+                <h4>{truth.conclusion.title}</h4>
+                <p>{truth.conclusion.text}</p>
+              </div>
+            )}
           </div>
         </section>
       )}
