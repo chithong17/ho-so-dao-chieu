@@ -1,7 +1,6 @@
-import {playBgm, playSfx} from '../lib/audio';
-import {useEffect} from 'react';
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
+import {playBgm, playSfx} from '../lib/audio';
 import {ArrowLeft,ArrowRight,BookOpen,FileCheck2,Lightbulb,Printer,RotateCcw,ShieldCheck} from 'lucide-react';
 import {useGame} from './GameProvider';
 import {taskConcepts} from '../game/config';
@@ -25,7 +24,8 @@ const chapterLessons={
 
 export function Debrief(){
   useEffect(() => { playSfx('chapter'); }, []);
-  const {state,dispatch,config}=useGame();
+  const {state,dispatch,config:baseConfig}=useGame();
+  const config={...baseConfig,lastChapter:state.chapterLimit??baseConfig.lastChapter};
   const {tasks}=config;
   const chapterTasks=tasks.filter(t=>t.chapter===state.chapter);
   const lesson=state.difficulty==='easy'?easyLessons[state.chapter as 1|2]:chapterLessons[state.chapter];
@@ -34,8 +34,10 @@ export function Debrief(){
 
 export function VerdictScreen(){
   useEffect(() => { playBgm('verdict'); }, []);
-  const {state,dispatch,config}=useGame();
-  const {tasks,initialOptions,verdictOptions}=config;
+  const {state,dispatch,config:baseConfig}=useGame();
+  const chapterLimit=state.chapterLimit??baseConfig.lastChapter;
+  const config={...baseConfig,lastChapter:chapterLimit,verdictEvidence:baseConfig.verdictEvidence.filter(id=>baseConfig.evidence.find(e=>e.id===id)!.chapter<=chapterLimit),verdictEvidenceCount:Math.min(baseConfig.verdictEvidenceCount,chapterLimit)};
+  const {initialOptions,verdictOptions}=config;
   const [v,setV]=useState<Verdict>(state.verdict??{conclusion:'V4',evidence:[],note:''}),[error,setError]=useState('');
   const a=state.answers[config.recoveryTask],recovery=state.difficulty==='easy'?{...simulateEasyRecovery(a?.kind==='easyOrder'?a.order:[]),totalTime:0}:simulateRecovery(a?.kind==='recovery'?a.order:[]);
   const update=(next:Verdict)=>{setV(next);dispatch({type:'verdictDraft',verdict:next});};
@@ -50,7 +52,9 @@ const endings=[
 ];
 
 export function ResultScreen(){
-  const {state,dispatch,setHome,config}=useGame();
+  const {state,dispatch,setHome,config:baseConfig}=useGame();
+  const chapterLimit=state.chapterLimit??baseConfig.lastChapter,visibleTasks=baseConfig.tasks.filter(t=>t.chapter<=chapterLimit);
+  const config={...baseConfig,tasks:visibleTasks,maxScore:visibleTasks.reduce((sum,t)=>sum+t.criteria.length,0)};
   const {tasks,initialOptions,verdictOptions}=config;
   const r=state.result!,ending=endings[r.ending-1],v=state.verdict!;
   return <main className="summary-page result-page"><div className="result-hero"><span className="result-seal"><FileCheck2 size={35}/></span><span className="eyebrow">KẾT THÚC 0{r.ending} / 04 · {ending.tag}</span><h1>{ending.title}</h1><p>{ending.text}</p><div className="result-score"><strong>{Math.round(r.score/config.maxScore*100)}<small>/100</small></strong><span>Mức độ hoàn chỉnh của lập luận<small>{r.score}/{config.maxScore} tiêu chí · đánh giá việc đối chiếu dữ kiện</small></span></div></div><div className="before-after"><article><span>NHẬN ĐỊNH BAN ĐẦU</span><h3>{initialOptions.find(o=>o.id===state.initial?.conclusion)?.label}</h3><small>Mức độ tin tưởng: {state.initial?.confidence}</small></article><ArrowRight size={23}/><article><span>SAU KHI ĐỐI CHIẾU</span><h3>{verdictOptions.find(o=>o.id===v.conclusion)?.label}</h3><small>{v.evidence.join(' · ')}</small></article></div>{r.ending===1&&<p className="note">{state.difficulty==='easy'?'Hãy đối chiếu lại kết luận với cuộc trao đổi đầy đủ và các mốc chạy thử.':v.conclusion==='V1'?'E07 và E08 cho thấy Nam không xóa mã nguồn; Mai chỉ đổi trạng thái hiển thị của dự án.':'E05 ghi nhận lỗi dữ liệu lúc 19:20, còn E06 cho thấy sự cố mạng chỉ xuất hiện từ 19:35. Hai sự kiện cần được phân biệt.'}</p>}{r.ending===2&&v.conclusion==='V3'&&<p className="note">{state.difficulty==='easy'?'Hãy kiểm tra lại chứng cứ hỗ trợ kết luận và các lập luận về sự cố trước khi khép hồ sơ.':'Để lập luận vững hơn, hãy nối E03–E05 thành cơ chế lỗi, dùng E07–E08 để kiểm tra quyết định ẩn demo và hoàn thiện các nhiệm vụ cốt lõi T01, T02, T05.'}</p>}{v.note&&<blockquote className="personal-conclusion">{v.note}</blockquote>}<h2>Hồ sơ lập luận của bạn</h2><div className="result-task-list">{tasks.map(t=>{const ev=r.evaluations[t.id];return <details key={t.id}><summary><span>{t.id}</span><strong>{t.title}</strong><b>{ev.score}/{t.criteria.length}</b></summary><ul>{t.criteria.map((c,i)=><li key={c}><span>{ev.met[i]?'✓':'○'} {c}</span><p>{t.feedback[i]}</p></li>)}</ul><small>Lần đầu: {state.attempts[t.id]?.[0].evaluation.score??0}/{t.criteria.length} · hiện tại: {ev.score}/{t.criteria.length} · Nộp lại {state.attempts[t.id]?.length??0} lần</small></details>;})}</div><h2>Bản đồ vận dụng phép biện chứng duy vật</h2><p className="muted">Tình huống trong hồ sơ là hư cấu, dùng để thực hành cách phân tích có căn cứ. Nguồn trang PDF tính từ 1; số trang in tính từ 84.</p><ConceptCards ids={tasks.flatMap(taskConcepts)}/><div className="summary-actions no-print"><button className="secondary" onClick={()=>dispatch({type:'reopen'})}><RotateCcw size={17}/> Hoàn thiện lập luận</button><button className="secondary" onClick={()=>window.print()}><Printer size={17}/> In kết quả</button><button className="primary" onClick={()=>setHome(true)}>Về trang chủ <ArrowRight size={17}/></button></div><footer className="result-foot">Hồ sơ HS-01 · Tình huống học tập hư cấu.<br/>Tài liệu tham chiếu: phepduyvatbienchung.pdf và các slide Tiết 16–21.</footer></main>;

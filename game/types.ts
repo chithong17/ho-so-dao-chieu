@@ -21,6 +21,7 @@ export type Verdict = { conclusion: 'V1'|'V2'|'V3'|'V4'; evidence: string[]; not
 export type Result = { ending: 1|2|3|4; score: number; evaluations: Record<string,Evaluation> };
 export type GameState = {
  schemaVersion: 2; caseVersion: '1.1.0'; caseId: 'HS-01'; mode: Mode; difficulty: Difficulty;
+ chapterLimit?: Chapter;
  screen: 'intro'|'investigation'|'debrief'|'verdict'|'result'; chapter: Chapter; unlocked: Chapter;
  initial: { conclusion: string; confidence: string } | null;
  selectedEvidence: string; activeTask: string; opened: string[]; pinned: string[];

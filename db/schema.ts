@@ -1,7 +1,7 @@
 import {index,integer,sqliteTable,text,uniqueIndex} from 'drizzle-orm/sqlite-core';
 
 export const competitionRooms=sqliteTable('competition_rooms',{
- id:text('id').primaryKey(),code:text('code').notNull(),status:text('status').notNull().default('lobby'),difficulty:text('difficulty').notNull(),durationSeconds:integer('duration_seconds').notNull(),maxPlayers:integer('max_players').notNull(),caseVersion:text('case_version').notNull(),scoringVersion:integer('scoring_version').notNull().default(1),createdAt:integer('created_at').notNull(),expiresAt:integer('expires_at').notNull(),startsAt:integer('starts_at'),playStartsAt:integer('play_starts_at'),endsAt:integer('ends_at'),endReason:text('end_reason'),revision:integer('revision').notNull().default(0)
+ id:text('id').primaryKey(),code:text('code').notNull(),status:text('status').notNull().default('lobby'),difficulty:text('difficulty').notNull(),chapterCount:integer('chapter_count').notNull().default(3),durationSeconds:integer('duration_seconds').notNull(),maxPlayers:integer('max_players').notNull(),caseVersion:text('case_version').notNull(),scoringVersion:integer('scoring_version').notNull().default(1),createdAt:integer('created_at').notNull(),expiresAt:integer('expires_at').notNull(),startsAt:integer('starts_at'),playStartsAt:integer('play_starts_at'),endsAt:integer('ends_at'),endReason:text('end_reason'),revision:integer('revision').notNull().default(0)
 },t=>[uniqueIndex('idx_competition_rooms_code').on(t.code),index('idx_competition_rooms_status_expiry').on(t.status,t.expiresAt)]);
 
 export const competitionMembers=sqliteTable('competition_members',{

@@ -76,7 +76,19 @@ export function deriveEnding(evaluations:Record<string,Evaluation>,v:Verdict,rec
 }
 export function resultFor(state:GameState,v:Verdict):Result {
  const config=getConfig(state.difficulty);
- const evaluations=Object.fromEntries(config.tasks.map(t=>[t.id,state.answers[t.id]?evaluateChallenge(t.id,state.answers[t.id]):{score:0,met:[false,false,false,false]}]));
+ const chapterLimit=state.chapterLimit??config.lastChapter;
+ const scopedTasks=config.tasks.filter(t=>t.chapter<=chapterLimit);
+ const evaluations=Object.fromEntries(scopedTasks.map(t=>[t.id,state.answers[t.id]?evaluateChallenge(t.id,state.answers[t.id]):{score:0,met:[false,false,false,false]}]));
+ if(chapterLimit<config.lastChapter){
+  const score=Object.values(evaluations).reduce((sum,e)=>sum+e.score,0),maxScore=scopedTasks.reduce((sum,t)=>sum+t.criteria.length,0);
+  const accessibleEvidence=config.evidence.filter(e=>e.chapter<=chapterLimit).map(e=>e.id);
+  const evidenceTarget=Math.min(config.verdictEvidenceCount,chapterLimit);
+  const backed=v.evidence.length>=evidenceTarget&&v.evidence.every(id=>accessibleEvidence.includes(id));
+  const requirements=config.chapters.filter(c=>c.id<=chapterLimit).flatMap(c=>config.requirements[c.id]);
+  const threshold=score>=Math.ceil(maxScore*.75)&&requirements.every(({taskId,minimum})=>(evaluations[taskId]?.score??0)>=minimum)&&backed;
+  const ending=v.conclusion==='V1'||v.conclusion==='V2'?1:v.conclusion==='V4'||!threshold?2:4;
+  return {score,ending,evaluations};
+ }
  if(state.difficulty==='easy'){
   const score=Object.values(evaluations).reduce((sum,e)=>sum+e.score,0);
   const backed=v.evidence.length===1&&v.evidence[0]==='EZ02';
@@ -95,9 +107,11 @@ export function chapterReadiness(s:GameState,c:Chapter){
 }
 export function caseCredibility(s:GameState){
  const {tasks,requirements:chapterRequirements,chapters,maxScore,evidence}=getConfig(s.difficulty);
- const achieved=tasks.reduce((total,t)=>total+(s.answers[t.id]?evaluateChallenge(t.id,s.answers[t.id]).score:0),0);
- const opened=s.difficulty==='easy'?Math.min(10,s.opened.length/evidence.length*10):Math.min(10,s.opened.length);
- const core=chapters.map(c=>c.id).reduce((total,c)=>total+(chapterRequirements[c].every(r=>(evaluateChallenge(r.taskId,s.answers[r.taskId]??emptyAnswer(r.taskId)).score)>=r.minimum)?15/chapters.length:0),0);
+ const chapterLimit=s.chapterLimit??getConfig(s.difficulty).lastChapter,scopedTasks=tasks.filter(t=>t.chapter<=chapterLimit),scopedChapters=chapters.filter(c=>c.id<=chapterLimit),scopedEvidence=evidence.filter(e=>e.chapter<=chapterLimit);
+ const scopedMaxScore=s.chapterLimit?scopedTasks.reduce((sum,t)=>sum+t.criteria.length,0):maxScore;
+ const achieved=scopedTasks.reduce((total,t)=>total+(s.answers[t.id]?evaluateChallenge(t.id,s.answers[t.id]).score:0),0);
+ const opened=s.difficulty==='easy'?Math.min(10,s.opened.length/scopedEvidence.length*10):Math.min(10,s.opened.length);
+ const core=scopedChapters.map(c=>c.id).reduce((total,c)=>total+(chapterRequirements[c].every(r=>(evaluateChallenge(r.taskId,s.answers[r.taskId]??emptyAnswer(r.taskId)).score)>=r.minimum)?15/scopedChapters.length:0),0);
 
  // Penalties:
  const resubmissions=Object.values(s.attempts).reduce((count,arr)=>count+Math.max(0,arr.length-1),0);
@@ -105,7 +119,7 @@ export function caseCredibility(s:GameState){
  const unlockedHints=(s.unlockedEvidenceHints??[]).length;
  const evidenceHintPenalty=unlockedHints*2;
 
- const score=Math.max(0,Math.min(100,Math.round(15+achieved/maxScore*60+opened+core-resubmissionPenalty-evidenceHintPenalty)));
+ const score=Math.max(0,Math.min(100,Math.round(15+achieved/scopedMaxScore*60+opened+core-resubmissionPenalty-evidenceHintPenalty)));
  const label=score<35?'Vội kết luận':score<60?'Đang kiểm chứng':score<80?'Lập luận có cơ sở':'Hồ sơ vững';
  return {score,label,resubmissions,resubmissionPenalty,unlockedHints,evidenceHintPenalty};
 }
@@ -114,6 +128,8 @@ export const chapterComplete=(s:GameState,c:Chapter)=>chapterReadiness(s,c).read
 export function reduceGame(s:GameState,a:Action):GameState {
  if(a.type==='load')return validateSave(a.state).state??s;
  const {tasks,evidence,chapters,lastChapter,initialOptions,initialEvidence}=getConfig(s.difficulty);
+ const chapterLimit=s.chapterLimit??lastChapter;
+ const scopedTasks=tasks.filter(t=>t.chapter<=chapterLimit),scopedChapters=chapters.filter(c=>c.id<=chapterLimit);
  if(['hint','experiment','note'].includes(a.type)&&'id' in a&&!tasks.some(t=>t.id===a.id&&t.chapter<=s.unlocked))return s;
  if(s.screen==='result'&&!['reopen','tick'].includes(a.type))return s;
  let next=s;
@@ -137,11 +153,11 @@ export function reduceGame(s:GameState,a:Action):GameState {
   case 'experiment':next={...s,experiments:{...s.experiments,[a.id]:[...new Set([...(s.experiments[a.id]??[]),a.run])]}};break;
   case 'note':next={...s,notes:{...s.notes,[a.id]:a.note.slice(0,500)}};break;
   case 'debrief':if(chapterReadiness(s,s.chapter).ready)next={...s,screen:'debrief'};break;
-  case 'next':if(s.screen==='debrief'&&chapterReadiness(s,s.chapter).ready){const c=Math.min(lastChapter,s.chapter+1) as Chapter;next={...s,debriefs:[...new Set([...s.debriefs,s.chapter])],screen:s.chapter===lastChapter?'verdict':'investigation',chapter:c,unlocked:Math.max(s.unlocked,c) as Chapter,activeTask:tasks.find(t=>t.chapter===c)!.id,selectedEvidence:evidence.find(e=>e.chapter===c)!.id};}break;
+  case 'next':if(s.screen==='debrief'&&chapterReadiness(s,s.chapter).ready){const c=Math.min(chapterLimit,s.chapter+1) as Chapter;next={...s,debriefs:[...new Set([...s.debriefs,s.chapter])],screen:s.chapter===chapterLimit?'verdict':'investigation',chapter:c,unlocked:Math.max(s.unlocked,c) as Chapter,activeTask:tasks.find(t=>t.chapter===c)!.id,selectedEvidence:evidence.find(e=>e.chapter===c)!.id};}break;
   case 'chapter':if(chapters.some(c=>c.id===a.chapter)&&a.chapter<=s.unlocked)next={...s,chapter:a.chapter,screen:'investigation',activeTask:tasks.find(t=>t.chapter===a.chapter)!.id,selectedEvidence:evidence.find(e=>e.chapter===a.chapter)!.id};break;
-  case 'verdictDraft':if(isVerdict(a.verdict,s.difficulty))next={...s,verdict:a.verdict};break;
-  case 'finish':if(tasks.every(t=>s.answers[t.id])&&s.debriefs.length===chapters.length&&isVerdict(a.verdict,s.difficulty))next={...s,screen:'result',verdict:a.verdict,result:resultFor(s,a.verdict)};break;
-  case 'reopen':next={...s,screen:'investigation',chapter:lastChapter,activeTask:tasks.find(t=>t.chapter===lastChapter)!.id,result:null};break;
+  case 'verdictDraft':if(isVerdict(a.verdict,s.difficulty,chapterLimit))next={...s,verdict:a.verdict};break;
+  case 'finish':if(scopedTasks.every(t=>s.answers[t.id])&&s.debriefs.length===scopedChapters.length&&isVerdict(a.verdict,s.difficulty,chapterLimit))next={...s,screen:'result',verdict:a.verdict,result:resultFor(s,a.verdict)};break;
+  case 'reopen':next={...s,screen:'investigation',chapter:chapterLimit,activeTask:tasks.find(t=>t.chapter===chapterLimit)!.id,result:null};break;
   case 'tick':if(s.screen!=='intro'&&s.screen!=='result')next={...s,elapsed:s.elapsed+Math.max(0,Math.min(a.seconds,10))};break;
  }
  return next===s?s:{...next,revision:s.revision+1};
@@ -164,7 +180,7 @@ export function isAnswer(id:string,input:unknown):input is Answer {
   default:return false;
  }
 }
-export function isVerdict(x:unknown,difficulty:Difficulty='standard'):x is Verdict{const config=getConfig(difficulty);return record(x)&&inList(x.conclusion,['V1','V2','V3','V4'])&&strings(x.evidence,config.verdictEvidence)&&x.evidence.length<=config.verdictEvidenceCount&&typeof x.note==='string'&&x.note.length<=500;}
+export function isVerdict(x:unknown,difficulty:Difficulty='standard',chapterLimit?:Chapter):x is Verdict{const config=getConfig(difficulty),allowed=config.evidence.filter(e=>e.chapter<=(chapterLimit??config.lastChapter)).map(e=>e.id).filter(id=>config.verdictEvidence.includes(id));return record(x)&&inList(x.conclusion,['V1','V2','V3','V4'])&&strings(x.evidence,allowed)&&x.evidence.length<=config.verdictEvidenceCount&&typeof x.note==='string'&&x.note.length<=500;}
 export function validateSave(input:unknown):{state:GameState|null;error:string|null}{
  const fail=(error='Bản lưu không hợp lệ. Bạn có thể bắt đầu lượt mới.')=>({state:null,error});
  if(!record(input))return fail();
@@ -173,20 +189,22 @@ export function validateSave(input:unknown):{state:GameState|null;error:string|n
  if(input.schemaVersion!==2||input.caseVersion!=='1.1.0'||input.caseId!=='HS-01')return fail('Bản lưu thuộc phiên bản khác. Hãy bắt đầu lượt mới để dùng hồ sơ hiện tại.');
  if(!inList(input.difficulty,['easy','standard']))return fail();
  const difficulty=input.difficulty as Difficulty;
- const {tasks,evidence,chapters,initialOptions}=getConfig(difficulty);
+ const {tasks,evidence,chapters,initialOptions,lastChapter}=getConfig(difficulty);
+ if(input.chapterLimit!==undefined&&(typeof input.chapterLimit!=='number'||!Number.isInteger(input.chapterLimit)||input.chapterLimit<1||input.chapterLimit>lastChapter))return fail();
+ const chapterLimit=(input.chapterLimit as Chapter|undefined)??lastChapter,scopedTasks=tasks.filter(t=>t.chapter<=chapterLimit),scopedChapters=chapters.filter(c=>c.id<=chapterLimit);
  const chapterIds:number[]=chapters.map(c=>c.id),evidenceIds=evidence.map(e=>e.id);
  const knownTask=(id:string)=>tasks.some(t=>t.id===id);
  if(!inList(input.mode,['individual','presenter'])||!inList(input.screen,['intro','investigation','debrief','verdict','result'])||!chapterIds.includes(Number(input.chapter))||!chapterIds.includes(Number(input.unlocked)))return fail();
- if(typeof input.chapter!=='number'||typeof input.unlocked!=='number'||input.chapter>input.unlocked)return fail();
+ if(typeof input.chapter!=='number'||typeof input.unlocked!=='number'||input.chapter>input.unlocked||input.chapter>chapterLimit||input.unlocked>chapterLimit)return fail();
  if(!record(input.answers)||!record(input.drafts)||!record(input.attempts)||!record(input.hints)||!record(input.experiments)||!record(input.notes))return fail();
  if(!Object.entries(input.answers).every(([id,a])=>knownTask(id)&&isAnswer(id,a)&&answerComplete(id,a))||!Object.entries(input.drafts).every(([id,a])=>knownTask(id)&&isAnswer(id,a)))return fail();
- if(!strings(input.opened,evidenceIds)||!strings(input.pinned,evidenceIds)||!Array.isArray(input.debriefs)||!input.debriefs.every(c=>chapterIds.includes(c))||new Set(input.debriefs).size!==input.debriefs.length)return fail();
+ if(!strings(input.opened,evidenceIds)||!strings(input.pinned,evidenceIds)||!Array.isArray(input.debriefs)||!input.debriefs.every(c=>chapterIds.includes(c)&&c<=chapterLimit)||new Set(input.debriefs).size!==input.debriefs.length)return fail();
  if(input.unlockedEvidenceHints!==undefined&&!strings(input.unlockedEvidenceHints,evidenceIds))return fail();
  if(!inList(input.selectedEvidence,evidenceIds)||!inList(input.activeTask,tasks.map(t=>t.id)))return fail();
  if(!['elapsed','revision'].every(k=>typeof input[k]==='number'&&Number.isFinite(input[k])&&Number(input[k])>=0)||typeof input.updatedAt!=='string')return fail();
  if(input.initial!==null&&(!record(input.initial)||!inList(input.initial.conclusion,initialOptions.map(o=>o.id))||!inList(input.initial.confidence,['Thấp','Vừa','Cao'])))return fail();
  if(input.screen!=='intro'&&!input.initial)return fail();
- if(input.verdict!==null&&!isVerdict(input.verdict,difficulty))return fail();
+ if(input.verdict!==null&&!isVerdict(input.verdict,difficulty,chapterLimit))return fail();
  if(!Object.entries(input.hints).every(([id,v])=>knownTask(id)&&typeof v==='number'&&[0,1,2].includes(v))||!Object.entries(input.notes).every(([id,v])=>knownTask(id)&&typeof v==='string'&&v.length<=500)||!Object.entries(input.experiments).every(([id,v])=>knownTask(id)&&strings(v)&&v.every(s=>s.length<=100)))return fail();
  for(const [id,arr]of Object.entries(input.attempts)){if(!knownTask(id)||!Array.isArray(arr)||!arr.every(a=>record(a)&&isAnswer(id,a.answer)&&answerComplete(id,a.answer)&&typeof a.at==='string'))return fail();}
  const s=structuredClone(input) as unknown as GameState;
@@ -197,7 +215,7 @@ export function validateSave(input:unknown):{state:GameState|null;error:string|n
  if(s.opened.concat(s.pinned, s.unlockedEvidenceHints).some(id=>evidence.find(e=>e.id===id)!.chapter>s.unlocked)||Object.keys(s.answers).some(id=>tasks.find(t=>t.id===id)!.chapter>s.unlocked))return fail();
  for(let c=1;c<s.unlocked;c++)if(!chapterReadiness(s,c as Chapter).ready||!s.debriefs.includes(c as Chapter))return fail();
  if(s.screen==='debrief'&&!chapterReadiness(s,s.chapter).ready)return fail();
- if(['verdict','result'].includes(s.screen)&&(!tasks.every(t=>s.answers[t.id])||s.debriefs.length!==chapters.length))return fail();
+ if(['verdict','result'].includes(s.screen)&&(!scopedTasks.every(t=>s.answers[t.id])||s.debriefs.length!==scopedChapters.length||!scopedChapters.every(c=>s.debriefs.includes(c.id))))return fail();
  if(s.screen==='result'){if(!s.verdict)return fail();s.result=resultFor(s,s.verdict);}else s.result=null;
  return {state:s,error:null};
 }

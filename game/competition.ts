@@ -9,7 +9,7 @@ export type CompetitionStatus='lobby'|'countdown'|'playing'|'finished'|'cancelle
 export type CompetitionRole='host'|'player';
 export type ScoreEvent={key:string;kind:string;reference:string;delta:number};
 export type LeaderboardEntry={id:string;name:string;score:number;rank:number;ready:boolean;connected:boolean;completedAt:number|null;scoreUpdatedAt:number|null;ending:number|null;tieTime:number;stats:{evidence:number;criteria:number;tasks:number;chapters:number;hints:number;evidenceHints:number;wrong:number;submissions:number}};
-export type RoomSnapshot={id:string;code:string;status:CompetitionStatus;role:CompetitionRole;difficulty:'easy'|'standard';durationSeconds:number;maxPlayers:number;startsAt:number|null;playStartsAt:number|null;endsAt:number|null;serverNow:number;endReason:string|null;members:{id:string;name:string;role:CompetitionRole;ready:boolean;connected:boolean}[];leaderboard:LeaderboardEntry[];me?:{id:string;name:string;ready:boolean;version:number;score:number;state:GameState|null;initial:{conclusion:string;confidence:string}|null}};
+export type RoomSnapshot={id:string;code:string;status:CompetitionStatus;role:CompetitionRole;difficulty:'easy'|'standard';chapterCount:number;durationSeconds:number;maxPlayers:number;startsAt:number|null;playStartsAt:number|null;endsAt:number|null;serverNow:number;endReason:string|null;members:{id:string;name:string;role:CompetitionRole;ready:boolean;connected:boolean}[];leaderboard:LeaderboardEntry[];me?:{id:string;name:string;ready:boolean;version:number;score:number;state:GameState|null;initial:{conclusion:string;confidence:string}|null}};
 
 export function scoreAction(before:GameState,action:Action,after:GameState,actionId:string):ScoreEvent[]{
  const events:ScoreEvent[]=[];
