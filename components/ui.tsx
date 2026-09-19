@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { X, ArrowUp, ArrowDown, Plus, Trash2, Check, Paperclip, Lock, Info } from 'lucide-react';
 import type { Option } from '../game/types';
+import {missionEvidence} from '../game/engine';
 import { useGame } from './GameProvider';
 
 export function InfoTooltip({
@@ -105,8 +106,9 @@ export function Modal({ title, children, onClose }: { title: string; children: R
 export function Choice({ label, value, options, onChange }: { label: ReactNode; value: string; options: Option[]; onChange: (v: string) => void }) { return <fieldset className="choice-field"><legend>{label}</legend><div className="choice-list">{options.map(o => <label className={`choice ${value === o.id ? 'selected' : ''}`} key={o.id}><input type="radio" name={typeof label === 'string' ? label : 'choice'} checked={value === o.id} onChange={() => onChange(o.id)} /><span>{o.label}</span>{value === o.id && <Check size={15} />}</label>)}</div></fieldset>; }
 export function Chips({ label, options, value, max, onChange }: { label: ReactNode; options: Option[]; value: string[]; max: number; onChange: (v: string[]) => void }) { return <fieldset className="choice-field"><legend>{label} <small>{value.length}/{max}</small></legend><div className="chip-list">{options.map(o => <button type="button" className={`chip ${value.includes(o.id) ? 'selected' : ''}`} aria-pressed={value.includes(o.id)} key={o.id} disabled={!value.includes(o.id) && value.length >= max} onClick={() => onChange(value.includes(o.id) ? value.filter(x => x !== o.id) : [...value, o.id])}>{value.includes(o.id) ? <Check size={14} /> : <Plus size={14} />} {o.label}</button>)}</div></fieldset>; }
 export function EvidencePicker({ value, max = 2, ids, onChange }: { value: string[]; max?: number; ids: string[]; onChange: (v: string[]) => void }) {
-  const { state, config: { evidence }, trackedMission } = useGame();
-  const isCollected = (id: string) => state.opened.includes(id) || (trackedMission?.foundEvidenceIds?.includes(id) ?? false);
+  const { state, config: { evidence } } = useGame();
+  const collected=state.screen==='verdict'||state.screen==='result'?state.opened:missionEvidence(state,state.activeTask);
+  const isCollected = (id: string) => collected.includes(id);
   const options = evidence.filter(e => ids.includes(e.id)).map(e => ({
     id: e.id,
     label: `${e.id} · ${e.title}`,

@@ -3,7 +3,7 @@ import { playSfx } from '../lib/audio';
 import { useState, useEffect } from 'react';
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Lightbulb, Link2, NotebookPen, Send, CheckCircle2, AlertCircle, Target, FileText } from 'lucide-react';
 import { chainOptions, relationOptions, reportOptions, recoveryActions } from '../game/tasks';
-import { answerComplete, caseCredibility, chapterComplete, chapterReadiness, emptyAnswer, evaluateChallenge } from '../game/engine';
+import { answerComplete, caseCredibility, chapterComplete, chapterReadiness, emptyAnswer, evaluateChallenge, missionEvidence } from '../game/engine';
 import type { Answer, Task, Evidence } from '../game/types';
 import { useGame } from './GameProvider';
 import { Chips, Choice, EvidencePicker, Sorter, InfoTooltip } from './ui';
@@ -53,8 +53,10 @@ function TaskForm({ task, answer: a, change, onViewEvidence }: { task: Task; ans
   return <>{meter}{form}{reaction}{gate}</>;
 }
 export default function TaskPanel() {
-  const { state, dispatch, config: { tasks, evidence, counterpoints }, trackedMission, setTrackedMission } = useGame();
-  const task = tasks.find(t => t.id === state.activeTask)!;
+  const { state:gameState, dispatch, config: { tasks, evidence, counterpoints }, trackedMission:activeMission, setTrackedMission } = useGame();
+  const task = tasks.find(t => t.id === gameState.activeTask)!;
+  const collectedIds=missionEvidence(gameState,task.id),state={...gameState,opened:collectedIds};
+  const trackedMission=activeMission?{...activeMission,foundEvidenceIds:missionEvidence(gameState,activeMission.taskId)}:null;
   const [error, setError] = useState('');
   const [viewingEvidence, setViewingEvidence] = useState<Evidence | null>(null);
   useEffect(() => {
@@ -75,10 +77,6 @@ export default function TaskPanel() {
   const changed = !!submitted && JSON.stringify(a) !== JSON.stringify(submitted);
   const chapterTasks = tasks.filter(t => t.chapter === state.chapter), index = chapterTasks.findIndex(t => t.id === task.id), hints = state.hints[task.id] ?? 0;
   const isTracking = trackedMission?.taskId === task.id;
-  const collectedIds = Array.from(new Set([
-    ...(isTracking ? (trackedMission?.foundEvidenceIds ?? []) : []),
-    ...task.evidence.filter(id => state.opened.includes(id)),
-  ]));
   const collectedEvidence = evidence.filter(e => collectedIds.includes(e.id));
 
   const handleOpenEvidenceDetail = (id: string) => {
@@ -91,11 +89,11 @@ export default function TaskPanel() {
     if (isTracking) {
       setTrackedMission(null);
     } else {
+      if(!Object.prototype.hasOwnProperty.call(state.missionProgress??{},task.id))dispatch({type:'acceptMission',id:task.id});
       setTrackedMission({
         taskId: task.id,
         taskTitle: task.title,
         evidenceIds: task.evidence,
-        foundEvidenceIds: task.evidence.filter(id => state.opened.includes(id)),
       });
     }
   };

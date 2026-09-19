@@ -5,12 +5,13 @@ import { useGame } from './GameProvider';
 import type { EvidenceSource } from '../game/config';
 
 export default function MissionTrackerPanel() {
-  const { config, dispatch, trackedMission } = useGame();
+  const { state,config, dispatch, trackedMission } = useGame();
   const [minimized, setMinimized] = useState(false);
 
   if (!trackedMission) return null;
 
-  const { taskId, taskTitle, evidenceIds, foundEvidenceIds = [] } = trackedMission;
+  const { taskId, taskTitle, evidenceIds } = trackedMission;
+  const foundEvidenceIds=state.missionProgress?.[taskId]??[];
   const foundCount = evidenceIds.filter(id => foundEvidenceIds.includes(id)).length;
   const totalCount = evidenceIds.length;
   const allFound = totalCount > 0 && foundCount === totalCount;

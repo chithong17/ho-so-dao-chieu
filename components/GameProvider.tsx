@@ -8,7 +8,6 @@ export type TrackedMission = {
   taskId: string;
   taskTitle: string;
   evidenceIds: string[];
-  foundEvidenceIds: string[];
 } | null;
 
 export type CompetitionBridge={state:GameState;version:number;showIntro:boolean;send:(action:Action,version:number)=>Promise<{state:GameState;version:number}>;exit:()=>void};
@@ -21,18 +20,6 @@ export function GameProvider({children,competition}:{children:ReactNode;competit
 
  const competitionVersion=useRef(competition?.version??0),competitionQueue=useRef(Promise.resolve());
  const customDispatch: Dispatch<Action> = useCallback((action: Action) => {
-  if (action.type === 'evidence') {
-   setTrackedMission(prev => {
-    if (!prev) return null;
-    if (prev.evidenceIds.includes(action.id) && !prev.foundEvidenceIds.includes(action.id)) {
-     return {
-      ...prev,
-      foundEvidenceIds: [...prev.foundEvidenceIds, action.id],
-     };
-    }
-    return prev;
-   });
-  }
   dispatch(action);
   if(competition&&!['load','begin','tick','reopen'].includes(action.type))competitionQueue.current=competitionQueue.current.then(async()=>{try{const result=await competition.send(action,competitionVersion.current);competitionVersion.current=result.version;setSaveStatus('Đã đồng bộ với phòng');}catch{setSaveStatus('Mất đồng bộ với phòng; đang khôi phục trạng thái…');window.location.reload();}});
  }, [competition]);

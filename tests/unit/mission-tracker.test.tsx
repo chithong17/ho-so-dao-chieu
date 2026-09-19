@@ -103,7 +103,7 @@ describe('Thu thập nhiệm vụ & Mission Tracker HUD', () => {
     window.removeEventListener('hsdc-inspect-evidence', inspectHandler);
   });
 
-  it('starts mission with 0/N progress without ticking items, omits "Đã tìm thấy" text, and resets on re-collect', () => {
+  it('starts mission with 0/N progress, omits "Đã tìm thấy" text, and retains progress on re-collect', () => {
     render(
       <GameProvider>
         <TaskPanel />
@@ -137,21 +137,36 @@ describe('Thu thập nhiệm vụ & Mission Tracker HUD', () => {
     expect(items[1].classList.contains('pending')).toBe(true);
     expect(items[1].classList.contains('found')).toBe(false);
 
+    act(() => {
+      window.dispatchEvent(new CustomEvent('hsdc-inspect-evidence', { detail: { id: 'EZ01', source: 'phone' } }));
+    });
+    expect(hud.querySelector('.mission-progress-label')?.textContent).toContain('1/2');
+
     // Untrack mission by clicking "Đã thu thập"
     const activeBtn = screen.getByRole('button', { name: /đã thu thập/i });
     fireEvent.click(activeBtn);
     expect(screen.queryByLabelText('Bảng theo dõi nhiệm vụ')).toBeNull();
 
-    // Re-collect mission by clicking "Thu thập nhiệm vụ" again -> must RESET back to 0/2
+    // Re-collect mission by clicking "Thu thập nhiệm vụ" again -> retains 1/2
     const newCollectBtn = screen.getByRole('button', { name: /thu thập nhiệm vụ/i });
     fireEvent.click(newCollectBtn);
 
     const newHud = screen.getByLabelText('Bảng theo dõi nhiệm vụ');
     const newProgressLabel = newHud.querySelector('.mission-progress-label');
-    expect(newProgressLabel?.textContent).toContain('0/2');
+    expect(newProgressLabel?.textContent).toContain('1/2');
     const newItems = newHud.querySelectorAll('.mission-evidence-item');
-    expect(newItems[0].classList.contains('pending')).toBe(true);
-    expect(newItems[0].classList.contains('found')).toBe(false);
+    expect(newItems[0].classList.contains('found')).toBe(true);
+  });
+
+  it('does not count evidence opened before the first mission acceptance', () => {
+    render(<GameProvider><TaskPanel/><MissionTrackerPanel/></GameProvider>);
+    act(() => {
+      window.dispatchEvent(new CustomEvent('hsdc-inspect-evidence', { detail: { id: 'EZ01', source: 'phone' } }));
+    });
+    fireEvent.click(screen.getByRole('button', { name: /thu thập nhiệm vụ/i }));
+    const hud=screen.getByLabelText('Bảng theo dõi nhiệm vụ');
+    expect(hud.querySelector('.mission-progress-label')?.textContent).toContain('0/2');
+    expect(hud.querySelectorAll('.mission-evidence-item')[0].classList.contains('pending')).toBe(true);
   });
 
   it('renders collected evidence on page 1 of the notebook and opens detail modal on click', () => {
@@ -193,4 +208,3 @@ describe('Thu thập nhiệm vụ & Mission Tracker HUD', () => {
     expect(screen.queryByRole('button', { name: /Đóng chi tiết chứng cứ/i })).toBeNull();
   });
 });
-

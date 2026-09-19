@@ -14,7 +14,7 @@ export type RoomSnapshot={id:string;code:string;status:CompetitionStatus;role:Co
 export function scoreAction(before:GameState,action:Action,after:GameState,actionId:string):ScoreEvent[]{
  const events:ScoreEvent[]=[];
  const add=(key:string,kind:string,reference:string,delta:number)=>events.push({key,kind,reference,delta});
- if(action.type==='evidence'&&getConfig(before.difficulty).tasks.find(t=>t.id===before.activeTask)?.evidence.includes(action.id))add(`evidence:${action.id}`,'evidence',action.id,SCORE_RULES.evidence);
+ if(action.type==='evidence'&&Object.prototype.hasOwnProperty.call(before.missionProgress??{},before.activeTask)&&getConfig(before.difficulty).tasks.find(t=>t.id===before.activeTask)?.evidence.includes(action.id))add(`evidence:${action.id}`,'evidence',action.id,SCORE_RULES.evidence);
  if(action.type==='submit'){
   const task=getConfig(before.difficulty).tasks.find(t=>t.id===action.id);
   const previous=before.attempts[action.id]?.at(-1)?.evaluation.met??[];

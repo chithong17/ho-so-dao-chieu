@@ -76,11 +76,11 @@ describe('EvidencePicker - Không cho phép gắn chứng cứ chưa thu thập'
     let targetId = '';
     function PickerWithCollect() {
       const [val, setVal] = useState<string[]>([]);
-      const { dispatch, config: { evidence } } = useGame();
+      const { state,dispatch, config: { evidence } } = useGame();
       targetId = evidence[0].id;
       return (
         <div>
-          <button onClick={() => dispatch({ type: 'evidence', id: targetId })}>Collect Evidence</button>
+          <button onClick={() => {dispatch({type:'acceptMission',id:state.activeTask});dispatch({ type: 'evidence', id: targetId });}}>Collect Evidence</button>
           <EvidencePicker ids={[targetId]} value={val} onChange={setVal} max={2} />
         </div>
       );

@@ -105,6 +105,13 @@ export function chapterReadiness(s:GameState,c:Chapter){
  const unresolved=chapterRequirements[c].filter(({taskId,minimum})=>(evaluateChallenge(taskId,s.answers[taskId]??emptyAnswer(taskId)).score)<minimum);
  return {complete:incomplete.length===0,ready:incomplete.length===0&&unresolved.length===0,incomplete,unresolved};
 }
+export function missionEvidence(s:GameState,taskId:string){
+ const task=getConfig(s.difficulty).tasks.find(t=>t.id===taskId);if(!task)return [];
+ const progress=s.missionProgress??{};
+ if(Object.prototype.hasOwnProperty.call(progress,taskId))return progress[taskId]??[];
+ const previouslyCollected=new Set(Object.values(progress).flat());
+ return task.evidence.filter(id=>previouslyCollected.has(id));
+}
 export function caseCredibility(s:GameState){
  const {tasks,requirements:chapterRequirements,chapters,maxScore,evidence}=getConfig(s.difficulty);
  const chapterLimit=s.chapterLimit??getConfig(s.difficulty).lastChapter,scopedTasks=tasks.filter(t=>t.chapter<=chapterLimit),scopedChapters=chapters.filter(c=>c.id<=chapterLimit),scopedEvidence=evidence.filter(e=>e.chapter<=chapterLimit);
@@ -123,7 +130,7 @@ export function caseCredibility(s:GameState){
  const label=score<35?'Vội kết luận':score<60?'Đang kiểm chứng':score<80?'Lập luận có cơ sở':'Hồ sơ vững';
  return {score,label,resubmissions,resubmissionPenalty,unlockedHints,evidenceHintPenalty};
 }
-export function createState(mode:Mode='individual',difficulty:Difficulty='standard'):GameState {const config=getConfig(difficulty);return {schemaVersion:2,caseVersion:'1.1.0',caseId:'HS-01',mode,difficulty,screen:'intro',chapter:1,unlocked:1,initial:null,selectedEvidence:config.evidence[0].id,activeTask:config.tasks[0].id,opened:[],pinned:[],answers:{},drafts:{},attempts:{},hints:{},experiments:{},notes:{},unlockedEvidenceHints:[],debriefs:[],verdict:null,result:null,elapsed:0,revision:0,updatedAt:''};}
+export function createState(mode:Mode='individual',difficulty:Difficulty='standard'):GameState {const config=getConfig(difficulty);return {schemaVersion:2,caseVersion:'1.1.0',caseId:'HS-01',mode,difficulty,screen:'intro',chapter:1,unlocked:1,initial:null,selectedEvidence:config.evidence[0].id,activeTask:config.tasks[0].id,opened:[],pinned:[],answers:{},drafts:{},attempts:{},hints:{},experiments:{},notes:{},missionProgress:{},unlockedEvidenceHints:[],debriefs:[],verdict:null,result:null,elapsed:0,revision:0,updatedAt:''};}
 export const chapterComplete=(s:GameState,c:Chapter)=>chapterReadiness(s,c).ready;
 export function reduceGame(s:GameState,a:Action):GameState {
  if(a.type==='load')return validateSave(a.state).state??s;
@@ -135,7 +142,7 @@ export function reduceGame(s:GameState,a:Action):GameState {
  let next=s;
  switch(a.type){
   case 'begin':if(initialOptions.some(o=>o.id===a.conclusion)&&['Thấp','Vừa','Cao'].includes(a.confidence))next={...s,initial:{conclusion:a.conclusion,confidence:a.confidence},screen:'investigation',opened:initialEvidence};break;
-  case 'evidence':if(evidence.some(e=>e.id===a.id&&e.chapter<=s.unlocked))next={...s,selectedEvidence:a.id,opened:[...new Set([...s.opened,a.id])]};break;
+  case 'evidence':if(evidence.some(e=>e.id===a.id&&e.chapter<=s.unlocked)){const progress=s.missionProgress??{},updated=Object.fromEntries(Object.entries(progress).map(([taskId,ids])=>{const task=tasks.find(t=>t.id===taskId);return [taskId,task?.evidence.includes(a.id)?[...new Set([...ids,a.id])]:ids];}));next={...s,selectedEvidence:a.id,opened:[...new Set([...s.opened,a.id])],missionProgress:updated};}break;
   case 'pin':if(evidence.some(e=>e.id===a.id&&e.chapter<=s.unlocked))next={...s,pinned:s.pinned.includes(a.id)?s.pinned.filter(x=>x!==a.id):[...s.pinned,a.id]};break;
   case 'task':if(tasks.some(t=>t.id===a.id&&t.chapter<=s.unlocked))next={...s,activeTask:a.id,chapter:tasks.find(t=>t.id===a.id)!.chapter,screen:'investigation'};break;
   case 'draft':if(isAnswer(a.id,a.answer)&&tasks.some(t=>t.id===a.id&&t.chapter<=s.unlocked))next={...s,drafts:{...s.drafts,[a.id]:a.answer}};break;
@@ -150,6 +157,7 @@ export function reduceGame(s:GameState,a:Action):GameState {
    if(!unlocked.includes(a.id))next={...s,unlockedEvidenceHints:[...unlocked,a.id]};
    break;
   }
+  case 'acceptMission':if(tasks.some(t=>t.id===a.id&&t.chapter<=s.unlocked)&&!Object.prototype.hasOwnProperty.call(s.missionProgress??{},a.id))next={...s,missionProgress:{...(s.missionProgress??{}),[a.id]:missionEvidence(s,a.id)}};break;
   case 'experiment':next={...s,experiments:{...s.experiments,[a.id]:[...new Set([...(s.experiments[a.id]??[]),a.run])]}};break;
   case 'note':next={...s,notes:{...s.notes,[a.id]:a.note.slice(0,500)}};break;
   case 'debrief':if(chapterReadiness(s,s.chapter).ready)next={...s,screen:'debrief'};break;
@@ -197,6 +205,7 @@ export function validateSave(input:unknown):{state:GameState|null;error:string|n
  if(!inList(input.mode,['individual','presenter'])||!inList(input.screen,['intro','investigation','debrief','verdict','result'])||!chapterIds.includes(Number(input.chapter))||!chapterIds.includes(Number(input.unlocked)))return fail();
  if(typeof input.chapter!=='number'||typeof input.unlocked!=='number'||input.chapter>input.unlocked||input.chapter>chapterLimit||input.unlocked>chapterLimit)return fail();
  if(!record(input.answers)||!record(input.drafts)||!record(input.attempts)||!record(input.hints)||!record(input.experiments)||!record(input.notes))return fail();
+ if(input.missionProgress!==undefined&&(!record(input.missionProgress)||!Object.entries(input.missionProgress).every(([id,ids])=>knownTask(id)&&strings(ids,evidenceIds)&&ids.every(evidenceId=>tasks.find(t=>t.id===id)!.evidence.includes(evidenceId)))))return fail();
  if(!Object.entries(input.answers).every(([id,a])=>knownTask(id)&&isAnswer(id,a)&&answerComplete(id,a))||!Object.entries(input.drafts).every(([id,a])=>knownTask(id)&&isAnswer(id,a)))return fail();
  if(!strings(input.opened,evidenceIds)||!strings(input.pinned,evidenceIds)||!Array.isArray(input.debriefs)||!input.debriefs.every(c=>chapterIds.includes(c)&&c<=chapterLimit)||new Set(input.debriefs).size!==input.debriefs.length)return fail();
  if(input.unlockedEvidenceHints!==undefined&&!strings(input.unlockedEvidenceHints,evidenceIds))return fail();
@@ -208,10 +217,11 @@ export function validateSave(input:unknown):{state:GameState|null;error:string|n
  if(!Object.entries(input.hints).every(([id,v])=>knownTask(id)&&typeof v==='number'&&[0,1,2].includes(v))||!Object.entries(input.notes).every(([id,v])=>knownTask(id)&&typeof v==='string'&&v.length<=500)||!Object.entries(input.experiments).every(([id,v])=>knownTask(id)&&strings(v)&&v.every(s=>s.length<=100)))return fail();
  for(const [id,arr]of Object.entries(input.attempts)){if(!knownTask(id)||!Array.isArray(arr)||!arr.every(a=>record(a)&&isAnswer(id,a.answer)&&answerComplete(id,a.answer)&&typeof a.at==='string'))return fail();}
  const s=structuredClone(input) as unknown as GameState;
+ if(!record(s.missionProgress))s.missionProgress={};
  if(!Array.isArray(s.unlockedEvidenceHints))s.unlockedEvidenceHints=[];
  for(const [id,a]of Object.entries(s.attempts))s.attempts[id]=a.map(x=>({...x,evaluation:evaluateChallenge(id,x.answer)}));
  if(tasks.find(t=>t.id===s.activeTask)!.chapter>s.unlocked||evidence.find(e=>e.id===s.selectedEvidence)!.chapter>s.unlocked)return fail();
- if([...Object.keys(s.drafts),...Object.keys(s.attempts),...Object.keys(s.hints),...Object.keys(s.experiments),...Object.keys(s.notes)].some(id=>tasks.find(t=>t.id===id)!.chapter>s.unlocked))return fail();
+ if([...Object.keys(s.drafts),...Object.keys(s.attempts),...Object.keys(s.hints),...Object.keys(s.experiments),...Object.keys(s.notes),...Object.keys(s.missionProgress)].some(id=>tasks.find(t=>t.id===id)!.chapter>s.unlocked))return fail();
  if(s.opened.concat(s.pinned, s.unlockedEvidenceHints).some(id=>evidence.find(e=>e.id===id)!.chapter>s.unlocked)||Object.keys(s.answers).some(id=>tasks.find(t=>t.id===id)!.chapter>s.unlocked))return fail();
  for(let c=1;c<s.unlocked;c++)if(!chapterReadiness(s,c as Chapter).ready||!s.debriefs.includes(c as Chapter))return fail();
  if(s.screen==='debrief'&&!chapterReadiness(s,s.chapter).ready)return fail();
