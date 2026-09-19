@@ -15,14 +15,14 @@ describe('Debrief Screen Redesign', () => {
     );
 
     // Section 1 header
-    expect(screen.getByText(/Danh mục chứng cứ thu thập & Lời giải vụ án/i)).toBeDefined();
+    expect(screen.getByText(/Chứng cứ đã thu thập/i)).toBeDefined();
 
-    // Check evidence title and solution displayed directly
+    // Check evidence title displayed as handwritten polaroid title
     expect(screen.getByText(/Tin nhắn khiến mọi người nghi ngờ/i)).toBeDefined();
+    expect(screen.getAllByText(/Bấm để xem chi tiết/i).length).toBeGreaterThan(0);
 
-    // CRITICAL: Solution (summary) must be directly visible in the list without opening modal
-    expect(screen.getByText(/Ảnh chụp tin nhắn và thông báo từ danh sách triển lãm/i)).toBeDefined();
-    expect(screen.getAllByText(/LỜI GIẢI & Ý NGHĨA CHỨNG MINH/i).length).toBeGreaterThan(0);
+    // CRITICAL: Solution is NOT rendered inline directly on the cards (mimics notebook)
+    expect(screen.queryByText(/LỜI GIẢI & Ý NGHĨA CHỨNG MINH/i)).toBeNull();
   });
 
   it('renders Section 2 with the real chapter truth matching section 1.3', () => {
@@ -67,11 +67,11 @@ describe('Debrief Screen Redesign', () => {
     );
 
     // Find first evidence card button
-    const firstCard = screen.getByTitle(/Bấm để xem tài liệu gốc: EZ01/i);
+    const firstCard = screen.getByTitle(/Bấm để xem chi tiết: E.*01/i);
     fireEvent.click(firstCard);
 
-    // Modal should be rendered
-    expect(screen.getByRole('dialog', { name: /Hồ sơ HS-01 \/ Chứng cứ EZ01/i })).toBeDefined();
+    // Modal should be rendered with raw content and full solution
+    expect(screen.getByRole('dialog', { name: /Hồ sơ HS-01 \/ Chứng cứ E.*01/i })).toBeDefined();
     expect(screen.getByText(/LỜI GIẢI VỤ ÁN & Ý NGHĨA CHỨNG MINH THỰC TẾ/i)).toBeDefined();
   });
 });

@@ -45,35 +45,35 @@ export function Debrief() {
         <p>{lesson.text}</p>
       </div>
 
-      {/* SECTION 1: Danh sách chứng cứ đã thu thập (dạng băng dính rộng, không bị bó dài) + lời giải */}
+      {/* SECTION 1: Danh sách chứng cứ đã thu thập (dạng polaroid như trong sổ điều tra) */}
       <section className="debrief-section debrief-evidence-section">
         <div className="debrief-section-header">
           <div className="section-title-wrap">
             <span className="section-badge"><FolderOpen size={15} /> MỤC 01</span>
-            <h2>Danh mục chứng cứ thu thập & Lời giải vụ án</h2>
-            <span className="section-hint-inline">(Bấm vào thẻ để xem tài liệu gốc)</span>
+            <h2>Chứng cứ đã thu thập ({chapterEvidence.length})</h2>
+            <span className="section-hint-inline">(Bấm vào ảnh để xem chi tiết & lời giải vụ án)</span>
           </div>
         </div>
 
-        <div className="debrief-evidence-grid">
+        <div className="debrief-notebook-polaroids-grid">
           {chapterEvidence.map((ev, idx) => {
             const bgImg = ev.app === 'chat' || ev.app === 'files' 
               ? '/scene_desk.jpg' 
               : ev.app === 'terminal' 
                 ? '/scene_wall.jpg' 
                 : '/bg_room.jpg';
-            const tapeAngle = idx % 2 === 0 ? -1.5 : 1.5;
-            const cardAngle = idx % 3 === 0 ? -0.4 : idx % 3 === 1 ? 0.4 : 0;
+            const tapeAngle = idx % 2 === 0 ? -2 : 2;
+            const cardAngle = idx % 4 === 0 ? -1.5 : idx % 4 === 1 ? 1.2 : idx % 4 === 2 ? -0.8 : 1.5;
 
             return (
               <div
                 key={ev.id}
-                className="debrief-polaroid-card"
+                className="collected-evidence-card taped-polaroid-item debrief-notebook-polaroid"
                 style={{ transform: `rotate(${cardAngle}deg)` }}
                 onClick={() => setViewingEvidence(ev)}
                 role="button"
                 tabIndex={0}
-                title={`Bấm để xem tài liệu gốc: ${ev.id} · ${ev.title}`}
+                title={`Bấm để xem chi tiết: ${ev.id} · ${ev.title}`}
                 onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -81,45 +81,32 @@ export function Debrief() {
                   }
                 }}
               >
-                {/* Adhesive Tape */}
+                {/* Adhesive masking tape */}
                 <div
                   className="polaroid-tape"
                   style={{ transform: `translateX(-50%) rotate(${tapeAngle}deg)` }}
                 />
 
-                {/* Top horizontal row: Photo frame + metadata */}
-                <div className="polaroid-top-row">
-                  <div className="polaroid-photo-frame">
-                    <div
-                      className="polaroid-photo-img"
-                      style={{ backgroundImage: `url(${bgImg})` }}
-                    >
-                      <span className="card-badge polaroid-stamp">{ev.id}</span>
-                      <span className="polaroid-app-tag">
-                        {ev.app === 'chat' ? 'Tin nhắn' : ev.app === 'terminal' ? 'Nhật ký' : ev.app === 'mail' ? 'Hộp thư' : ev.app === 'lab' ? 'Mô phỏng' : 'Tài liệu'}
-                      </span>
-                      <span className="polaroid-view-overlay">
-                        <Eye size={12} /> Xem
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="polaroid-meta-col">
-                    <strong className="polaroid-title">{ev.title}</strong>
-                    <span className="polaroid-author-time">{ev.author} · {ev.time}</span>
-                    <span className="polaroid-click-hint">
-                      <ExternalLink size={11} /> Bấm xem chi tiết
+                {/* Photo Frame */}
+                <div className="polaroid-photo-frame">
+                  <div
+                    className="polaroid-photo-img"
+                    style={{ backgroundImage: `url(${bgImg})` }}
+                  >
+                    <span className="card-badge polaroid-stamp">{ev.id}</span>
+                    <span className="polaroid-app-tag">
+                      {ev.app === 'chat' ? 'Tin nhắn' : ev.app === 'terminal' ? 'Nhật ký' : ev.app === 'mail' ? 'Hộp thư' : ev.app === 'lab' ? 'Mô phỏng' : 'Tài liệu'}
                     </span>
                   </div>
                 </div>
 
-                {/* Bottom wide row: Solution displayed directly on the card */}
-                <div className="debrief-evidence-solution">
-                  <div className="solution-badge">
-                    <CheckCircle2 size={13} />
-                    <span>LỜI GIẢI & Ý NGHĨA CHỨNG MINH</span>
-                  </div>
-                  <p className="solution-text">{ev.summary}</p>
+                {/* Polaroid Bottom Caption with handwritten ink */}
+                <div className="polaroid-caption">
+                  <strong className="card-title polaroid-title">{ev.title}</strong>
+                  <span className="card-action polaroid-hint">
+                    <CheckCircle2 size={13} style={{ stroke: '#15803d', display: 'inline', verticalAlign: '-2px', marginRight: '4px' }} />
+                    Bấm để xem chi tiết
+                  </span>
                 </div>
               </div>
             );
