@@ -2446,6 +2446,40 @@ td {
   margin-bottom: 28px;
 }
 
+.debrief-page .summary-heading h1 {
+  font-family: var(--font-body) !important;
+  font-size: 36px !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.025em !important;
+  color: #f8fafc !important;
+  margin-bottom: 14px !important;
+}
+
+/* Ensure all headings on Debrief page use modern sans-serif */
+.debrief-page h1,
+.debrief-page h2,
+.debrief-page h3,
+.debrief-page h4,
+.debrief-page h5,
+.debrief-page h6,
+.debrief-page .concept-card h3 {
+  font-family: var(--font-body) !important;
+  letter-spacing: -0.02em;
+}
+
+.debrief-page .concept-card h3 {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  line-height: 1.35 !important;
+}
+
+.debrief-page .score-circle {
+  font-family: var(--font-body) !important;
+  font-weight: 800 !important;
+}
+
 .debrief-section {
   margin-top: 44px;
   padding-top: 32px;
@@ -2492,11 +2526,13 @@ td {
 }
 
 .debrief-section-header h2 {
-  font-family: var(--font-heading) !important;
-  font-size: 26px;
-  color: var(--ink);
+  font-family: var(--font-body) !important;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc;
   margin: 0;
   line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
 .section-subtitle {
@@ -2743,11 +2779,13 @@ td {
 }
 
 .truth-hero-header h3 {
-  font-family: var(--font-heading) !important;
-  font-size: 24px;
-  color: var(--ink);
+  font-family: var(--font-body) !important;
+  font-size: 23px;
+  font-weight: 700;
+  color: #f8fafc;
   margin: 0;
   line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
 .truth-summary-lead {
@@ -2879,9 +2917,9 @@ td {
 }
 
 .timeline-node-num {
-  font-family: var(--font-heading) !important;
+  font-family: var(--font-body) !important;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 15px;
   color: #241403;
   line-height: 1;
 }
@@ -3130,12 +3168,13 @@ td {
 }
 
 .truth-timeline-conclusion .conclusion-title {
-  font-family: var(--font-heading) !important;
-  font-size: 23px;
+  font-family: var(--font-body) !important;
+  font-size: 22px;
+  font-weight: 700;
   color: #fef08a;
   margin: 0;
   line-height: 1.35;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.02em;
   text-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
 }
 
