@@ -90,7 +90,7 @@ export default function EscapeRoom({ onInteract, onExit, forceIntro, competition
         {scene === 'desk' && (
           <>
             <img
-              src="/scene_desk.jpg"
+              src="/scene_desk.png"
               alt="Desk View"
               className="room-bg"
               draggable="false"

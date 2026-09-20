@@ -131,7 +131,7 @@ export function Debrief() {
         <div className="debrief-notebook-polaroids-grid">
           {chapterEvidence.map((ev, idx) => {
             const bgImg = ev.app === 'chat' || ev.app === 'files'
-              ? '/scene_desk.jpg'
+              ? '/scene_desk.png'
               : ev.app === 'terminal'
                 ? '/scene_wall.jpg'
                 : '/bg_room.jpg';

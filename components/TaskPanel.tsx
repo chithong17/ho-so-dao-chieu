@@ -137,7 +137,7 @@ export default function TaskPanel() {
           {collectedEvidence.map((ev, i) => {
             const rotationAngle = i % 2 === 0 ? -2.5 : 2;
             const tapeAngle = i % 2 === 0 ? 3 : -2.5;
-            const bgImg = ev.app === 'chat' || ev.app === 'files' ? '/scene_desk.jpg' : ev.app === 'terminal' ? '/scene_wall.jpg' : '/bg_room.jpg';
+            const bgImg = ev.app === 'chat' || ev.app === 'files' ? '/scene_desk.png' : ev.app === 'terminal' ? '/scene_wall.jpg' : '/bg_room.jpg';
             return (
               <div
                 key={ev.id}
