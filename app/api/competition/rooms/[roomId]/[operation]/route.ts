@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import {competitionAction,endRoom,getRoom,handleApiError,heartbeat,leaveRoom,readyRoom,removePlayer,startRoom} from '../../../../../../lib/competition-server';
 const id=async(params:Promise<{roomId:string;operation:string}>)=>await params;
 export async function GET(request:Request,{params}:{params:Promise<{roomId:string;operation:string}>}){try{const p=await id(params);if(p.operation==='me'||p.operation==='results')return await getRoom(request,p.roomId);return Response.json({error:'Không tìm thấy API.'},{status:404});}catch(error){return handleApiError(error);}}

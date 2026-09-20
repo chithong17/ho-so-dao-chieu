@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
-import {Volume2,VolumeX,ArrowRight,ArrowUpRight,BookOpen,Check,Clock,FileSearch,FileText,Fingerprint,FlaskConical,FolderClosed,HelpCircle,LayoutGrid,LockKeyhole,Mail,Maximize2,MessageSquare,Pause,Pin,Play,Search,Settings2,ShieldCheck,Terminal,Users} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {Volume2,VolumeX,ArrowRight,ArrowUpRight,BookOpen,Check,Clock,FileSearch,FileText,Fingerprint,FlaskConical,FolderClosed,HelpCircle,LayoutGrid,LockKeyhole,Mail,Maximize2,MessageSquare,Pause,Pin,Play,Search,Settings2,ShieldCheck,Terminal,Users,Swords,Trophy} from 'lucide-react';
 import { initAudio, playBgm, playSfx, getMute, setMute, ensureBgmPlaying } from '../lib/audio';
 import {GameProvider,useGame,type CompetitionBridge} from './GameProvider';
 import {Modal,Choice,Avatar} from './ui';
@@ -18,16 +19,156 @@ import LandingExperience from './LandingExperience';
 import { Smartphone, Laptop, Book } from 'lucide-react';
 const icons={chat:MessageSquare,mail:Mail,files:FolderClosed,terminal:Terminal,lab:FlaskConical};
 function Brand(){return <span className="brand"><span className="brand-symbol"><Fingerprint size={27}/></span><span>HỒ SƠ<span>ĐẢO CHIỀU</span></span></span>;}
-function HomeScreen(){const {state,config,enter,dispatch,setHome}=useGame();const {evidence,initialOptions}=config;const [assessment,setAssessment]=useState(false),[guide,setGuide]=useState(false),[conclusion,setConclusion]=useState(''),[confidence,setConfidence]=useState(''),[mode,setMode]=useState<Mode>(state.mode),[restart,setRestart]=useState(false);
- const start=(m:Mode,fresh=false)=>{initAudio();setMode(m);enter(m,fresh);setAssessment(true);};
+function HomeScreen(){const {state,config,enter,dispatch,setHome}=useGame();const {evidence,initialOptions}=config;const [assessment,setAssessment]=useState(false),[guide,setGuide]=useState(false),[conclusion,setConclusion]=useState(''),[confidence,setConfidence]=useState(''),[mode,setMode]=useState<string>(state.mode),[restart,setRestart]=useState(false);
+ const [showModeSelection, setShowModeSelection] = useState(false);
+ const [difficulty, setDifficulty] = useState<Difficulty>(state.difficulty ?? 'standard');
+ const start=(m:string,fresh=false,d?:Difficulty)=>{initAudio();setMode(m);if(d)setDifficulty(d);enter(m as Mode,fresh,d);setAssessment(true);};
  const hasSave=!!state.initial;
  return (
     <>
       <LandingExperience 
-        onStart={() => hasSave ? setHome(false) : start('individual')} 
-        onReset={() => start('individual', true)}
+        onStart={() => hasSave ? setHome(false) : setShowModeSelection(true)} 
+        onReset={() => setShowModeSelection(true)}
         hasSave={hasSave} 
       />
+
+      <AnimatePresence>
+        {showModeSelection && (
+          <motion.div
+            initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            animate={{ opacity: 1, backdropFilter: 'blur(10px)' }}
+            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 font-inter"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20, rotateX: 10 }}
+              animate={{ scale: 1, y: 0, rotateX: 0 }}
+              className="bg-[#0c0a09]/95 backdrop-blur-xl border border-[#cfa861]/30 p-8 md:p-12 max-w-4xl w-full mx-4 relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]"
+              style={{ perspective: 1000 }}
+            >
+              {/* Scanlines and Noise */}
+              <div className="absolute inset-0 pointer-events-none opacity-20" style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,200,200,0.05) 2px, rgba(200,200,200,0.05) 4px)' }} />
+              
+              {/* Decorative corners */}
+              <div className="absolute top-0 left-0 w-12 h-12 border-t border-l border-[#cfa861] opacity-40 m-6 transition-all duration-1000" />
+              <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#cfa861] opacity-40 m-6 transition-all duration-1000" />
+              <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#cfa861] opacity-40 m-6 transition-all duration-1000" />
+              <div className="absolute bottom-0 right-0 w-12 h-12 border-b border-r border-[#cfa861] opacity-40 m-6 transition-all duration-1000" />
+
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#cfa861] to-transparent opacity-60" />
+              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#cfa861] to-transparent opacity-30" />
+              
+              <div className="text-center mb-14 relative z-10 mt-2">
+                <div className="flex items-center justify-center gap-6 mb-5 opacity-80">
+                  <div className="w-16 h-[1px] bg-[#cfa861]" />
+                  <span className="text-[#cfa861] text-[10px] md:text-xs tracking-[0.5em] uppercase font-bold">Mã vùng an toàn</span>
+                  <div className="w-16 h-[1px] bg-[#cfa861]" />
+                </div>
+                <h2 className="font-playfair text-5xl md:text-6xl text-white font-bold drop-shadow-[0_0_20px_rgba(207,168,97,0.25)] tracking-wide">THIẾT LẬP HỒ SƠ</h2>
+              </div>
+              
+              <div className="flex flex-col md:flex-row gap-10 mb-12 relative z-10">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-5 opacity-90">
+                    <Fingerprint size={16} className="text-[#cfa861]" />
+                    <h3 className="text-[#cfa861] text-xs tracking-[0.2em] uppercase font-bold">Quyền truy cập</h3>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <button 
+                      onClick={() => setMode('individual')}
+                      className={`group p-6 border text-left transition-all duration-400 outline-none flex gap-5 ${mode === 'individual' ? 'border-[#cfa861] bg-[#cfa861]/15 shadow-[inset_0_0_25px_rgba(207,168,97,0.15)]' : 'border-white/10 hover:border-white/30 bg-black/40 hover:bg-black/60'}`}
+                    >
+                      <Fingerprint size={28} className={`mt-1 transition-colors duration-400 ${mode === 'individual' ? 'text-[#cfa861]' : 'text-gray-600 group-hover:text-gray-400'}`} />
+                      <div>
+                        <strong className={`block mb-2 text-sm tracking-widest uppercase transition-colors duration-400 ${mode === 'individual' ? 'text-[#cfa861] drop-shadow-[0_0_8px_rgba(207,168,97,0.8)]' : 'text-white'}`}>ĐIỀU TRA ĐỘC LẬP</strong>
+                        <span className="text-xs text-gray-400 leading-relaxed block">Trải nghiệm cá nhân. Lưu tiến trình cục bộ trên thiết bị này.</span>
+                      </div>
+                    </button>
+                    <button 
+                      onClick={() => setMode('presenter')}
+                      className={`group p-6 border text-left transition-all duration-400 outline-none flex gap-5 ${mode === 'presenter' ? 'border-[#cfa861] bg-[#cfa861]/15 shadow-[inset_0_0_25px_rgba(207,168,97,0.15)]' : 'border-white/10 hover:border-white/30 bg-black/40 hover:bg-black/60'}`}
+                    >
+                      <Users size={28} className={`mt-1 transition-colors duration-400 ${mode === 'presenter' ? 'text-[#cfa861]' : 'text-gray-600 group-hover:text-gray-400'}`} />
+                      <div>
+                        <strong className={`block mb-2 text-sm tracking-widest uppercase transition-colors duration-400 ${mode === 'presenter' ? 'text-[#cfa861] drop-shadow-[0_0_8px_rgba(207,168,97,0.8)]' : 'text-white'}`}>TRÌNH CHIẾU NHÓM</strong>
+                        <span className="text-xs text-gray-400 leading-relaxed block">Dùng chung một màn hình. Thảo luận và thống nhất nhận định.</span>
+                      </div>
+                    </button>
+                    <button 
+                      onClick={() => setMode('competition')}
+                      className={`group p-6 border text-left transition-all duration-400 outline-none flex gap-5 ${mode === 'competition' ? 'border-[#cfa861] bg-[#cfa861]/15 shadow-[inset_0_0_25px_rgba(207,168,97,0.15)]' : 'border-white/10 hover:border-white/30 bg-black/40 hover:bg-black/60'}`}
+                    >
+                      <Trophy size={28} className={`mt-1 transition-colors duration-400 ${mode === 'competition' ? 'text-[#cfa861]' : 'text-gray-600 group-hover:text-gray-400'}`} />
+                      <div>
+                        <strong className={`block mb-2 text-sm tracking-widest uppercase transition-colors duration-400 ${mode === 'competition' ? 'text-[#cfa861] drop-shadow-[0_0_8px_rgba(207,168,97,0.8)]' : 'text-white'}`}>PHÒNG THI ĐẤU</strong>
+                        <span className="text-xs text-gray-400 leading-relaxed block">Cấp mã phòng. Tranh tài trên bảng xếp hạng (Leaderboard) thực.</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="w-[1px] bg-gradient-to-b from-transparent via-[#cfa861]/20 to-transparent hidden md:block mt-8 mb-4" />
+
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-5 opacity-90">
+                    <ShieldCheck size={16} className="text-[#ff1111]" />
+                    <h3 className="text-[#ff1111] text-xs tracking-[0.2em] uppercase font-bold">Mức độ giải mã</h3>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <button 
+                      onClick={() => setDifficulty('standard')}
+                      className={`group p-6 border text-left transition-all duration-400 outline-none flex gap-5 ${difficulty === 'standard' ? 'border-[#ff1111]/80 bg-[#ff1111]/15 shadow-[inset_0_0_25px_rgba(255,17,17,0.2)]' : 'border-white/10 hover:border-white/30 bg-black/40 hover:bg-black/60'}`}
+                    >
+                      <ShieldCheck size={28} className={`mt-1 transition-colors duration-400 ${difficulty === 'standard' ? 'text-[#ff1111]' : 'text-gray-600 group-hover:text-gray-400'}`} />
+                      <div>
+                        <strong className={`block mb-2 text-sm tracking-widest uppercase transition-colors duration-400 ${difficulty === 'standard' ? 'text-[#ff1111] drop-shadow-[0_0_8px_rgba(255,17,17,0.8)]' : 'text-white'}`}>TIÊU CHUẨN</strong>
+                        <span className="text-xs text-gray-400 leading-relaxed block">Đầy đủ thông tin, nhiễu loạn cao. Yêu cầu xâu chuỗi dữ kiện logic.</span>
+                      </div>
+                    </button>
+                    <button 
+                      onClick={() => setDifficulty('easy')}
+                      className={`group p-6 border text-left transition-all duration-400 outline-none flex gap-5 ${difficulty === 'easy' ? 'border-[#ff1111]/80 bg-[#ff1111]/15 shadow-[inset_0_0_25px_rgba(255,17,17,0.2)]' : 'border-white/10 hover:border-white/30 bg-black/40 hover:bg-black/60'}`}
+                    >
+                      <Search size={28} className={`mt-1 transition-colors duration-400 ${difficulty === 'easy' ? 'text-[#ff1111]' : 'text-gray-600 group-hover:text-gray-400'}`} />
+                      <div>
+                        <strong className={`block mb-2 text-sm tracking-widest uppercase transition-colors duration-400 ${difficulty === 'easy' ? 'text-[#ff1111] drop-shadow-[0_0_8px_rgba(255,17,17,0.8)]' : 'text-white'}`}>CƠ BẢN</strong>
+                        <span className="text-xs text-gray-400 leading-relaxed block">Lược bớt chi tiết ẩn, tập trung thẳng vào lỗ hổng chính.</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-10 relative z-10 pt-8 border-t border-white/10">
+                <div className="text-[10px] md:text-xs text-gray-500 tracking-[0.2em] font-mono uppercase">
+                  STATUS: <span className="text-[#cfa861] animate-pulse">READY_TO_DECRYPT</span>
+                </div>
+                <div className="flex items-center gap-5">
+                  <button 
+                    onClick={() => setShowModeSelection(false)}
+                    className="px-6 py-4 text-xs tracking-widest uppercase text-gray-400 hover:text-white transition-colors outline-none"
+                  >
+                    HỦY LỆNH
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (mode === 'competition') {
+                        window.location.href = '/thi-dau';
+                        return;
+                      }
+                      setShowModeSelection(false);
+                      start(mode, true, difficulty);
+                    }}
+                    className="group px-10 py-4 text-xs md:text-sm tracking-[0.25em] uppercase bg-[#cfa861]/15 border border-[#cfa861] text-[#cfa861] hover:bg-[#cfa861] hover:text-black transition-all duration-400 flex items-center gap-4 outline-none shadow-[0_0_15px_rgba(207,168,97,0.2)] hover:shadow-[0_0_30px_rgba(207,168,97,0.8)] font-bold"
+                  >
+                    GIẢI MÃ <ArrowRight size={18} className="transition-transform group-hover:translate-x-2" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {guide && (
         <Modal title="Cách mở một hồ sơ" onClose={() => setGuide(false)}>
