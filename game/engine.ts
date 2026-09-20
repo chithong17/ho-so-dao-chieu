@@ -160,7 +160,7 @@ export function reduceGame(s: GameState, a: Action): GameState {
         case 'acceptMission': if (tasks.some(t => t.id === a.id && t.chapter <= s.unlocked) && !Object.prototype.hasOwnProperty.call(s.missionProgress ?? {}, a.id)) next = { ...s, missionProgress: { ...(s.missionProgress ?? {}), [a.id]: missionEvidence(s, a.id) } }; break;
         case 'experiment': next = { ...s, experiments: { ...s.experiments, [a.id]: [...new Set([...(s.experiments[a.id] ?? []), a.run])] } }; break;
         case 'note': next = { ...s, notes: { ...s.notes, [a.id]: a.note.slice(0, 500) } }; break;
-        case 'debrief': if (chapterReadiness(s, s.chapter).ready) next = { ...s, screen: 'debrief' }; break;
+        case 'debrief': next = { ...s, screen: 'debrief' }; break;
         case 'next': if (s.screen === 'debrief' && chapterReadiness(s, s.chapter).ready) { const c = Math.min(chapterLimit, s.chapter + 1) as Chapter; next = { ...s, debriefs: [...new Set([...s.debriefs, s.chapter])], screen: s.chapter === chapterLimit ? 'verdict' : 'investigation', chapter: c, unlocked: Math.max(s.unlocked, c) as Chapter, activeTask: tasks.find(t => t.chapter === c)!.id, selectedEvidence: evidence.find(e => e.chapter === c)!.id }; } break;
         case 'chapter': if (chapters.some(c => c.id === a.chapter) && a.chapter <= s.unlocked) next = { ...s, chapter: a.chapter, screen: 'investigation', activeTask: tasks.find(t => t.chapter === a.chapter)!.id, selectedEvidence: evidence.find(e => e.chapter === a.chapter)!.id }; break;
         case 'verdictDraft': if (isVerdict(a.verdict, s.difficulty, chapterLimit)) next = { ...s, verdict: a.verdict }; break;

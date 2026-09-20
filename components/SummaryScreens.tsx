@@ -1,7 +1,7 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { playBgm, playSfx } from '../lib/audio';
-import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Clock, Compass, ExternalLink, Eye, FileCheck2, FileSearch, FolderOpen, Layers, Lightbulb, Printer, RotateCcw, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Clock, Compass, ExternalLink, Eye, FileCheck2, FileSearch, FolderOpen, Layers, Lightbulb, Printer, RotateCcw, ShieldCheck, Sparkles, Search, Settings, Dices, Network, Users } from 'lucide-react';
 import { useGame } from './GameProvider';
 import { taskConcepts } from '../game/config';
 import { easyLessons } from '../game/easy';
@@ -15,7 +15,61 @@ import { Choice, EvidencePicker } from './ui';
 
 export function ConceptCards({ ids }: { ids: ConceptId[] }) {
   const { config: { concepts } } = useGame();
-  return <div className="concept-grid">{[...new Set(ids)].map(id => { const c = concepts.find(c => c.id === id)!; return <article className="concept-card" key={id}><span className="concept-id">{id.startsWith('NL') ? 'NGUYÊN LÝ' : id.startsWith('QL') ? 'QUY LUẬT' : 'CẶP PHẠM TRÙ'} · {id}</span><h3>{c.title}</h3><p>{c.explanation}</p><details><summary>Liên hệ hồ sơ & giới hạn</summary><p><b>Trong hồ sơ:</b> {c.application}</p><p className="concept-limit"><Lightbulb size={16} />{c.limit}</p></details><footer><BookOpen size={13} /><span>phepduyvatbienchung.pdf · tr. {c.pages[0]}–{c.pages[1]}<br />Trang in {c.pages[0] + 83}–{c.pages[1] + 83} · {c.slide}</span></footer></article>; })}{!ids.length && <p className="note">Hoàn thành một chương để mở phần giải mã kiến thức tương ứng.</p>}</div>;
+  const getIcon = (index: number) => {
+    const icons = [Search, Settings, Dices, Network, Users, Layers];
+    const IconComponent = icons[index % icons.length];
+    return <IconComponent size={22} />;
+  };
+
+  return <div className="concept-grid case-theme">
+    {[...new Set(ids)].map((id, index) => { 
+      const c = concepts.find(c => c.id === id)!; 
+      const num = String(index + 1).padStart(2, '0');
+      return (
+        <article className="concept-card case-card" key={id}>
+          {/* Faded Polaroid Watermark */}
+          <div className="case-watermark-wrapper">
+            <div className="case-watermark-polaroid">
+               <div className="polaroid-photo">
+                 {getIcon(index)}
+               </div>
+               <div className="polaroid-tape"></div>
+            </div>
+          </div>
+          
+          <div className="case-left-col">
+            <div className="case-icon-box">
+               {getIcon(index)}
+            </div>
+          </div>
+          
+          <div className="case-main-col">
+            <div className="case-number">{num}</div>
+            <h3>{c.title}</h3>
+            <p className="case-desc">{c.explanation}</p>
+            
+            <details className="case-details">
+              <summary>
+                <ArrowRight size={14} className="case-details-arrow" />
+                <span className="summary-text">Xem chi tiết</span>
+              </summary>
+              <div className="case-details-content">
+                <p><b>Trong hồ sơ:</b> {c.application}</p>
+                <div className="case-limit">
+                  <Lightbulb size={12} className="limit-icon" />
+                  <p>{c.limit}</p>
+                </div>
+                <div className="case-source">
+                  <BookOpen size={12} /> Tr. {c.pages[0]}–{c.pages[1]}
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+      ); 
+    })}
+    {!ids.length && <p className="note case-note">Hoàn thành một chương để mở phần giải mã kiến thức tương ứng.</p>}
+  </div>;
 }
 
 function parseFormattedText(text: string) {

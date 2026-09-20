@@ -66,7 +66,7 @@ export default function LandingExperience({
 
   const [stage, setStage] = useState<"boot" | "room" | "idle">("boot");
 
-  const clipPath = useMotionTemplate`circle(165px at ${rawX}px ${rawY}px)`;
+  const clipPath = useMotionTemplate`circle(110px at ${rawX}px ${rawY}px)`;
 
   const bgX = useTransform(smoothX, [-1, 1], [-15, 15]);
   const bgY = useTransform(smoothY, [-1, 1], [-15, 15]);
@@ -183,8 +183,8 @@ export default function LandingExperience({
           bottom: auto;
           right: auto;
 
-          width: 18px;
-          height: 18px;
+          width: 12px;
+          height: 12px;
 
           background: radial-gradient(
             circle,
@@ -209,8 +209,8 @@ export default function LandingExperience({
           bottom: auto;
           right: auto;
 
-          width: 19px;
-          height: 98px;
+          width: 12px;
+          height: 65px;
 
           background: linear-gradient(
             to right,
@@ -561,10 +561,10 @@ export default function LandingExperience({
 
       {/* Magnifying glass ring cursor */}
       <motion.div
-        className="fixed top-0 left-0 z-[100] w-[330px] h-[330px] pointer-events-none rounded-full mag-glass flex items-center justify-center"
+        className="fixed top-0 left-0 z-[100] w-[220px] h-[220px] pointer-events-none rounded-full mag-glass flex items-center justify-center"
         style={{
-          x: useTransform(rawX, (x) => x - 165),
-          y: useTransform(rawY, (y) => y - 165),
+          x: useTransform(rawX, (x) => x - 110),
+          y: useTransform(rawY, (y) => y - 110),
         }}
       >
         <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#d6a45b]/10 via-transparent to-[#5e4120]/10" />
