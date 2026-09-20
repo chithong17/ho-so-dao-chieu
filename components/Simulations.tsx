@@ -1,6 +1,7 @@
 import { playSfx } from '../lib/audio';
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Play, CheckCircle2, AlertCircle, ArrowRight, RotateCcw, Wifi, WifiOff } from 'lucide-react';
 import { simulateNetwork, simulateLinks, simulateRecovery, simulateEasyRecovery } from '../game/engine';
 import { useGame } from './GameProvider';
@@ -64,13 +65,14 @@ function T11Simulation({ id, actions, record, runs }: any) {
         <Play size={14} /> Mô phỏng phương án
       </button>
 
-      {running && (
-        <div className="sim-overlay" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', flexDirection: 'column', padding: '40px', fontFamily: 'monospace', color: '#0f0', fontSize: '18px' }}>
+      {running && typeof document !== 'undefined' && createPortal(
+        <div className="sim-overlay" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', flexDirection: 'column', padding: '40px', fontFamily: 'monospace', color: '#0f0', fontSize: '18px', textShadow: '0 0 5px #0f0' }}>
           <h2>HỆ THỐNG MÔ PHỎNG V.1</h2>
           <hr style={{ borderColor: '#0f0', marginBottom: '20px' }} />
           {logs.map((l, i) => <div key={i} style={{ marginBottom: '10px' }}>{l}</div>)}
           <span className="blink-cursor">_</span>
-        </div>
+        </div>,
+        document.body
       )}
 
       {done && (

@@ -2228,18 +2228,39 @@ td {
   border-radius: 6px;
   padding: 14px;
   margin: 18px 0;
-  background: #111d28;
-  font-size: 11px
+  background: #111d28 !important;
+  font-size: 11px !important;
+  color: #e0e6ed !important;
+  mix-blend-mode: normal !important;
+}
+
+.modal-overlay.point-and-click dialog.ui-notebook .task-content > .simulation {
+  color: #e0e6ed !important;
+}
+
+.simulation * {
+  mix-blend-mode: normal !important;
+}
+
+.simulation button.secondary {
+  background: #1c2b39 !important;
+  color: #a3b7c7 !important;
+  border-color: #2e414c !important;
+}
+
+.simulation button.secondary:hover {
+  background: #233547 !important;
+  color: #fff !important;
 }
 
 .sim-title {
-  font: 8px Consolas, monospace;
-  letter-spacing: .8px;
-  color: #a3b7c7;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-bottom: 15px
+  font: 8px Consolas, monospace !important;
+  letter-spacing: .8px !important;
+  color: #a3b7c7 !important;
+  display: flex !important;
+  gap: 6px !important;
+  align-items: center !important;
+  margin-bottom: 15px !important;
 }
 
 .sim-toggles {
@@ -2258,15 +2279,15 @@ td {
 }
 
 .sim-code {
-  font: 10px Consolas, monospace;
-  display: block;
-  overflow-wrap: anywhere;
-  padding: 12px;
-  background: #0a131c;
-  color: #b5cbbf;
-  margin-bottom: 12px;
-  border: 1px solid #2e414c;
-  border-radius: 4px
+  font: 10px Consolas, monospace !important;
+  display: block !important;
+  overflow-wrap: anywhere !important;
+  padding: 12px !important;
+  background: #0a131c !important;
+  color: #b5cbbf !important;
+  margin-bottom: 12px !important;
+  border: 1px solid #2e414c !important;
+  border-radius: 4px !important;
 }
 
 .sim-result {
@@ -2319,8 +2340,9 @@ td {
   border-radius: 4px;
   font-size: 10px;
   display: flex;
-  align-items: center;
-  justify-content: center
+  align-items: center !important;
+  justify-content: center !important;
+  color: #a3b7c7 !important;
 }
 
 .sim-buttons .selected {
@@ -9602,80 +9624,6 @@ body[data-cinematic='true'] .mission-tracker-hud,
 }
 
 
-/* OVERRIDE SIMULATION STYLES FOR NOTEBOOK */
-.simulation {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border: 1px dashed rgba(0, 0, 0, 0.3) !important;
-  color: #384247 !important;
-}
-
-.sim-title {
-  color: #5a4a35 !important;
-  font-weight: bold;
-}
-
-.sim-code {
-  background: rgba(255, 255, 255, 0.5) !important;
-  color: #d32f2f !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-}
-
-.sim-buttons button {
-  background: rgba(255, 255, 255, 0.5) !important;
-  border: 1px solid rgba(0, 0, 0, 0.2) !important;
-  color: #384247 !important;
-}
-
-.sim-buttons .selected {
-  background: #384247 !important;
-  color: #fff !important;
-  border-color: #384247 !important;
-}
-
-.sim-result.good {
-  background: rgba(76, 175, 80, 0.1) !important;
-  border-color: rgba(76, 175, 80, 0.5) !important;
-  color: #2e7d32 !important;
-}
-
-.sim-result.bad {
-  background: rgba(244, 67, 54, 0.1) !important;
-  border-color: rgba(244, 67, 54, 0.5) !important;
-  color: #c62828 !important;
-}
-
-.sim-note {
-  color: #6a756e !important;
-}
-
-.flow-node {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
-}
-
-.flow-node b {
-  color: #384247 !important;
-}
-
-.flow-node small {
-  color: #6a756e !important;
-}
-
-.flow-diagram>span {
-  color: #6a756e !important;
-}
-
-.time-budget strong {
-  color: #384247 !important;
-}
-
-.time-budget strong span {
-  color: #6a756e !important;
-}
-
-.time-budget>div {
-  background: rgba(0, 0, 0, 0.1) !important;
-}
 
 /* Bảng lập luận: phiếu điều tra ghim lên nền cork, không phải thẻ web nền trắng. */
 .modal-overlay.point-and-click dialog.ui-board .inner-content {
@@ -12702,3 +12650,66 @@ body:has(.landing) .competition-entry {
 
 
 
+
+/* NUCLEAR OVERRIDE TO ENSURE SIMULATION READABILITY IN NOTEBOOK */
+body .modal-overlay dialog.ui-notebook .task-content .simulation {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border: 1px dashed rgba(26, 20, 15, 0.3) !important;
+  mix-blend-mode: multiply !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation,
+body .modal-overlay dialog.ui-notebook .task-content .simulation * {
+  color: #1a0f05 !important;
+  text-shadow: none !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-title {
+  color: #4a3b2c !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-code {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(26, 20, 15, 0.15) !important;
+  color: #7b1c1c !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation button.secondary,
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-buttons button {
+  background: transparent !important;
+  color: #1a0f05 !important;
+  border: 1px solid rgba(26, 20, 15, 0.35) !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation button.secondary:hover,
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-buttons button:hover,
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-buttons button.selected {
+  background: rgba(26, 20, 15, 0.08) !important;
+  color: #000 !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation .flow-node {
+  background: rgba(26, 20, 15, 0.05) !important;
+  border-color: rgba(26, 20, 15, 0.25) !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation .flow-node b {
+  color: #1a0f05 !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation .flow-diagram > span {
+  color: #4a3b2c !important;
+}
+
+/* RESTORE TERMINAL OVERLAY COLORS (IT IS A FULLSCREEN HACK, NOT PAPER) */
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-overlay {
+  background: rgba(0, 0, 0, 0.95) !important;
+  mix-blend-mode: normal !important;
+}
+
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-overlay,
+body .modal-overlay dialog.ui-notebook .task-content .simulation .sim-overlay * {
+  color: #0f0 !important;
+  text-shadow: 0 0 5px #0f0 !important;
+}
