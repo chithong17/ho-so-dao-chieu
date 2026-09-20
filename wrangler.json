@@ -4,5 +4,12 @@
   "compatibility_date": "2026-05-15",
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ho-so-dao-chieu-db",
+      "database_id": "f48bce46-6d00-4baa-918a-b8c8ec880f0f"
+    }
   ]
 }
