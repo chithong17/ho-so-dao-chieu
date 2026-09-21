@@ -13,11 +13,7 @@ export default function TutorialOverlay() {
     if (typeof window === 'undefined') return;
     const isDone = localStorage.getItem('hs01_tutorial_completed') === 'true';
     if (!isDone) {
-      // Don't show in competition mode
-      const isCompetition = document.documentElement.dataset.competition === 'true';
-      if (!isCompetition) {
-        setCompleted(false);
-      }
+      setCompleted(false);
     }
   }, []);
 
